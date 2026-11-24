@@ -3,6 +3,8 @@ import hmac
 import io
 import json
 import re
+import urllib.request
+import xml.etree.ElementTree as ET
 import zipfile
 import zlib
 from datetime import datetime, timedelta
@@ -38,25 +40,16 @@ CNXT_COLORS = {
     "line_strong": "#C7C2A8",
 }
 
-CNXT_CHART_PALETTE = [
-    "#005AAC",  # Connext Blue
-    "#E58B25",  # Sun Orange
-    "#0F818A",  # Teal
-    "#071776",  # Twilight Navy
-    "#7E9E7F",  # Sage
-    "#FC4301",  # Flame Red
-    "#F1C916",  # Gold Yellow
-    "#90CBDB",  # Teal Blue
-    "#071739",  # Midnight
-]
-
 CNXT_LOGO_COLOR = "https://cdn.prod.website-files.com/6a5abaee04ee2fd8ff22a3ec/6a72a1e48c2cd52f0e5f2578_CONNEXT%20MAIN%20LOGO%20COLOR.png"
 CNXT_LOGO_WHITE = "https://cdn.prod.website-files.com/6a5abaee04ee2fd8ff22a3ec/6ad6f9596637ac5988a5bf28_CONNEXT%20MAIN%20LOGO%20WHITE%20V.png"
 CNXT_FAVICON = "https://cdn.prod.website-files.com/6a5abaee04ee2fd8ff22a3ec/6a965e51559ff3d4d6cad70f_Connext_Icons_Connext%20Logo-lg.png"
 
+SITEMAP_XML_URL = "https://connextglobal.com/sitemap.xml"
+SITEMAP_HTML_URL = "https://connextglobal.com/sitemap"
+
 # --- PAGE CONFIGURATION ---
 st.set_page_config(
-    page_title="Connext Global | Search & AI Visibility Trend Radar",
+    page_title="Connext Global | Google Search & AI Trend Radar",
     page_icon=CNXT_FAVICON,
     layout="wide",
     initial_sidebar_state="expanded",
@@ -87,19 +80,19 @@ section[data-testid="stSidebar"] .stButton > button { background-color: rgba(255
 section[data-testid="stSidebar"] .stButton > button[kind="primary"] { background-color: var(--cnxt-sun) !important; color: var(--cnxt-midnight) !important; border: none !important; font-weight: 600 !important; }
 .stButton > button[kind="primary"], .stDownloadButton > button { background-color: var(--cnxt-sun) !important; color: var(--cnxt-midnight) !important; font-family: var(--font-body) !important; font-weight: 600 !important; border: none !important; border-radius: 999px !important; padding: 0.55rem 1.4rem !important; box-shadow: 0 6px 18px -8px rgba(229, 139, 37, 0.65) !important; transition: all 0.2s ease !important; }
 .stButton > button[kind="primary"]:hover, .stDownloadButton > button:hover { background-color: var(--cnxt-twilight) !important; color: var(--cnxt-cream) !important; transform: translateY(-1px); }
-.cnxt-hero-banner { background: linear-gradient(135deg, #071776 0%, #071739 100%); color: #FFFFFF; padding: 24px 30px; border-radius: 10px; margin-bottom: 18px; position: relative; overflow: hidden; border: 1px solid rgba(144, 203, 219, 0.22); }
+.cnxt-hero-banner { background: linear-gradient(135deg, #071776 0%, #071739 100%); color: #FFFFFF; padding: 24px 30px; border-radius: 10px; margin-bottom: 16px; position: relative; overflow: hidden; border: 1px solid rgba(144, 203, 219, 0.22); }
 .cnxt-hero-banner::after { content: ""; position: absolute; top: -90px; right: -90px; width: 280px; height: 280px; background: radial-gradient(circle, rgba(241, 201, 22, 0.22), transparent 65%); pointer-events: none; }
 .cnxt-eyebrow { font-family: var(--font-mono); font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.18em; color: #F1C916; margin-bottom: 6px; font-weight: 600; }
 .cnxt-hero-title { font-family: var(--font-display); font-size: clamp(1.45rem, 2.4vw, 2.05rem); font-weight: 700; color: #FFFFFF; line-height: 1.18; margin: 0 0 8px 0; }
 .cnxt-hero-title span { color: #E58B25; }
-.cnxt-hero-sub { color: #90CBDB; font-size: 0.93rem; margin: 0; max-width: 900px; }
+.cnxt-hero-sub { color: #90CBDB; font-size: 0.94rem; margin: 0; max-width: 920px; }
 div[data-testid="stMetric"] { background-color: var(--cnxt-paper); border: 1px solid var(--cnxt-line); border-top: 3px solid var(--cnxt-blue); border-radius: 8px; padding: 14px 16px; box-shadow: 0 2px 10px rgba(7, 23, 57, 0.04); }
 div[data-testid="stMetric"] label { font-family: var(--font-mono) !important; font-size: 0.71rem !important; text-transform: uppercase !important; letter-spacing: 0.08em !important; color: var(--cnxt-ash) !important; }
 div[data-testid="stMetric"] [data-testid="stMetricValue"] { font-family: var(--font-display) !important; color: var(--cnxt-twilight) !important; font-weight: 700 !important; }
 .stTabs [data-baseweb="tab-list"] { gap: 6px; border-bottom: 2px solid var(--cnxt-line); }
 .stTabs [data-baseweb="tab"] { font-family: var(--font-display); font-weight: 600; color: var(--cnxt-midnight); background-color: var(--cnxt-cream); border-radius: 6px 6px 0 0; padding: 10px 18px; border: 1px solid var(--cnxt-line); border-bottom: none; }
 .stTabs [aria-selected="true"] { background-color: var(--cnxt-twilight) !important; color: var(--cnxt-paper) !important; border-color: var(--cnxt-twilight) !important; }
-.cnxt-cream-panel { background-color: var(--cnxt-cream); border: 1px solid var(--cnxt-line-strong); border-left: 4px solid var(--cnxt-sun); border-radius: 6px; padding: 14px 18px; margin: 10px 0; color: var(--cnxt-midnight); font-size: 0.92rem; line-height: 1.55; }
+.cnxt-cream-panel { background-color: var(--cnxt-cream); border: 1px solid var(--cnxt-line-strong); border-left: 4px solid var(--cnxt-sun); border-radius: 6px; padding: 14px 18px; margin: 10px 0; color: var(--cnxt-midnight); font-size: 0.93rem; line-height: 1.55; }
 .cnxt-cream-panel strong { color: var(--cnxt-twilight); }
 span[data-baseweb="tag"] { background-color: var(--cnxt-twilight) !important; color: var(--cnxt-paper) !important; }
 </style>"""
@@ -127,7 +120,7 @@ def require_connext_login():
             """<div class="cnxt-hero-banner" style="margin-top: 14px; padding: 24px 28px;">
 <div class="cnxt-eyebrow">INTERNAL TEAM ACCESS</div>
 <h2 style="color:#FFFFFF !important; margin:0 0 6px 0; font-size:1.5rem;">Connext Search &amp; AI <span style="color:#E58B25;">Trend Radar</span></h2>
-<p class="cnxt-hero-sub" style="font-size:0.88rem;">Sign in with your Connext team password to view live Google search demand, landing page opportunities, and recommended ad keywords.</p>
+<p class="cnxt-hero-sub" style="font-size:0.88rem;">Sign in with your Connext team password to view live Google search demand, existing sitemap coverage, and recommended Google Ads keywords.</p>
 </div>""",
             unsafe_allow_html=True,
         )
@@ -153,7 +146,7 @@ def require_connext_login():
 require_connext_login()
 
 # ==============================================================================
-# CONNEXT GLOBAL LIVE SITE ARCHITECTURE (1,301 LIVE PAGES — NOV 20, 2026)
+# CONNEXT GLOBAL LIVE SITE ARCHITECTURE (FALLBACK + LIVE SITEMAP.XML SYNC)
 # ==============================================================================
 CORE_LIVE_PATHS = [
     "/",
@@ -398,7 +391,6 @@ CORE_LIVE_PATHS = [
     "/white-paper/why-ai-human-teams-outperform-traditional-bpo",
 ]
 
-# Compressed index of all 1,070 live /blog/* URLs from Live Pages Nov 20_2026.xlsx
 BLOG_PATHS_ZLIB = (
     "eNqtfemW4ziu5v95F5/OzKrs5XFoibZVIYlqUYpI19NfLFxAEpJd1XPm3OnKMAFJXEAsH4B/XEd3/8f3b5erne1t2PzF3W7+4VZ7"
     "2Wz3uPh9Wdy6XSa/+P/3jzi42/3mJrtevF0/h85e3L55t6/dMN8v3o37NrjZX25uvTzMlxmGS+emxcyDFUxWazyO+no84ed5tr+2"
@@ -833,6 +825,7 @@ GENERIC_BRAND_STOPWORDS = {
     "bpo", "services", "service", "outsourcing", "outsource", "offshore", "nearshore",
     "staffing", "company", "companies", "solutions", "team", "teams", "hire", "best",
     "top", "cost", "pricing", "philippines", "colombia", "india", "mexico",
+    "how", "what", "why", "when", "where", "the", "and", "for", "with", "into", "from",
 }
 
 
@@ -902,12 +895,59 @@ def human_rank_label(pos: float) -> str:
     return f"Page 3+ (#{pos:.1f})"
 
 
-@st.cache_resource(show_spinner=False)
-def get_default_live_site_index() -> tuple[set[str], pd.DataFrame, TfidfVectorizer, object]:
-    """Builds the TF-IDF & structural index across all 1,301 live connextglobal.com URLs."""
+def _get_embedded_paths() -> list[str]:
     blog_paths = zlib.decompress(base64.b64decode(BLOG_PATHS_ZLIB)).decode("utf-8").split("\n")
-    all_paths = sorted(set(CORE_LIVE_PATHS) | set(blog_paths))
-    return _build_index_from_paths(all_paths)
+    return sorted(set(CORE_LIVE_PATHS) | set(blog_paths))
+
+
+@st.cache_data(ttl=3600, show_spinner=False)
+def fetch_live_sitemap_paths() -> tuple[list[str], str]:
+    """
+    Fetches live URLs directly from https://connextglobal.com/sitemap.xml
+    (with fallback to https://connextglobal.com/sitemap and the embedded 1,301-page snapshot).
+    """
+    headers = {"User-Agent": "Mozilla/5.0 (compatible; ConnextTrendRadar/1.0)"}
+
+    # 1. Try https://connextglobal.com/sitemap.xml
+    try:
+        req = urllib.request.Request(SITEMAP_XML_URL, headers=headers)
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            xml_bytes = resp.read()
+        root = ET.fromstring(xml_bytes)
+        locs = [el.text.strip() for el in root.iter() if el.tag.endswith("loc") and el.text]
+
+        # Handle sitemapindex if child sitemaps exist
+        child_sitemaps = [u for u in locs if u.lower().endswith(".xml")]
+        if child_sitemaps:
+            all_urls = []
+            for sm_url in child_sitemaps[:10]:
+                c_req = urllib.request.Request(sm_url, headers=headers)
+                with urllib.request.urlopen(c_req, timeout=10) as c_resp:
+                    c_root = ET.fromstring(c_resp.read())
+                all_urls.extend([el.text.strip() for el in c_root.iter() if el.tag.endswith("loc") and el.text])
+            locs = all_urls
+
+        paths = sorted({url_to_path(u) for u in locs if "connextglobal.com" in u.lower()})
+        if len(paths) >= 50:
+            return paths, f"Live Sitemap.xml ({len(paths):,} URLs)"
+    except Exception:
+        pass
+
+    # 2. Fallback: try https://connextglobal.com/sitemap HTML page
+    try:
+        req = urllib.request.Request(SITEMAP_HTML_URL, headers=headers)
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            html_text = resp.read().decode("utf-8", errors="ignore")
+        hrefs = re.findall(r'href=["\']((?:https?://(?:www\.)?connextglobal\.com)?/[^"\'#?]*)["\']', html_text, re.I)
+        paths = sorted({url_to_path(h) for h in hrefs})
+        if len(paths) >= 50:
+            return paths, f"Live /sitemap Page ({len(paths):,} URLs)"
+    except Exception:
+        pass
+
+    # 3. Fallback: embedded Nov 20, 2026 verified 1,301-page sitemap snapshot
+    embedded = _get_embedded_paths()
+    return embedded, f"Verified Sitemap Snapshot ({len(embedded):,} URLs)"
 
 
 def _build_index_from_paths(all_paths: list[str]) -> tuple[set[str], pd.DataFrame, TfidfVectorizer, object]:
@@ -932,7 +972,7 @@ def _build_index_from_paths(all_paths: list[str]) -> tuple[set[str], pd.DataFram
     return live_set, live_df, vec, mat
 
 
-def parse_uploaded_live_pages(uploaded_file) -> set[str]:
+def parse_uploaded_live_pages(uploaded_file) -> list[str]:
     """Parses an optional user-uploaded Excel/CSV of live connextglobal.com URLs."""
     name = uploaded_file.name.lower()
     if name.endswith(".xlsx") or name.endswith(".xls"):
@@ -940,11 +980,11 @@ def parse_uploaded_live_pages(uploaded_file) -> set[str]:
     else:
         df = pd.read_csv(uploaded_file, header=None)
     urls = df.iloc[:, 0].dropna().astype(str).str.strip().tolist()
-    paths = [url_to_path(u) for u in urls if "connextglobal.com" in u.lower() or u.startswith("/")]
-    return set(paths)
+    paths = sorted({url_to_path(u) for u in urls if "connextglobal.com" in u.lower() or u.startswith("/")})
+    return paths
 
 
-def match_topic_to_live_site(
+def check_topic_against_sitemap(
     topic: str,
     queries_sample: str,
     live_set: set[str],
@@ -952,13 +992,33 @@ def match_topic_to_live_site(
     vec: TfidfVectorizer,
     mat,
 ) -> dict:
-    """Finds the best live Commercial Money Page and top live Supporting Content pages on connextglobal.com."""
+    """
+    Checks a trending topic against ALL pages in connextglobal.com/sitemap.xml to:
+      1. Identify the best existing commercial Service/Industry page.
+      2. Detect whether an article/guide covering this topic ALREADY exists in the sitemap
+         (preventing duplicate content suggestions!).
+    """
     combined_text = f"{topic} {queries_sample}"
     q_vec = vec.transform([combined_text])
     sims = cosine_similarity(q_vec, mat).flatten()
 
     scored = live_df.copy()
+    scored["raw_sim"] = sims
     scored["sim"] = sims
+
+    # Also compute specific keyword overlap (ignoring generic words like 'outsourcing', 'bpo', 'services')
+    topic_tokens = {
+        w for w in re.findall(r"[a-z0-9]+", topic.lower())
+        if len(w) > 2 and w not in GENERIC_BRAND_STOPWORDS
+    }
+
+    def specific_token_overlap(slug_txt: str) -> float:
+        if not topic_tokens:
+            return 0.0
+        slug_tokens = set(re.findall(r"[a-z0-9]+", str(slug_txt).lower()))
+        return len(topic_tokens & slug_tokens) / len(topic_tokens)
+
+    scored["token_overlap"] = scored["slug_text"].apply(specific_token_overlap)
 
     boosted_path = None
     for pat, target_path in MONEY_PAGE_BOOST_RULES:
@@ -968,21 +1028,46 @@ def match_topic_to_live_site(
             break
 
     money_df = scored[scored["is_money_page"]].sort_values("sim", ascending=False)
-    content_df = scored[scored["is_content_page"]].sort_values("sim", ascending=False)
+    content_df = scored[scored["is_content_page"]].sort_values(["raw_sim", "token_overlap"], ascending=False)
 
     best_money_row = money_df.iloc[0]
     best_money_url = best_money_row["full_url"]
     best_money_role = best_money_row["role"]
     best_money_score = float(best_money_row["sim"])
 
+    # Check if ANY existing page in sitemap.xml already covers this exact topic
+    existing_matches = scored[
+        (scored["path"] != "/")
+        & ((scored["raw_sim"] >= 0.28) | (scored["token_overlap"] >= 0.67))
+    ].sort_values(["token_overlap", "raw_sim"], ascending=False)
+
+    already_exists_in_sitemap = len(existing_matches) > 0
+    closest_existing_url = existing_matches.iloc[0]["full_url"] if already_exists_in_sitemap else (
+        content_df.iloc[0]["full_url"] if not content_df.empty else best_money_url
+    )
+    closest_existing_role = existing_matches.iloc[0]["role"] if already_exists_in_sitemap else (
+        content_df.iloc[0]["role"] if not content_df.empty else best_money_role
+    )
+    closest_overlap_pct = int(round(
+        max(
+            float(existing_matches.iloc[0]["raw_sim"]) if already_exists_in_sitemap else float(content_df.iloc[0]["raw_sim"]),
+            float(existing_matches.iloc[0]["token_overlap"]) if already_exists_in_sitemap else float(content_df.iloc[0]["token_overlap"]),
+        ) * 100
+    ))
+
     top_money_pages = money_df.head(3)[["full_url", "role", "sim"]].to_dict("records")
-    top_content_pages = content_df[content_df["sim"] >= 0.08].head(5)[["full_url", "role", "sim"]].to_dict("records")
+    top_content_pages = content_df[content_df["raw_sim"] >= 0.08].head(5)[["full_url", "role", "raw_sim"]].to_dict("records")
 
     return {
         "best_money_url": best_money_url,
         "best_money_role": best_money_role,
         "best_money_score": round(best_money_score, 2),
         "has_strong_money_match": bool(boosted_path is not None or best_money_score >= 0.22),
+        "already_exists_in_sitemap": already_exists_in_sitemap,
+        "closest_existing_url": closest_existing_url,
+        "closest_existing_role": closest_existing_role,
+        "closest_overlap_pct": min(100, closest_overlap_pct),
+        "existing_sitemap_matches": existing_matches.head(3)[["full_url", "role"]].to_dict("records"),
         "top_money_pages": top_money_pages,
         "top_content_pages": top_content_pages,
     }
@@ -1310,7 +1395,7 @@ def analyze_multi_horizon_trends(
     min_norm_slope: float,
     min_lift: float,
 ) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
-    """Analyzes impressions, Connext organic position, GSC ranking pages, and plain-English team actions."""
+    """Analyzes impressions, Connext Google rank, sitemap coverage, and query-level metrics."""
     if non_brand_df.empty:
         return pd.DataFrame(), pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
 
@@ -1323,9 +1408,11 @@ def analyze_multi_horizon_trends(
     week_dates = all_dates[-7:]
     prior_14_dates = all_dates[-21:-7] if n_days >= 21 else all_dates[:-7]
 
-    month_len = min(21, n_days // 2)
-    month_recent_dates = all_dates[-month_len:]
-    month_prior_dates = all_dates[-(month_len * 2):-month_len] if n_days >= month_len * 2 else all_dates[:-month_len]
+    month_len = min(30, n_days)
+    month_dates = all_dates[-month_len:]
+    month_comp_len = min(21, n_days // 2)
+    month_recent_dates = all_dates[-month_comp_len:]
+    month_prior_dates = all_dates[-(month_comp_len * 2):-month_comp_len] if n_days >= month_comp_len * 2 else all_dates[:-month_comp_len]
 
     df = non_brand_df.copy()
     df["weighted_pos"] = df["position"] * df["impressions"]
@@ -1341,10 +1428,7 @@ def analyze_multi_horizon_trends(
 
     recent_df = df[df["date"].isin(week_dates)]
     prior_df = df[df["date"].isin(prior_14_dates)]
-
-    brand_recent = full_df[(full_df["is_branded"]) & (full_df["date"].isin(week_dates))].copy()
-    if not brand_recent.empty:
-        brand_recent["weighted_pos"] = brand_recent["position"] * brand_recent["impressions"]
+    month_df = df[df["date"].isin(month_dates)]
 
     top_queries_map = (
         recent_df.groupby(["topic", "query"], as_index=False)["impressions"].sum()
@@ -1382,10 +1466,6 @@ def analyze_multi_horizon_trends(
     top_page_role_map = pages_agg.groupby("topic")["page_role"].first().to_dict()
     has_money_ranking_map = pages_agg.groupby("topic")["is_money_url"].any().to_dict()
     has_legacy_url_map = (~pages_agg["is_live_url"]).groupby(pages_agg["topic"]).any().to_dict()
-    all_pages_map = {
-        t: " | ".join(f"{r['path']} ({r['page_role']}, #{r['page_org_pos']})" for _, r in g.iterrows())
-        for t, g in pages_agg.groupby("topic")
-    }
     page_count_map = pages_agg.groupby("topic")["norm_page"].nunique().to_dict()
 
     results = []
@@ -1437,7 +1517,7 @@ def analyze_multi_horizon_trends(
 
         rec_grp = group[group["date"].isin(week_dates)]
         tot_imp_7d = int(rec_grp["impressions"].sum())
-        tot_imp_month = int(group[group["date"].isin(month_recent_dates)]["impressions"].sum())
+        tot_imp_30d = int(group[group["date"].isin(month_dates)]["impressions"].sum())
 
         avg_pos_7d = float(rec_grp["weighted_pos"].sum() / max(tot_imp_7d, 1))
         pri_grp = prior_df[prior_df["topic"] == topic]
@@ -1446,16 +1526,6 @@ def analyze_multi_horizon_trends(
             pos_delta = round(avg_pos_prior - avg_pos_7d, 1)
         else:
             pos_delta = 0.0
-
-        specific_kws = [w for w in topic.split() if len(w) > 3 and w not in GENERIC_BRAND_STOPWORDS]
-        brand_pos_label = "No Topic Brand Qs"
-        if not brand_recent.empty and specific_kws:
-            kw_pat = re.compile("|".join(re.escape(w) for w in specific_kws), re.I)
-            matched_brand = brand_recent[brand_recent["query"].str.contains(kw_pat, na=False)]
-            if not matched_brand.empty and matched_brand["impressions"].sum() > 0:
-                b_pos = matched_brand["weighted_pos"].sum() / matched_brand["impressions"].sum()
-                b_imp = int(matched_brand["impressions"].sum())
-                brand_pos_label = f"#{b_pos:.1f} ({b_imp:,} imp)"
 
         queries_list = top_queries_map.get(topic, [topic])
         lt_list = long_tail_map.get(topic, [])
@@ -1468,29 +1538,26 @@ def analyze_multi_horizon_trends(
         has_money_ranking = bool(has_money_ranking_map.get(topic, False))
         has_legacy_url = bool(has_legacy_url_map.get(topic, False))
 
-        # Classify vertical using BOTH the search queries AND the ranking Connext URL path
         sector = classify_sector(f"{joined_queries} {gsc_top_url}")
+        site_check = check_topic_against_sitemap(topic, joined_queries, live_set, live_df, live_vec, live_mat)
+        recommended_lp = site_check["best_money_url"] if site_check["has_strong_money_match"] else gsc_top_url
 
-        site_match = match_topic_to_live_site(topic, joined_queries, live_set, live_df, live_vec, live_mat)
-        recommended_lp = site_match["best_money_url"] if site_match["has_strong_money_match"] else gsc_top_url
-
-        # Internal coverage flag (used for Content & SEO Audit)
         if has_legacy_url:
             coverage_status = "Old URL Redirect Check"
         elif has_money_ranking:
             coverage_status = "Service/Industry Page Ranking"
-        elif site_match["has_strong_money_match"]:
-            coverage_status = "Blog Ranking (Service Page Exists)"
+        elif site_check["already_exists_in_sitemap"]:
+            coverage_status = "Already Covered in Sitemap"
         else:
-            coverage_status = "New Topic Opportunity"
+            coverage_status = "Not in Sitemap (New Topic)"
 
-        # Plain-English Primary Team Action (easy for non-SEO users to filter & understand)
+        # Plain-English Primary Team Action
         if has_commercial and avg_pos_7d > 5.0:
             team_action = "Launch Paid Ads"
-        elif 4.0 <= avg_pos_7d <= 15.0:
-            team_action = "Refresh Existing Page"
-        elif avg_pos_7d > 15.0 or not site_match["has_strong_money_match"]:
-            team_action = "Create New Content"
+        elif site_check["already_exists_in_sitemap"] or (4.0 <= avg_pos_7d <= 15.0):
+            team_action = "Update Existing Page"
+        elif not site_check["already_exists_in_sitemap"]:
+            team_action = "Write New Page (Not in Sitemap)"
         else:
             team_action = "Defend Top 3 Rank"
 
@@ -1532,23 +1599,27 @@ def analyze_multi_horizon_trends(
             "month_lift_x": round(lift_month, 2),
             "month_growth_pct": month_growth_pct,
             "impressions_7d": tot_imp_7d,
-            "impressions_month": tot_imp_month,
+            "impressions_30d": tot_imp_30d,
+            "daily_avg_7d": round(tot_imp_7d / 7.0, 1),
             "sparkline_7d": [int(v) for v in arr_week],
             "connext_org_pos": round(avg_pos_7d, 1),
             "google_rank_label": human_rank_label(avg_pos_7d),
             "rank_change": pos_delta,
-            "brand_org_pos": brand_pos_label,
             "commercial_intent": has_commercial,
             "intent_label": "Ready-to-Buy / Commercial" if has_commercial else "Research / How-To",
             "coverage_status": coverage_status,
+            "already_exists_in_sitemap": site_check["already_exists_in_sitemap"],
+            "closest_existing_url": site_check["closest_existing_url"],
+            "closest_existing_role": site_check["closest_existing_role"],
+            "closest_overlap_pct": site_check["closest_overlap_pct"],
+            "existing_sitemap_matches": site_check["existing_sitemap_matches"],
             "ranking_pages_count": unique_pages,
             "primary_page": gsc_top_url,
             "primary_page_role": gsc_top_role,
             "recommended_money_page": recommended_lp,
-            "best_money_role": site_match["best_money_role"],
-            "matching_money_pages": site_match["top_money_pages"],
-            "matching_content_pages": site_match["top_content_pages"],
-            "all_related_pages": all_pages_map.get(topic, ""),
+            "best_money_role": site_check["best_money_role"],
+            "matching_money_pages": site_check["top_money_pages"],
+            "matching_content_pages": site_check["top_content_pages"],
             "queries_list": queries_list,
             "long_tail_list": lt_list,
             "total_queries": len(queries_list),
@@ -1561,6 +1632,7 @@ def analyze_multi_horizon_trends(
 
     trends_df = pd.DataFrame(results).sort_values("impressions_7d", ascending=False).reset_index(drop=True)
 
+    # Query-Level Metrics (with BOTH 7-day and 30-day real GSC impressions!)
     q_recent = (
         recent_df.groupby(["topic", "query", "is_long_tail", "is_ai_prompt", "word_count"], as_index=False)
         .agg(
@@ -1570,16 +1642,24 @@ def analyze_multi_horizon_trends(
             top_path=("path", "first"),
         )
     )
+    q_month = month_df.groupby("query", as_index=False).agg(imp_30d=("impressions", "sum"))
     q_base = prior_df.groupby("query", as_index=False).agg(imp_base14=("impressions", "sum"))
-    q_merged = q_recent.merge(q_base, on="query", how="left").fillna({"imp_base14": 0})
-    q_merged["daily_7d"] = q_merged["imp_7d"] / 7.0
+
+    q_merged = (
+        q_recent.merge(q_month, on="query", how="left")
+        .merge(q_base, on="query", how="left")
+        .fillna({"imp_30d": 0, "imp_base14": 0})
+    )
+    q_merged["imp_30d"] = q_merged["imp_30d"].astype(int)
+    q_merged["daily_7d"] = (q_merged["imp_7d"] / 7.0).round(1)
     q_merged["daily_base"] = np.maximum(q_merged["imp_base14"] / max(len(prior_14_dates), 1), 0.5)
     q_merged["query_lift_x"] = (q_merged["daily_7d"] / q_merged["daily_base"]).round(2)
+    q_merged["query_growth_pct"] = ((q_merged["query_lift_x"] - 1.0) * 100).round(0).astype(int)
     q_merged["connext_org_pos"] = (q_merged["weighted_pos"] / np.maximum(q_merged["imp_7d"], 1)).round(1)
     q_merged["sector"] = q_merged.apply(lambda r: classify_sector(f"{r['query']} {r['top_page']}"), axis=1)
     q_merged["is_commercial"] = q_merged["query"].str.contains(COMMERCIAL_MODIFIERS, na=False)
     q_merged["page_role"] = q_merged["top_path"].apply(lambda p: classify_page_role(p, live_set))
-    q_merged = q_merged.sort_values(["imp_7d", "query_lift_x"], ascending=False)
+    q_merged = q_merged.sort_values(["imp_7d", "imp_30d"], ascending=False)
 
     pages_merged = pages_agg[pages_agg["topic"].isin(trends_df["topic"])].copy()
     topic_tot_map = trends_df.set_index("topic")["impressions_7d"].to_dict()
@@ -1620,9 +1700,9 @@ def analyze_ai_search_verified(
     )
     web_7d["web_org_pos"] = (web_7d["web_wpos"] / np.maximum(web_7d["web_imp_7d"], 1)).round(1)
 
-    page_queries_grp = all_queries_df.sort_values(["query_lift_x", "imp_7d"], ascending=[False, False])
+    page_queries_grp = all_queries_df.sort_values(["imp_7d", "query_lift_x"], ascending=[False, False])
     connected_qs_map = {
-        p: [f"{r['query']} (+{round((r['query_lift_x']-1)*100)}%, #{r['connext_org_pos']})" for _, r in g.head(6).iterrows()]
+        p: [f"{r['query']} ({r['imp_7d']:,} impr., #{r['connext_org_pos']})" for _, r in g.head(6).iterrows()]
         for p, g in page_queries_grp.groupby("top_page")
     }
     raw_qs_map = page_queries_grp.groupby("top_page")["query"].apply(list).to_dict()
@@ -1704,9 +1784,9 @@ def analyze_ai_search_verified(
                 qs = " ".join(raw_qs_map.get(r["norm_page"], []))
                 is_comm = bool(COMMERCIAL_MODIFIERS.search(qs))
                 if is_comm and r["ai_lift_x"] >= 1.3:
-                    return "Run Paid Search on connected buyer keywords & add pricing/comparison tables."
+                    return "Run Google Ads on connected buyer keywords & add pricing/comparison tables."
                 if len(prompt_qs_map.get(r["norm_page"], [])) > 0:
-                    return "Add a 50-word direct answer summary + FAQ block for the connected 7+ word AI questions."
+                    return "Add a 50-word direct answer summary + FAQ section for the connected 7+ word questions."
                 return "Keep statistics and bulleted answers fresh to hold AI Overview visibility."
 
             ai_pages_df["recommended_action"] = ai_pages_df.apply(ai_page_action, axis=1)
@@ -1722,13 +1802,16 @@ def analyze_ai_search_verified(
             bridge_df = bridge_df.sort_values(["ai_lift_x", "imp_7d"], ascending=[False, False]).reset_index(drop=True)
 
     prompts_df = all_queries_df[all_queries_df["is_ai_prompt"]].copy()
-    prompts_df = prompts_df.sort_values(["query_lift_x", "imp_7d"], ascending=[False, False]).reset_index(drop=True)
+    prompts_df = prompts_df.sort_values(["imp_7d", "query_lift_x"], ascending=[False, False]).reset_index(drop=True)
 
     return ai_pages_df, ai_daily_series, bridge_df, prompts_df
 
 
 def build_ads_recommendations(trends_df: pd.DataFrame, queries_df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
-    """Evaluates trending topics for Paid Ads using Connext's real live money pages."""
+    """
+    Evaluates trending topics for Google Ads and outputs ALL suggested keywords
+    with real 7-day impressions, 30-day impressions, daily averages, growth %, and Google rank.
+    """
     ads_topics = []
     rec_keywords = []
 
@@ -1743,46 +1826,46 @@ def build_ads_recommendations(trends_df: pd.DataFrame, queries_df: pd.DataFrame)
 
         if r["is_today"] and comm and pos > 5.0:
             campaign_play = "P0 — Launch Ads Today (24h)"
-            rationale = f"Search demand jumped +{r['growth_pct_3d']}% in the last 3 days while Connext sits at Google Rank #{pos}. Run Exact/Phrase ads to {lp_url}."
+            rationale = f"Search volume jumped +{r['growth_pct_3d']}% in 3 days ({r['impressions_7d']:,} weekly impr.) while Connext sits at Rank #{pos}. Run Exact/Phrase ads to {lp_url}."
         elif comm and pos > 5.0:
             campaign_play = "P1 — High-Intent Search Ad Group"
-            rationale = f"Steady +{r['daily_growth_%']}% daily growth on buyer keywords where Connext ranks #{pos} organically. Send paid traffic to {lp_url}."
-        elif r["coverage_status"] == "Blog Ranking (Service Page Exists)":
+            rationale = f"Steady +{r['daily_growth_%']}% daily growth on buyer keywords ({r['impressions_7d']:,} weekly impr.) where Connext ranks #{pos}. Route ads to {lp_url}."
+        elif r["coverage_status"] == "Already Covered in Sitemap" and pos > 5.0:
             campaign_play = "P1 — Route Traffic to Service Page"
-            rationale = f"Only a blog article ranks organically ({r['primary_page']}); run Google Ads directly to our commercial page {lp_url}."
+            rationale = f"Connext ranks #{pos} organically ({r['impressions_7d']:,} weekly impr.). Run Google Ads directly to {lp_url} to capture immediate clicks."
         elif pages >= 2 and pos > 8.0:
             campaign_play = "P1 — Consolidate onto Landing Page"
-            rationale = f"Organic impressions are split across {pages} URLs (#{pos} avg rank). Focus ad spend on {lp_url}."
+            rationale = f"Organic impressions ({r['impressions_7d']:,}/wk) are split across {pages} URLs (#{pos} avg rank). Focus ad spend on {lp_url}."
         elif comm and pos <= 5.0:
-            campaign_play = "P2 — Defend Top-5 SERP"
+            campaign_play = "P2 — Defend Top-5 Google Spot"
             rationale = f"Connext already ranks #{pos} organically ({r['impressions_7d']:,} weekly impr.). Pair Paid Search with organic to own the top of Google."
         else:
             campaign_play = "P2 — Long-Tail / Retargeting"
-            rationale = f"Research-stage surge (+{r['growth_pct_3d']}%). Bid on specific long-tail buyer terms or retarget visitors to {lp_url}."
+            rationale = f"Research-stage surge (+{r['growth_pct_3d']}%, {r['impressions_7d']:,} weekly impr.). Bid on specific long-tail buyer terms or retarget visitors to {lp_url}."
 
         ads_topics.append({
             "Priority": campaign_play,
             "Ad Fit Score": fit,
             "Vertical": r["sector"],
             "Trending Topic": r["topic"],
-            "When It Surged": r["horizons"],
             "7d Impressions": r["impressions_7d"],
+            "30d Impressions": r["impressions_30d"],
+            "Daily Avg Impr.": r["daily_avg_7d"],
             "Growth (vs 2w)": f"+{r['growth_pct_3d']}%",
-            "Google Rank": r["google_rank_label"],
+            "Current Google Rank": r["google_rank_label"],
             "Best Landing Page": lp_url,
             "Why Run Ads": rationale,
         })
 
-    top_ad_topics = set(trends_df[trends_df["ads_fit_score"] >= 45]["topic"])
-    target_q_df = queries_df[queries_df["topic"].isin(top_ad_topics)].copy()
-
-    for _, q in target_q_df.iterrows():
+    # Include ALL keywords from filtered surging topics so no keyword is hidden without impression data
+    for _, q in queries_df.iterrows():
         kw = q["query"]
         is_lt = q["is_long_tail"]
         is_comm = q["is_commercial"]
         q_pos = q["connext_org_pos"]
         rec_lp = money_page_by_topic.get(q["topic"], q["top_page"])
-        q_growth = round((q["query_lift_x"] - 1.0) * 100)
+        q_growth = int(q["query_growth_pct"])
+        growth_str = f"+{q_growth}%" if q_growth >= 0 else f"{q_growth}%"
 
         if is_comm and not is_lt:
             kw_tier = "Core Buyer Keyword"
@@ -1802,27 +1885,33 @@ def build_ads_recommendations(trends_df: pd.DataFrame, queries_df: pd.DataFrame)
             bid_strategy = "Moderate Bid + Exclude Job Seekers"
 
         rec_keywords.append({
-            "Recommended Keyword": kw,
+            "Suggested Keyword": kw,
+            "7d Impressions": int(q["imp_7d"]),
+            "30d Impressions": int(q["imp_30d"]),
+            "Daily Avg Impr.": float(q["daily_7d"]),
+            "Growth (vs 2w)": growth_str,
+            "Current Google Rank": human_rank_label(q_pos),
             "Keyword Type": kw_tier,
             "Match Type": match_type,
-            "Vertical": q["sector"],
             "Topic Cluster": q["topic"],
-            "7d Impressions": int(q["imp_7d"]),
-            "Growth (vs 2w)": f"+{q_growth}%",
-            "Google Rank": human_rank_label(q_pos),
+            "Vertical": q["sector"],
             "Recommended Landing Page": rec_lp,
             "Bidding Tip": bid_strategy,
         })
 
     ads_topics_df = pd.DataFrame(ads_topics).sort_values(["Ad Fit Score", "7d Impressions"], ascending=False)
-    rec_kws_df = pd.DataFrame(rec_keywords).sort_values(["7d Impressions", "Recommended Keyword"], ascending=[False, True]) if rec_keywords else pd.DataFrame()
+    rec_kws_df = pd.DataFrame(rec_keywords).sort_values(["7d Impressions", "30d Impressions"], ascending=False) if rec_keywords else pd.DataFrame()
     return ads_topics_df, rec_kws_df
 
 
 def build_content_and_new_topics(trends_df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
-    """Builds plain-English Content Team tasks and New Topic proposals."""
-    content_rows = []
-    new_topic_rows = []
+    """
+    Separates content recommendations into:
+      1. existing_updates_df: Topics where a page ALREADY EXISTS in connextglobal.com/sitemap.xml (no duplicate creation!)
+      2. truly_new_df: Topics NOT found in connextglobal.com/sitemap.xml (genuine new content opportunities)
+    """
+    existing_rows = []
+    truly_new_rows = []
 
     for _, r in trends_df.iterrows():
         pos = r["connext_org_pos"]
@@ -1830,79 +1919,74 @@ def build_content_and_new_topics(trends_df: pd.DataFrame) -> tuple[pd.DataFrame,
         cov = r["coverage_status"]
         money_lp = r["recommended_money_page"]
         gsc_url = r["primary_page"]
+        sitemap_url = r["closest_existing_url"]
+        overlap_pct = r["closest_overlap_pct"]
 
         if cov == "Old URL Redirect Check":
-            sprint = "P0 — Check 301 Redirect"
-            action = f"Google is still showing an older URL ({gsc_url}). Confirm it redirects cleanly to {money_lp}."
-        elif cov == "Blog Ranking (Service Page Exists)":
-            sprint = "P1 — Link Blog to Service Page"
-            action = f"Our blog ({gsc_url}) ranks #{pos}, while our main service page ({money_lp}) isn't ranking yet. Add strong internal links & CTAs from the blog to {money_lp}."
-        elif (r["is_today"] or r["is_week"]) and 4.0 <= pos <= 15.0:
-            sprint = "P1 — 48h Page Refresh (Push to Top 3)"
-            action = f"Update {gsc_url} with new H2 headings & FAQs answering the rising search terms, and add 3 internal links to move into Google's Top 3."
+            priority = "P0 — Fix Old URL Redirect"
+            action = f"Google is still showing an older URL ({gsc_url}). Confirm it redirects to {money_lp}."
+        elif r["already_exists_in_sitemap"]:
+            priority = "P1 — Update Existing Sitemap Page (Do Not Duplicate)"
+            if gsc_url != sitemap_url:
+                action = (
+                    f"Connext already has a live page covering this topic ({sitemap_url}, {overlap_pct}% match). "
+                    f"Update that existing page with the rising search phrases and link it with {money_lp} instead of writing a duplicate article."
+                )
+            else:
+                action = (
+                    f"Live page {sitemap_url} already exists and ranks #{pos}. "
+                    f"Refresh its headings & FAQ section with the rising long-tail searches to push into Google's Top 3."
+                )
         elif pages >= 2:
-            sprint = "P1 — Merge / Clarify Competing Pages"
-            action = f"{pages} different Connext pages are splitting Google visibility. Strengthen {money_lp} as the main page and link supporting posts to it."
-        elif cov == "New Topic Opportunity" or pos > 15.0:
-            sprint = "P1 — Write New Guide / Page"
-            action = f"Connext is on Page 2+ (#{pos}) with no dedicated service page. Create a focused guide or solution page for this topic."
+            priority = "P1 — Consolidate Competing Pages"
+            action = f"{pages} Connext pages are splitting impressions. Strengthen {money_lp} as the primary page."
         else:
-            sprint = "P2 — Keep Top-3 Spot Fresh"
-            action = f"Connext ranks #{pos} on {gsc_url}. Add quick Q&A answers for rising long-tail questions to protect Top 3."
+            priority = "P2 — Protect Top-3 Ranking"
+            action = f"Connext ranks #{pos} on {gsc_url}. Keep statistics and FAQ answers updated."
 
-        content_rows.append({
-            "Priority": sprint,
+        existing_rows.append({
+            "Priority": priority,
+            "Sitemap Status": "Already in Sitemap.xml" if r["already_exists_in_sitemap"] else "Service Page Exists",
             "Vertical": r["sector"],
             "Trending Topic": r["topic"],
-            "When It Surged": r["horizons"],
             "7d Impressions": r["impressions_7d"],
             "Growth (vs 2w)": f"+{r['growth_pct_3d']}%",
-            "Google Rank": r["google_rank_label"],
-            "Page Currently Ranking": gsc_url,
+            "Current Google Rank": r["google_rank_label"],
+            "Existing Sitemap Page": sitemap_url,
             "Main Service Page": money_lp,
-            "What Content Team Should Do": action,
+            "Recommended Action": action,
         })
 
-        if cov in ("New Topic Opportunity", "Blog Ranking (Service Page Exists)") or pos > 8.0 or r["long_tail_count"] >= 2:
+        # ONLY suggest creating a new page when NO matching page exists in connextglobal.com/sitemap.xml!
+        if not r["already_exists_in_sitemap"]:
             slug_base = re.sub(r"[^a-z0-9]+", "-", r["topic"].lower()).strip("-")
-            if cov == "New Topic Opportunity":
-                asset_type = "New Solution Subpage + Buyer's Guide"
-                draft_slug = f"/blog/{slug_base}-guide (Draft Idea)"
-                angle = f"Create a dedicated commercial page under {r['best_money_role']} plus a supporting buyer's guide covering the rising search queries."
-            elif cov == "Blog Ranking (Service Page Exists)":
-                asset_type = "Pricing / Comparison Article"
-                draft_slug = f"/blog/{slug_base}-cost-and-roi (Draft Idea)"
-                angle = f"Write a practical cost & comparison article that funnels readers directly to {money_lp} and our Pricing Calculator."
-            else:
-                asset_type = "FAQ / How-To Cluster Post"
-                draft_slug = f"/blog/how-to-{slug_base} (Draft Idea)"
-                angle = f"Publish a step-by-step Q&A post answering the {r['long_tail_count']} rising long-tail questions and link to {money_lp}."
-
-            new_topic_rows.append({
-                "Recommended New Asset": asset_type,
+            truly_new_rows.append({
+                "Recommended New Page Type": "New Blog Guide / Commercial Subpage (Verified Not in Sitemap)",
                 "Vertical": r["sector"],
-                "Trending Topic": r["topic"],
+                "New Topic Gap": r["topic"],
                 "7d Impressions": r["impressions_7d"],
+                "30d Impressions": r["impressions_30d"],
                 "Growth (vs 2w)": f"+{r['growth_pct_3d']}%",
-                "Current Google Rank": r["google_rank_label"],
-                "Draft URL Idea (Not Live Yet)": draft_slug,
-                "Live Service Page to Link": money_lp,
-                "Content Angle": angle,
-                "Real Rising Searches from GSC": r["top_rising_queries"],
+                "Suggested New URL Slug": f"/blog/{slug_base}-guide (Not Live Yet)",
+                "Closest Existing Sitemap Page": sitemap_url,
+                "Similarity to Existing": f"{overlap_pct}% (Low — Safe to Create)",
+                "Service Page to Link To": money_lp,
+                "Real Rising Searches to Cover": r["top_rising_queries"],
             })
 
-    content_df = pd.DataFrame(content_rows)
-    new_topics_df = pd.DataFrame(new_topic_rows).sort_values(["7d Impressions", "Trending Topic"], ascending=[False, True]) if new_topic_rows else pd.DataFrame()
-    return content_df, new_topics_df
+    existing_df = pd.DataFrame(existing_rows)
+    truly_new_df = pd.DataFrame(truly_new_rows).sort_values(["7d Impressions", "30d Impressions"], ascending=False) if truly_new_rows else pd.DataFrame()
+    return existing_df, truly_new_df
 
 
-# --- LOAD LIVE SITE INDEX (1,301 LIVE URLS FROM NOV 20, 2026) ---
-default_live_set, default_live_df, default_live_vec, default_live_mat = get_default_live_site_index()
+# --- LOAD LIVE SITEMAP (HTTPS://CONNEXTGLOBAL.COM/SITEMAP.XML) ---
+sitemap_paths, sitemap_source_label = fetch_live_sitemap_paths()
+default_live_set, default_live_df, default_live_vec, default_live_mat = _build_index_from_paths(sitemap_paths)
 
 # --- SIDEBAR CONTROLS (MIDNIGHT NAVY WITH OFFICIAL WHITE CONNEXT LOGO) ---
 st.sidebar.image(CNXT_LOGO_WHITE, width=185)
 st.sidebar.markdown("**Search & AI Visibility Radar**")
-st.sidebar.caption("Property: `connextglobal.com` • Live GSC Data")
+st.sidebar.caption(f"Property: `connextglobal.com` • {sitemap_source_label}")
 if st.sidebar.button("Lock / Log Out"):
     st.session_state["cnxt_authenticated"] = False
     st.rerun()
@@ -1985,7 +2069,11 @@ elif data_source == "Upload GSC Web Export (.csv / .zip)":
             st.sidebar.error(f"Upload Error: {upload_err}")
 
 st.sidebar.divider()
-st.sidebar.subheader("2. AI Report & Sitemap Sync (Optional)")
+st.sidebar.subheader("2. Sitemap & AI Report Sync")
+if st.sidebar.button("Re-Sync connextglobal.com/sitemap.xml"):
+    fetch_live_sitemap_paths.clear()
+    st.rerun()
+
 uploaded_ai_csv = st.sidebar.file_uploader(
     "GSC Generative AI Export (.csv / .zip)",
     type=["csv", "zip"],
@@ -2000,21 +2088,22 @@ if uploaded_ai_csv:
         st.sidebar.error(f"AI Export Error: {exc}")
 
 uploaded_live_sheet = st.sidebar.file_uploader(
-    "Update Live Pages List (.xlsx / .csv)",
+    "Manual Sitemap Override (.xlsx / .csv)",
     type=["xlsx", "xls", "csv"],
     key="live_pages_uploader",
-    help="Preloaded with all 1,301 live URLs from Nov 20, 2026. Upload a newer export anytime to refresh.",
+    help="Optional: upload a custom URL spreadsheet to override connextglobal.com/sitemap.xml.",
 )
 if uploaded_live_sheet:
     try:
         custom_paths = parse_uploaded_live_pages(uploaded_live_sheet)
         if custom_paths:
-            live_set, live_df, live_vec, live_mat = _build_index_from_paths(sorted(custom_paths))
-            st.sidebar.success(f"Updated live index: {len(live_set):,} URLs.")
+            live_set, live_df, live_vec, live_mat = _build_index_from_paths(custom_paths)
+            sitemap_source_label = f"Uploaded File ({len(live_set):,} URLs)"
+            st.sidebar.success(f"Loaded {len(live_set):,} custom URLs.")
         else:
             live_set, live_df, live_vec, live_mat = default_live_set, default_live_df, default_live_vec, default_live_mat
     except Exception as exc:
-        st.sidebar.error(f"Live Pages Upload Error: {exc}")
+        st.sidebar.error(f"Upload Error: {exc}")
         live_set, live_df, live_vec, live_mat = default_live_set, default_live_df, default_live_vec, default_live_mat
 else:
     live_set, live_df, live_vec, live_mat = default_live_set, default_live_df, default_live_vec, default_live_mat
@@ -2058,22 +2147,38 @@ with hdr_meta:
         date_badge = f"Verified GSC Window: {d_min} – {d_max} ({n_completed_days} complete days)"
     else:
         date_badge = "Awaiting GSC Data"
-    st.caption(f"{date_badge}  •  {len(live_set):,} Live Connext Pages Indexed  •  Impressions & Google Rank Only")
+    st.caption(f"{date_badge}  •  Synced with {sitemap_source_label}  •  Impressions & Google Rank Only")
 
 st.markdown(
     """<div class="cnxt-hero-banner">
 <div class="cnxt-eyebrow">CONNEXT GLOBAL GROWTH &amp; SEARCH INTELLIGENCE</div>
 <h1 class="cnxt-hero-title">Search &amp; AI Visibility <span>Trend Radar</span></h1>
-<p class="cnxt-hero-sub">See which B2B outsourcing topics are gaining search momentum on Google right now—with plain-English recommendations for Paid Ads keywords, Content updates, and new pages.</p>
+<p class="cnxt-hero-sub">Track rising B2B outsourcing topics on Google right now—checked against <strong>connextglobal.com/sitemap.xml</strong> so Paid Ads gets real search volume per keyword and Content only creates pages we don’t already have.</p>
 </div>""",
     unsafe_allow_html=True,
 )
+
+# --- 30-SECOND PLAIN-ENGLISH GUIDE FOR NON-SEO REVIEWERS ---
+with st.expander("New here? 30-Second Guide for Non-SEO Reviewers", expanded=False):
+    st.markdown(
+        """
+- **What are "Impressions"?** Every time someone searches Google and sees a `connextglobal.com` link on their screen, that counts as **1 impression**. Rising impressions mean growing customer demand—even before they click.
+- **What is "Growth (vs 2w)"?** How much faster people are searching for a topic over the last 3 days compared to the previous 2 weeks (e.g., `+85%` means nearly double the daily search visibility).
+- **What is "Google Rank"?** Where Connext currently shows up in organic (unpaid) Google results: **Top 3 (#1–3)** is the top of Page 1, **Page 1 (#4–10)** is visible without scrolling to Page 2, and **Page 2+ (#11+)** means most searchers won't see us unless we run Google Ads or update our page.
+- **How to use each tab:**
+  1. **Trending Topics Overview:** See which topics and business verticals are growing fastest right now.
+  2. **Pages & Long-Tail Queries:** See which Connext pages currently show up on Google and the exact phrases people type.
+  3. **AI Search & Prompts:** See question-style searches (7+ words) that trigger Google AI Overviews & AI Mode.
+  4. **Paid Ads & Keywords:** Get ready-to-bid Google Ads keywords with **real 7-day and 30-day impression counts** and matching landing pages.
+  5. **Content Plan & New Topics:** Automatically separates **pages that already exist in `sitemap.xml`** (update them, don't duplicate!) from **genuinely new topic gaps**.
+        """
+    )
 
 if raw_df.empty:
     st.info("Configure your GSC credentials or upload a Search Console export in the sidebar to begin analyzing `connextglobal.com`.")
     st.stop()
 
-with st.spinner("Grouping live B2B search queries & mapping Connext pages..."):
+with st.spinner("Grouping live B2B search queries & cross-checking connextglobal.com/sitemap.xml..."):
     clustered_df = cluster_queries(raw_df, cluster_dist)
     trends_df, daily_topic_df, all_queries_df, pages_df = analyze_multi_horizon_trends(
         clustered_df,
@@ -2091,14 +2196,14 @@ with st.spinner("Grouping live B2B search queries & mapping Connext pages..."):
         ai_raw_df, ai_csv_mode, clustered_df, all_queries_df, live_set
     )
 
-# --- DATA INTEGRITY & EXTRACTION AUDIT EXPANDER ---
+# --- DATA VERIFICATION SUMMARY EXPANDER ---
 with st.expander("Data Verification & GSC Extraction Summary (100% Live Data)", expanded=False):
     aud1, aud2, aud3, aud4, aud5 = st.columns(5)
     aud1.metric("Raw GSC Rows Fetched", f"{raw_total_count:,}")
     aud2.metric("Job/Noise Rows Filtered", f"{excluded_rows_count:,}")
     aud3.metric("Non-Branded B2B Rows", f"{len(clustered_df):,}")
     aud4.metric("Unique Non-Branded Queries", f"{clustered_df['query'].nunique():,}" if not clustered_df.empty else "0")
-    aud5.metric("Unique GSC URLs Found", f"{clustered_df['norm_page'].nunique():,}" if not clustered_df.empty else "0")
+    aud5.metric("Live Sitemap URLs Checked", f"{len(live_set):,}")
 
     if incomplete_date_note and incomplete_date_note != "None":
         st.caption(
@@ -2119,18 +2224,18 @@ action_counts = trends_df["team_action"].value_counts().to_dict()
 action_options = [
     "All Recommended Actions",
     f"Launch Paid Ads ({action_counts.get('Launch Paid Ads', 0)})",
-    f"Refresh Existing Page ({action_counts.get('Refresh Existing Page', 0)})",
-    f"Create New Content ({action_counts.get('Create New Content', 0)})",
+    f"Update Existing Page ({action_counts.get('Update Existing Page', 0)})",
+    f"Write New Page (Not in Sitemap) ({action_counts.get('Write New Page (Not in Sitemap)', 0)})",
     f"Defend Top 3 Rank ({action_counts.get('Defend Top 3 Rank', 0)})",
 ]
 
-f1, f2, f3, f4 = st.columns([1.45, 1.35, 1.1, 1.2])
+f1, f2, f3, f4 = st.columns([1.45, 1.45, 1.05, 1.15])
 with f1:
     selected_vertical_label = st.selectbox("Business Vertical:", vertical_options, index=0)
 with f2:
-    selected_action_label = st.selectbox("Recommended Team Action:", action_options, index=0)
+    selected_action_label = st.selectbox("Recommended Next Step:", action_options, index=0)
 with f3:
-    intent_filter = st.selectbox("Buyer Intent:", ["All Searches", "Ready-to-Buy / Commercial", "Research / How-To"])
+    intent_filter = st.selectbox("Search Type:", ["All Searches", "Ready-to-Buy / Commercial", "Research / How-To"])
 with f4:
     quick_search = st.text_input("Search Topic, Keyword, or URL:", placeholder="e.g., medical billing, cpa, python...")
 
@@ -2156,6 +2261,7 @@ if quick_search.strip():
         | filtered_trends["top_rising_queries"].str.contains(qs_pat, case=False, na=False)
         | filtered_trends["primary_page"].str.contains(qs_pat, case=False, na=False)
         | filtered_trends["recommended_money_page"].str.contains(qs_pat, case=False, na=False)
+        | filtered_trends["closest_existing_url"].str.contains(qs_pat, case=False, na=False)
     ]
 
 filtered_trends = filtered_trends.reset_index(drop=True)
@@ -2176,7 +2282,7 @@ filtered_ai_bridge = ai_bridge_df[ai_bridge_df["norm_page"].isin(filtered_ai_pag
 filtered_ai_prompts = ai_prompts_df[ai_prompts_df["topic"].isin(filtered_trends["topic"])].copy() if not ai_prompts_df.empty else pd.DataFrame()
 
 ads_topics_df, rec_kws_df = build_ads_recommendations(filtered_trends, filtered_queries)
-content_df, new_topics_df = build_content_and_new_topics(filtered_trends)
+existing_content_df, truly_new_df = build_content_and_new_topics(filtered_trends)
 
 # --- TOP KPI METRICS (PLAIN ENGLISH) ---
 k1, k2, k3, k4, k5 = st.columns(5)
@@ -2213,11 +2319,11 @@ tab_horizons, tab_pages_clusters, tab_ai_search, tab_ads_strategy, tab_content =
     f"Pages & Long-Tail Queries ({len(filtered_pages)} URLs)",
     f"AI Search & Prompts ({ai_tab_count})",
     f"Paid Ads & Keywords ({len(rec_kws_df)} KWs)",
-    f"Content Plan & New Topics ({len(new_topics_df)} Ideas)",
+    f"Content Plan & New Topics ({len(truly_new_df)} Truly New)",
 ])
 
 # ==============================================================================
-# TAB 1: TRENDING TOPICS OVERVIEW (EASY-TO-READ CHARTS & PLAIN-ENGLISH CARDS)
+# TAB 1: TRENDING TOPICS OVERVIEW
 # ==============================================================================
 with tab_horizons:
     horizon_choice = st.radio(
@@ -2256,11 +2362,11 @@ with tab_horizons:
                 text="growth_pct_3d",
                 color_discrete_map={
                     "Launch Paid Ads": CNXT_COLORS["sun"],
-                    "Refresh Existing Page": CNXT_COLORS["blue"],
-                    "Create New Content": CNXT_COLORS["twilight"],
+                    "Update Existing Page": CNXT_COLORS["blue"],
+                    "Write New Page (Not in Sitemap)": CNXT_COLORS["twilight"],
                     "Defend Top 3 Rank": CNXT_COLORS["teal"],
                 },
-                custom_data=["sector", "google_rank_label", "growth_pct_3d", "primary_page"],
+                custom_data=["sector", "google_rank_label", "growth_pct_3d", "closest_existing_url"],
                 labels={
                     "impressions_7d": "7-Day Search Impressions",
                     "topic": "",
@@ -2276,7 +2382,7 @@ with tab_horizons:
                     "Growth vs. Prior 2 Weeks: <b>+%{customdata[2]}%</b><br>"
                     "Google Rank: <b>%{customdata[1]}</b><br>"
                     "Vertical: %{customdata[0]}<br>"
-                    "Ranking Page: %{customdata[3]}<extra></extra>"
+                    "Closest Sitemap Page: %{customdata[3]}<extra></extra>"
                 ),
             )
             fig_topics.update_layout(
@@ -2335,16 +2441,22 @@ with tab_horizons:
 
         st.divider()
         st.subheader("Inspect a Topic's Daily Search Trend")
-        selected_topic = st.selectbox("Choose a topic to see its daily impression history & action plan:", view_df["topic"].tolist(), key="horizon_topic_select")
+        selected_topic = st.selectbox("Choose a topic to see its daily impression history & sitemap check:", view_df["topic"].tolist(), key="horizon_topic_select")
         sel_row = view_df[view_df["topic"] == selected_topic].iloc[0]
 
-        # Plain-English Executive Summary Card for the selected topic
+        sitemap_note = (
+            f"<strong>Already in Sitemap.xml:</strong> <code>{sel_row['closest_existing_url']}</code> ({sel_row['closest_existing_role']}, {sel_row['closest_overlap_pct']}% match) — update this page rather than creating a duplicate."
+            if sel_row["already_exists_in_sitemap"]
+            else f"<strong>Not in Sitemap.xml yet:</strong> Closest existing page is <code>{sel_row['closest_existing_url']}</code> ({sel_row['closest_overlap_pct']}% overlap) — safe to create a dedicated page."
+        )
+
         st.markdown(
             f"""<div class="cnxt-cream-panel">
 <strong>Plain-English Summary for "{sel_row['topic'].title()}":</strong><br/>
-• <strong>Search Volume &amp; Momentum:</strong> Appeared <strong>{sel_row['impressions_7d']:,} times</strong> on Google in the last 7 days (<strong>+{sel_row['growth_pct_3d']}%</strong> vs. the prior 2 weeks; <strong>+{sel_row['month_growth_pct']}%</strong> over the past month).<br/>
-• <strong>Where Connext Ranks Today:</strong> <strong>{sel_row['google_rank_label']}</strong> on <code>{sel_row['primary_page']}</code>.<br/>
-• <strong>Recommended Next Step ({sel_row['team_action']}):</strong> Route Paid Ads &amp; internal links to <code>{sel_row['recommended_money_page']}</code> using rising searches like <em>{sel_row['top_rising_queries']}</em>.
+• <strong>Search Volume &amp; Momentum:</strong> Appeared <strong>{sel_row['impressions_7d']:,} times</strong> on Google in the last 7 days and <strong>{sel_row['impressions_30d']:,} times</strong> in the last 30 days (<strong>+{sel_row['growth_pct_3d']}%</strong> vs. prior 2 weeks).<br/>
+• <strong>Current Google Rank:</strong> <strong>{sel_row['google_rank_label']}</strong> on <code>{sel_row['primary_page']}</code>.<br/>
+• {sitemap_note}<br/>
+• <strong>Recommended Next Step ({sel_row['team_action']}):</strong> Route Google Ads &amp; internal links to <code>{sel_row['recommended_money_page']}</code> using rising searches like <em>{sel_row['top_rising_queries']}</em>.
 </div>""",
             unsafe_allow_html=True,
         )
@@ -2383,15 +2495,15 @@ with tab_horizons:
 
         st.subheader(f"All Surging Topics ({len(view_df)})")
         overview_table = view_df[[
-            "topic", "sector", "team_action", "horizons", "sparkline_7d",
-            "impressions_7d", "growth_pct_3d", "impressions_month",
-            "google_rank_label", "intent_label", "primary_page", "recommended_money_page",
+            "topic", "sector", "team_action", "coverage_status", "sparkline_7d",
+            "impressions_7d", "impressions_30d", "growth_pct_3d",
+            "google_rank_label", "closest_existing_url", "recommended_money_page",
         ]].copy()
         overview_table["growth_label"] = overview_table["growth_pct_3d"].apply(lambda x: f"+{x}%" if x >= 0 else f"{x}%")
         overview_table = overview_table[[
-            "topic", "sector", "team_action", "horizons", "sparkline_7d",
-            "impressions_7d", "growth_label", "impressions_month",
-            "google_rank_label", "intent_label", "primary_page", "recommended_money_page",
+            "topic", "sector", "team_action", "coverage_status", "sparkline_7d",
+            "impressions_7d", "impressions_30d", "growth_label",
+            "google_rank_label", "closest_existing_url", "recommended_money_page",
         ]]
         st.dataframe(
             overview_table,
@@ -2401,15 +2513,14 @@ with tab_horizons:
                 "topic": "Trending Topic",
                 "sector": "Business Vertical",
                 "team_action": "Recommended Action",
-                "horizons": "When It Surged",
+                "coverage_status": "Sitemap Check",
                 "sparkline_7d": st.column_config.LineChartColumn("7-Day Curve", width="small"),
                 "impressions_7d": st.column_config.NumberColumn("7d Impressions"),
+                "impressions_30d": st.column_config.NumberColumn("30d Impressions"),
                 "growth_label": "Growth (vs 2w)",
-                "impressions_month": st.column_config.NumberColumn("Monthly Impressions"),
-                "google_rank_label": "Connext Google Rank",
-                "intent_label": "Search Intent",
-                "primary_page": st.column_config.LinkColumn("Page Currently Ranking"),
-                "recommended_money_page": st.column_config.LinkColumn("Best Connext Service Page"),
+                "google_rank_label": "Current Google Rank",
+                "closest_existing_url": st.column_config.LinkColumn("Existing Sitemap Page"),
+                "recommended_money_page": st.column_config.LinkColumn("Best Service Page"),
             },
         )
 
@@ -2420,7 +2531,7 @@ with tab_pages_clusters:
     st.subheader("Which Connext Pages Rank for Each Trending Topic & Long-Tail Search")
     st.markdown(
         """<div class="cnxt-cream-panel">
-<strong>How to Use This Tab:</strong> Pick any trending topic below to see (1) which <code>connextglobal.com</code> pages currently appear on Google for it, (2) which official Service/Industry pages should receive ads or internal links, and (3) the exact 4+ word long-tail searches people are typing.
+<strong>How to Use This Tab:</strong> Pick any trending topic below to see (1) which <code>connextglobal.com</code> pages currently appear on Google for it, (2) which live pages from <code>sitemap.xml</code> already cover it, and (3) the exact 7-day and 30-day search volume of every phrase people typed.
 </div>""",
         unsafe_allow_html=True,
     )
@@ -2486,7 +2597,7 @@ with tab_pages_clusters:
 
     m1, m2, m3, m4 = st.columns(4)
     m1.metric("Connext Google Rank", topic_meta["google_rank_label"])
-    m2.metric("Recommended Action", topic_meta["team_action"])
+    m2.metric("Sitemap Status", topic_meta["coverage_status"])
     m3.metric("Connext Pages Ranking", topic_meta["ranking_pages_count"])
     m4.metric("Long-Tail Searches (4+ words)", f"{topic_meta['long_tail_count']} of {topic_meta['total_queries']}")
 
@@ -2511,42 +2622,57 @@ with tab_pages_clusters:
         )
 
     with col_live:
-        st.markdown("**2. Best Live Connext Pages for Ads & Internal Links**")
+        st.markdown("**2. Matching Live Pages Already in `sitemap.xml`**")
         matched_records = []
+        seen_urls = set()
+        for item in topic_meta["existing_sitemap_matches"]:
+            if item["full_url"] not in seen_urls:
+                matched_records.append({
+                    "Live Connext URL": item["full_url"],
+                    "Page Type": item["role"],
+                    "Status": "Already Covers Topic in Sitemap",
+                })
+                seen_urls.add(item["full_url"])
         for item in topic_meta["matching_money_pages"]:
-            matched_records.append({
-                "Live Connext URL": item["full_url"],
-                "Page Type": item["role"],
-                "How to Use": "Send Paid Ads & Internal Links Here",
-            })
+            if item["full_url"] not in seen_urls:
+                matched_records.append({
+                    "Live Connext URL": item["full_url"],
+                    "Page Type": item["role"],
+                    "Status": "Best Commercial Service Page",
+                })
+                seen_urls.add(item["full_url"])
         for item in topic_meta["matching_content_pages"]:
-            matched_records.append({
-                "Live Connext URL": item["full_url"],
-                "Page Type": item["role"],
-                "How to Use": "Related Guide / Case Study to Link",
-            })
+            if item["full_url"] not in seen_urls:
+                matched_records.append({
+                    "Live Connext URL": item["full_url"],
+                    "Page Type": item["role"],
+                    "Status": "Related Content in Sitemap",
+                })
+                seen_urls.add(item["full_url"])
         matched_live_df = pd.DataFrame(matched_records)
         st.dataframe(
             matched_live_df,
             use_container_width=True,
             hide_index=True,
             column_config={
-                "Live Connext URL": st.column_config.LinkColumn("Live Connext URL"),
+                "Live Connext URL": st.column_config.LinkColumn("Live Sitemap URL"),
             },
         )
 
-    st.markdown("**3. Exact Searches People Typed for This Topic**")
+    st.markdown("**3. Exact Searches People Typed for This Topic (With Real Impressions)**")
     topic_qs = filtered_queries[filtered_queries["topic"] == inspect_cluster].sort_values("imp_7d", ascending=False).copy()
-    topic_qs["growth_str"] = topic_qs["query_lift_x"].apply(lambda x: f"+{round((x-1)*100)}%")
+    topic_qs["growth_str"] = topic_qs["query_growth_pct"].apply(lambda x: f"+{x}%" if x >= 0 else f"{x}%")
     topic_qs["rank_str"] = topic_qs["connext_org_pos"].apply(human_rank_label)
     st.dataframe(
-        topic_qs[["query", "is_long_tail", "imp_7d", "growth_str", "rank_str", "top_page"]],
+        topic_qs[["query", "is_long_tail", "imp_7d", "imp_30d", "daily_7d", "growth_str", "rank_str", "top_page"]],
         use_container_width=True,
         hide_index=True,
         column_config={
             "query": "Search Query",
             "is_long_tail": st.column_config.CheckboxColumn("Long-Tail (4+w)"),
             "imp_7d": st.column_config.NumberColumn("7d Impressions"),
+            "imp_30d": st.column_config.NumberColumn("30d Impressions"),
+            "daily_7d": st.column_config.NumberColumn("Daily Avg", format="%.1f"),
             "growth_str": "Growth (vs 2w)",
             "rank_str": "Google Rank",
             "top_page": st.column_config.LinkColumn("Ranking Connext URL"),
@@ -2675,10 +2801,10 @@ Below are your <strong>100% live GSC conversational question &amp; prompt search
         st.info("No 7+ word or question-style searches matched your current filters.")
     else:
         p_disp = filtered_ai_prompts.copy()
-        p_disp["growth_str"] = p_disp["query_lift_x"].apply(lambda x: f"+{round((x-1)*100)}%")
+        p_disp["growth_str"] = p_disp["query_growth_pct"].apply(lambda x: f"+{x}%" if x >= 0 else f"{x}%")
         p_disp["rank_str"] = p_disp["connext_org_pos"].apply(human_rank_label)
         st.dataframe(
-            p_disp[["query", "sector", "topic", "imp_7d", "growth_str", "rank_str", "top_page"]],
+            p_disp[["query", "sector", "topic", "imp_7d", "imp_30d", "growth_str", "rank_str", "top_page"]],
             use_container_width=True,
             hide_index=True,
             column_config={
@@ -2686,6 +2812,7 @@ Below are your <strong>100% live GSC conversational question &amp; prompt search
                 "sector": "Vertical",
                 "topic": "Parent Topic",
                 "imp_7d": st.column_config.NumberColumn("7d Impressions"),
+                "imp_30d": st.column_config.NumberColumn("30d Impressions"),
                 "growth_str": "Growth (vs 2w)",
                 "rank_str": "Google Rank",
                 "top_page": st.column_config.LinkColumn("Ranking Connext Page"),
@@ -2693,18 +2820,18 @@ Below are your <strong>100% live GSC conversational question &amp; prompt search
         )
         st.download_button(
             "Download Conversational AI Prompts CSV",
-            p_disp[["query", "sector", "topic", "imp_7d", "growth_str", "rank_str", "top_page"]].to_csv(index=False).encode("utf-8"),
+            p_disp[["query", "sector", "topic", "imp_7d", "imp_30d", "growth_str", "rank_str", "top_page"]].to_csv(index=False).encode("utf-8"),
             file_name="connext_conversational_ai_prompts.csv",
             mime="text/csv",
         )
 
 # ==============================================================================
-# TAB 4: PAID ADS OPPORTUNITIES & RECOMMENDED KEYWORDS SECTION
+# TAB 4: PAID ADS OPPORTUNITIES & SUGGESTED KEYWORDS (WITH REAL IMPRESSIONS)
 # ==============================================================================
 with tab_ads_strategy:
-    st.subheader("Trending Topics Recommended for Google Ads & Paid Search")
+    st.subheader("Trending Topics & Suggested Keywords for Google Ads (With Real Search Volume)")
     st.markdown(
-        "Topics below are ranked by **Ad Fit Score (0–100)**—prioritizing surging buyer searches where Connext does not yet rank in Google's Top 5 organically."
+        "Every topic and suggested keyword below includes its **real Google Search Console impressions (7-day, 30-day, and daily average)**, **2-week growth %**, and **current organic Google rank** so your Paid Media team can prioritize high-volume buyer terms."
     )
 
     p0_p1_ads = ads_topics_df[ads_topics_df["Ad Fit Score"] >= 60]
@@ -2715,15 +2842,15 @@ with tab_ads_strategy:
         st.markdown(
             f"""<div class="cnxt-cream-panel">
 <strong>Top Paid Search Opportunities ({len(p0_p1_ads)})</strong><br/>
-{", ".join(f"<code>{t}</code>" for t in p0_p1_ads["Trending Topic"].head(3)) if not p0_p1_ads.empty else "No high-gap commercial surges currently."}
+{", ".join(f"<code>{t}</code> ({imp:,} 7d impr.)" for t, imp in zip(p0_p1_ads["Trending Topic"].head(2), p0_p1_ads["7d Impressions"].head(2))) if not p0_p1_ads.empty else "No high-gap commercial surges currently."}
 </div>""",
             unsafe_allow_html=True,
         )
     with s2:
         st.markdown(
             f"""<div class="cnxt-cream-panel">
-<strong>Lower-CPC Buyer Keywords ({len(high_intent_lt)})</strong><br/>
-{", ".join(f"<code>[{k}]</code>" for k in high_intent_lt["Recommended Keyword"].head(3)) if not high_intent_lt.empty else "Switch to Broad sensitivity in sidebar to surface more long-tail terms."}
+<strong>Top Lower-CPC Buyer Keywords ({len(high_intent_lt)})</strong><br/>
+{", ".join(f"<code>[{k}]</code> ({imp:,} 7d impr.)" for k, imp in zip(high_intent_lt["Suggested Keyword"].head(2), high_intent_lt["7d Impressions"].head(2))) if not high_intent_lt.empty else "Switch to Broad sensitivity in sidebar to surface more long-tail terms."}
 </div>""",
             unsafe_allow_html=True,
         )
@@ -2736,57 +2863,88 @@ Always add <code>-jobs</code>, <code>-careers</code>, <code>-hiring</code>, <cod
             unsafe_allow_html=True,
         )
 
-    st.markdown("### 1. Trending Topics Evaluated for Paid Campaigns")
+    st.markdown("### 1. Trending Topics Evaluated for Google Ads")
     st.dataframe(
         ads_topics_df,
         use_container_width=True,
         hide_index=True,
         column_config={
             "Ad Fit Score": st.column_config.ProgressColumn("Ad Fit Score", min_value=0, max_value=100, format="%d/100"),
+            "7d Impressions": st.column_config.NumberColumn("7d Impressions"),
+            "30d Impressions": st.column_config.NumberColumn("30d Impressions"),
+            "Daily Avg Impr.": st.column_config.NumberColumn("Daily Avg Impr.", format="%.1f"),
             "Best Landing Page": st.column_config.LinkColumn("Best Landing Page"),
         },
     )
 
     st.divider()
-    st.markdown("### 2. Recommended Keywords to Bid On")
+    st.markdown(f"### 2. All Suggested Keywords to Bid On ({len(rec_kws_df)} Keywords with Real Impressions)")
     if rec_kws_df.empty:
-        st.info("No keywords met the Ad Fit threshold under current filters.")
+        st.info("No keywords matched the current filters.")
     else:
-        kw_topic_filter = st.multiselect(
-            "Filter Keywords by Topic:",
-            options=sorted(rec_kws_df["Topic Cluster"].unique().tolist()),
-            default=sorted(rec_kws_df["Topic Cluster"].unique().tolist()),
-        )
-        scoped_kws = rec_kws_df[rec_kws_df["Topic Cluster"].isin(kw_topic_filter)]
+        f_kw1, f_kw2 = st.columns([2, 1])
+        with f_kw1:
+            kw_topic_filter = st.multiselect(
+                "Filter Keywords by Topic:",
+                options=sorted(rec_kws_df["Topic Cluster"].unique().tolist()),
+                default=sorted(rec_kws_df["Topic Cluster"].unique().tolist()),
+            )
+        with f_kw2:
+            min_kw_imp = st.number_input("Min 7-Day Impressions per Keyword:", min_value=1, max_value=10000, value=5, step=5)
+
+        scoped_kws = rec_kws_df[
+            (rec_kws_df["Topic Cluster"].isin(kw_topic_filter))
+            & (rec_kws_df["7d Impressions"] >= min_kw_imp)
+        ]
 
         st.dataframe(
             scoped_kws,
             use_container_width=True,
             hide_index=True,
             column_config={
+                "7d Impressions": st.column_config.NumberColumn("7d Impressions"),
+                "30d Impressions": st.column_config.NumberColumn("30d Impressions"),
+                "Daily Avg Impr.": st.column_config.NumberColumn("Daily Avg Impr.", format="%.1f"),
                 "Recommended Landing Page": st.column_config.LinkColumn("Recommended Landing Page"),
             },
         )
         st.download_button(
-            "Download Recommended Paid Keywords CSV",
+            "Download Suggested Keywords & Impressions CSV",
             scoped_kws.to_csv(index=False).encode("utf-8"),
-            file_name="connext_recommended_paid_keywords.csv",
+            file_name="connext_suggested_paid_keywords_with_impressions.csv",
             mime="text/csv",
         )
 
         st.divider()
-        st.markdown("### 3. Ready-to-Copy Google Ads Keywords & Headlines")
+        st.markdown("### 3. Ad Group Builder: Keyword Volume Breakdown & Copy-Paste Lists")
         selected_ad_topic = st.selectbox("Select Trending Topic to Build Ad Group:", ads_topics_df["Trending Topic"].tolist())
         ad_row = filtered_trends[filtered_trends["topic"] == selected_ad_topic].iloc[0]
-        kw_list = ad_row["queries_list"]
+        topic_kw_df = rec_kws_df[rec_kws_df["Topic Cluster"] == selected_ad_topic].sort_values("7d Impressions", ascending=False)
 
-        st.caption(f"Recommended Destination Landing Page: **{ad_row['recommended_money_page']}**")
+        st.caption(
+            f"Recommended Landing Page: **{ad_row['recommended_money_page']}**  •  "
+            f"Topic Total: **{ad_row['impressions_7d']:,}** 7d impressions / **{ad_row['impressions_30d']:,}** 30d impressions"
+        )
+
+        # Show exact impression volume for every keyword in this selected ad group
+        st.dataframe(
+            topic_kw_df[["Suggested Keyword", "7d Impressions", "30d Impressions", "Daily Avg Impr.", "Growth (vs 2w)", "Current Google Rank", "Match Type"]],
+            use_container_width=True,
+            hide_index=True,
+            column_config={
+                "7d Impressions": st.column_config.NumberColumn("7d Impressions"),
+                "30d Impressions": st.column_config.NumberColumn("30d Impressions"),
+                "Daily Avg Impr.": st.column_config.NumberColumn("Daily Avg Impr.", format="%.1f"),
+            },
+        )
+
+        kw_list = topic_kw_df["Suggested Keyword"].tolist() if not topic_kw_df.empty else ad_row["queries_list"]
         c_ex, c_ph, c_ng = st.columns(3)
         with c_ex:
-            st.markdown("**[Exact Match] Keywords**")
+            st.markdown("**[Exact Match] Keywords (Ready to Paste)**")
             st.code("\n".join(f"[{q}]" for q in kw_list), language="text")
         with c_ph:
-            st.markdown('**"Phrase Match" Keywords**')
+            st.markdown('**"Phrase Match" Keywords (Ready to Paste)**')
             st.code("\n".join(f'"{q}"' for q in kw_list), language="text")
         with c_ng:
             st.markdown("**Negative Keywords (Block Job Seekers)**")
@@ -2807,52 +2965,62 @@ Always add <code>-jobs</code>, <code>-careers</code>, <code>-hiring</code>, <cod
                 st.text(f"{d} ({len(d)}/90)")
 
 # ==============================================================================
-# TAB 5: CONTENT PLAN, NEW TOPICS & BRIEF GENERATOR
+# TAB 5: CONTENT PLAN & NEW TOPICS (CHECKED AGAINST CONNEXTGLOBAL.COM/SITEMAP.XML)
 # ==============================================================================
 with tab_content:
-    st.subheader("1. Content Team Priority Action List")
+    st.subheader("1. Update Existing Sitemap Pages (Already Published on `connextglobal.com`)")
+    st.markdown(
+        """<div class="cnxt-cream-panel">
+<strong>Anti-Duplicate Sitemap Protection:</strong> Every trending topic below was checked against <code>https://connextglobal.com/sitemap.xml</code>. When Connext already has a live page on that topic, it appears here so the Content team <strong>updates the existing page</strong> instead of creating a duplicate URL.
+</div>""",
+        unsafe_allow_html=True,
+    )
     st.dataframe(
-        content_df,
+        existing_content_df,
         use_container_width=True,
         hide_index=True,
         column_config={
-            "Page Currently Ranking": st.column_config.LinkColumn("Page Currently Ranking"),
+            "7d Impressions": st.column_config.NumberColumn("7d Impressions"),
+            "Existing Sitemap Page": st.column_config.LinkColumn("Existing Sitemap Page"),
             "Main Service Page": st.column_config.LinkColumn("Main Service Page"),
         },
     )
     st.download_button(
-        "Download Content Action List CSV",
-        content_df.to_csv(index=False).encode("utf-8"),
-        file_name="connext_content_action_queue.csv",
+        "Download Existing Page Updates CSV",
+        existing_content_df.to_csv(index=False).encode("utf-8"),
+        file_name="connext_existing_sitemap_page_updates.csv",
         mime="text/csv",
     )
 
     st.divider()
-    st.subheader(f"2. New Content & Topic Ideas ({len(new_topics_df)})")
+    st.subheader(f"2. Truly New Content Ideas — Verified Not in Sitemap ({len(truly_new_df)})")
     st.markdown(
-        "Suggested articles and commercial subpages based on surging Google searches where Connext does not yet have a dedicated page or ranks on Page 2+."
+        "Only topics with **no matching page in `connextglobal.com/sitemap.xml`** appear here. The closest existing sitemap page is shown side-by-side so you can confirm it is a genuine content gap."
     )
-    if new_topics_df.empty:
-        st.info("All currently surging topics already have strong Page-1 coverage.")
+    if truly_new_df.empty:
+        st.success("Every currently surging topic already has a matching page in `connextglobal.com/sitemap.xml`! Focus on updating the existing pages in Section 1 above.")
     else:
         st.dataframe(
-            new_topics_df,
+            truly_new_df,
             use_container_width=True,
             hide_index=True,
             column_config={
-                "Live Service Page to Link": st.column_config.LinkColumn("Live Service Page to Link"),
+                "7d Impressions": st.column_config.NumberColumn("7d Impressions"),
+                "30d Impressions": st.column_config.NumberColumn("30d Impressions"),
+                "Closest Existing Sitemap Page": st.column_config.LinkColumn("Closest Existing Sitemap Page"),
+                "Service Page to Link To": st.column_config.LinkColumn("Service Page to Link To"),
             },
         )
         st.download_button(
-            "Download New Content Ideas CSV",
-            new_topics_df.to_csv(index=False).encode("utf-8"),
-            file_name="connext_new_topics_content_roadmap.csv",
+            "Download Truly New Content Roadmap CSV",
+            truly_new_df.to_csv(index=False).encode("utf-8"),
+            file_name="connext_truly_new_content_gaps.csv",
             mime="text/csv",
         )
 
     st.divider()
     st.subheader("3. One-Click Writer Brief")
-    brief_topic = st.selectbox("Select Topic to Generate a Writer Brief:", content_df["Trending Topic"].tolist())
+    brief_topic = st.selectbox("Select Topic to Generate a Writer Brief:", existing_content_df["Trending Topic"].tolist())
     b_row = filtered_trends[filtered_trends["topic"] == brief_topic].iloc[0]
 
     lt_bullets = (
@@ -2862,15 +3030,20 @@ with tab_content:
     )
     supporting_links = "\n".join(
         f"  - `{item['full_url']}` ({item['role']})" for item in b_row["matching_content_pages"]
-    ) or "  - None matched — create new supporting guide"
+    ) or "  - None matched in sitemap"
+
+    action_headline = (
+        f"Update Existing Live Page: `{b_row['closest_existing_url']}`"
+        if b_row["already_exists_in_sitemap"]
+        else "Create New Page (Verified Not in Sitemap)"
+    )
 
     brief_md = f"""### Writer Brief: {b_row['topic'].title()} ({b_row['sector']})
-- **When It Surged:** `{b_row['horizons']}`
+- **Action:** {action_headline}
 - **Current Google Rank:** **{b_row['google_rank_label']}**
-- **Page Currently Ranking:** `{b_row['primary_page']}` ({b_row['primary_page_role']})
 - **Main Service Page to Link To:** `{b_row['recommended_money_page']}` ({b_row['best_money_role']})
-- **Weekly Search Impressions:** **{b_row['impressions_7d']:,}** (**+{b_row['growth_pct_3d']}%** vs. prior 2 weeks)
-- **Existing Live Pages to Interlink:**
+- **Search Volume:** **{b_row['impressions_7d']:,}** 7-day impressions / **{b_row['impressions_30d']:,}** 30-day impressions (**+{b_row['growth_pct_3d']}%** vs. prior 2 weeks)
+- **Related Live Pages in Sitemap to Interlink:**
 {supporting_links}
 - **Exact Search Questions & Phrases to Cover (H2s / FAQs):**
 {lt_bullets}
