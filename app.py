@@ -72,10 +72,11 @@ html, body, [class*="css"] { font-family: var(--font-body); color: var(--cnxt-mi
 h1, h2, h3, h4 { font-family: var(--font-display) !important; color: var(--cnxt-twilight) !important; letter-spacing: -0.015em; }
 .stApp { background-color: var(--cnxt-paper); }
 section[data-testid="stSidebar"] { background-color: var(--cnxt-midnight) !important; border-right: 1px solid rgba(144, 203, 219, 0.18); }
-section[data-testid="stSidebar"] * { color: var(--cnxt-paper); }
+section[data-testid="stSidebar"] label, section[data-testid="stSidebar"] p, section[data-testid="stSidebar"] span { color: var(--cnxt-paper) !important; }
+section[data-testid="stSidebar"] code { background-color: rgba(144, 203, 219, 0.18) !important; color: #F1C916 !important; padding: 2px 6px; border-radius: 4px; }
 section[data-testid="stSidebar"] .stCaption, section[data-testid="stSidebar"] small { color: var(--cnxt-teal-blue) !important; }
 section[data-testid="stSidebar"] h1, section[data-testid="stSidebar"] h2, section[data-testid="stSidebar"] h3 { color: var(--cnxt-paper) !important; }
-section[data-testid="stSidebar"] input, section[data-testid="stSidebar"] textarea { background-color: rgba(255, 255, 255, 0.08) !important; border: 1px solid rgba(144, 203, 219, 0.35) !important; color: var(--cnxt-paper) !important; border-radius: 6px !important; }
+section[data-testid="stSidebar"] input, section[data-testid="stSidebar"] textarea { background-color: #FFFFFF !important; border: 1px solid #90CBDB !important; color: #071739 !important; border-radius: 6px !important; }
 section[data-testid="stSidebar"] [data-testid="stFileUploaderDropzone"] { background-color: rgba(255, 255, 255, 0.06) !important; border: 1px dashed var(--cnxt-teal-blue) !important; }
 section[data-testid="stSidebar"] [data-testid="stFileUploaderDropzone"] button { background-color: var(--cnxt-blue) !important; color: var(--cnxt-paper) !important; border: none !important; }
 section[data-testid="stSidebar"] .stButton > button { background-color: rgba(255, 255, 255, 0.10) !important; color: var(--cnxt-teal-blue) !important; border: 1px solid rgba(144, 203, 219, 0.35) !important; border-radius: 999px !important; }
@@ -874,7 +875,7 @@ def _build_index_from_paths(all_paths: list[str]) -> tuple[set[str], pd.DataFram
         .str.replace(r"[/\-_]", " ", regex=True)
         .str.strip()
     )
-    vec = TfidfVectorizer(ngram_range=(1, 2), min_df=1, stop_words="english")
+    vec = TfidfVectorizer(ngram_range=(1, 2), min_df=1, token_pattern=r"(?u)\b\w+\b")
     mat = vec.fit_transform(live_df["slug_text"].fillna(""))
     return live_set, live_df, vec, mat
 
@@ -907,7 +908,6 @@ def match_topic_to_live_site(
     scored = live_df.copy()
     scored["sim"] = sims
 
-    # Apply deterministic vertical/service boosts for exact Webflow money pages
     boosted_path = None
     for pat, target_path in MONEY_PAGE_BOOST_RULES:
         if pat.search(combined_text) and target_path in live_set:
@@ -1174,17 +1174,20 @@ def fetch_gsc_api_data(
             date_str, query, page = r["keys"]
             if first_incomplete != "None" and date_str >= first_incomplete:
                 continue
-            if STRICT_NON_INDUSTRY_REGEX.search(query):
+            clean_q = query.lower().strip()
+            if not clean_q:
+                continue
+            if STRICT_NON_INDUSTRY_REGEX.search(clean_q):
                 excluded_count += 1
                 continue
-            if custom_pattern and custom_pattern.search(query):
+            if custom_pattern and custom_pattern.search(clean_q):
                 excluded_count += 1
                 continue
 
-            is_brand = bool(brand_pattern.search(query)) if brand_pattern else False
+            is_brand = bool(brand_pattern.search(clean_q)) if brand_pattern else False
             rows.append({
                 "date": date_str,
-                "query": query.lower().strip(),
+                "query": clean_q,
                 "page": normalize_url(page),
                 "impressions": r["impressions"],
                 "position": r["position"],
@@ -1201,11 +1204,14 @@ def fetch_gsc_api_data(
     return df, str(first_incomplete), excluded_count
 
 
-# --- CLUSTERING & MULTI-HORIZON TREND SCORING ---
+# --- CLUSTERING & MULTI-HORIZON TREND SCORING (ZERO-VECTOR SAFE) ---
 @st.cache_data(show_spinner=False)
 def cluster_queries(df: pd.DataFrame, distance_threshold: float) -> pd.DataFrame:
-    """Clusters top non-branded B2B queries into semantic topic groups and tags long-tail & AI prompt terms."""
+    """Clusters top non-branded B2B queries into semantic topic groups safely (handles zero-norm vectors)."""
     non_brand = df[~df["is_branded"]].copy()
+    if non_brand.empty:
+        return non_brand
+
     non_brand["norm_page"] = non_brand["page"].apply(normalize_url)
     non_brand["path"] = non_brand["norm_page"].apply(url_to_path)
 
@@ -1215,7 +1221,7 @@ def cluster_queries(df: pd.DataFrame, distance_threshold: float) -> pd.DataFrame
         .sort_values("total_impressions", ascending=False)
     )
 
-    top_queries = query_stats.head(3500).copy()
+    top_queries = query_stats.head(3500).copy().reset_index(drop=True)
     if len(top_queries) < 2:
         non_brand["topic"] = non_brand["query"]
         non_brand["word_count"] = non_brand["query"].str.split().str.len()
@@ -1223,16 +1229,25 @@ def cluster_queries(df: pd.DataFrame, distance_threshold: float) -> pd.DataFrame
         non_brand["is_ai_prompt"] = (non_brand["word_count"] >= 7) | non_brand["query"].str.contains(AI_PROMPT_REGEX, na=False)
         return non_brand
 
-    vectorizer = TfidfVectorizer(ngram_range=(1, 2), min_df=1, stop_words="english")
+    # Use token_pattern capturing words & numbers so stop-word-only queries don't collapse to zero vectors
+    vectorizer = TfidfVectorizer(ngram_range=(1, 2), min_df=1, token_pattern=r"(?u)\b\w+\b")
     tfidf_matrix = vectorizer.fit_transform(top_queries["query"]).astype(np.float32).toarray()
 
-    clustering = AgglomerativeClustering(
-        n_clusters=None,
-        metric="cosine",
-        linkage="average",
-        distance_threshold=distance_threshold,
-    )
-    top_queries["cluster_id"] = clustering.fit_predict(tfidf_matrix)
+    # Guard against any zero-norm rows (e.g., pure symbols/punctuation) before cosine clustering
+    row_norms = np.linalg.norm(tfidf_matrix, axis=1)
+    valid_mask = row_norms > 1e-9
+
+    cluster_ids = np.arange(-1, -len(top_queries) - 1, -1, dtype=int)
+    if int(np.sum(valid_mask)) >= 2:
+        clustering = AgglomerativeClustering(
+            n_clusters=None,
+            metric="cosine",
+            linkage="average",
+            distance_threshold=distance_threshold,
+        )
+        cluster_ids[valid_mask] = clustering.fit_predict(tfidf_matrix[valid_mask])
+
+    top_queries["cluster_id"] = cluster_ids
 
     topic_names = (
         top_queries.sort_values("total_impressions", ascending=False)
@@ -1262,6 +1277,9 @@ def analyze_multi_horizon_trends(
     min_lift: float,
 ) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """Analyzes impressions, Connext organic position, GSC ranking pages, and live site architecture mapping."""
+    if non_brand_df.empty:
+        return pd.DataFrame(), pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
+
     all_dates = sorted(non_brand_df["date"].unique())
     n_days = len(all_dates)
     if n_days < 14:
@@ -1310,7 +1328,6 @@ def analyze_multi_horizon_trends(
         .to_dict()
     )
 
-    # Aggregate ALL GSC ranking pages per topic and audit against Live Pages list
     pages_agg = (
         recent_df.groupby(["topic", "norm_page", "path"], as_index=False)
         .agg(
@@ -1413,14 +1430,12 @@ def analyze_multi_horizon_trends(
         unique_pages = int(page_count_map.get(topic, 1))
         sector = classify_sector(joined_queries)
 
-        # Match topic to Connext's 1,301 Live Pages
         site_match = match_topic_to_live_site(topic, joined_queries, live_set, live_df, live_vec, live_mat)
         gsc_top_url = top_page_map.get(topic, "")
         gsc_top_role = top_page_role_map.get(topic, "Blog / Guide")
         has_money_ranking = bool(has_money_ranking_map.get(topic, False))
         has_legacy_url = bool(has_legacy_url_map.get(topic, False))
 
-        # Determine Page & Content Coverage Status
         if has_legacy_url:
             coverage_status = "Legacy / Non-Live URL in GSC"
         elif has_money_ranking:
@@ -1430,7 +1445,6 @@ def analyze_multi_horizon_trends(
         else:
             coverage_status = "New Topic / Content Gap"
 
-        # Recommended LP for Paid Ads: prefer live money page if strong match exists, else GSC top live page
         recommended_lp = site_match["best_money_url"] if site_match["has_strong_money_match"] else gsc_top_url
 
         velocity_score = round(
@@ -1494,7 +1508,6 @@ def analyze_multi_horizon_trends(
 
     trends_df = pd.DataFrame(results).sort_values("velocity_score", ascending=False).reset_index(drop=True)
 
-    # Query-Level Table
     q_recent = (
         recent_df.groupby(["topic", "query", "is_long_tail", "is_ai_prompt", "word_count"], as_index=False)
         .agg(
@@ -1515,7 +1528,6 @@ def analyze_multi_horizon_trends(
     q_merged["page_role"] = q_merged["top_path"].apply(lambda p: classify_page_role(p, live_set))
     q_merged = q_merged.sort_values(["imp_7d", "query_lift_x"], ascending=False)
 
-    # Page-Level Content Mapping Table
     pages_merged = pages_agg[pages_agg["topic"].isin(trends_df["topic"])].copy()
     topic_tot_map = trends_df.set_index("topic")["impressions_7d"].to_dict()
     pages_merged["topic_imp_share_%"] = (
@@ -1534,6 +1546,9 @@ def analyze_ai_pages_and_queries(
     live_set: set[str],
 ) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """Connects trending pages from GSC's Generative AI report with trending queries & clusters."""
+    if non_brand_web_df.empty or all_queries_df.empty:
+        return pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
+
     web = non_brand_web_df.copy()
     web["norm_page"] = web["page"].apply(normalize_url)
     web["weighted_pos"] = web["position"] * web["impressions"]
@@ -1784,11 +1799,7 @@ def build_ads_recommendations(trends_df: pd.DataFrame, queries_df: pd.DataFrame)
 
 
 def build_content_and_new_topics(trends_df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
-    """
-    Builds:
-      1. content_df: Immediate Content Team action queue (refreshes, redirects, interlinking, new pages)
-      2. new_topics_df: New Topic & Content Expansion opportunities derived from surging gaps & long-tail prompts
-    """
+    """Builds Content Team action queue and New Topic & Content Expansion proposals."""
     content_rows = []
     new_topic_rows = []
 
@@ -1832,7 +1843,6 @@ def build_content_and_new_topics(trends_df: pd.DataFrame) -> tuple[pd.DataFrame,
             "Action Plan": action,
         })
 
-        # Generate New Topic & Content Expansion proposals for gaps, blog-only topics, or high-velocity surges
         if cov in ("New Topic / Content Gap", "Blog Only (Money Page Exists)") or pos > 8.0 or r["long_tail_count"] >= 2:
             slug_base = re.sub(r"[^a-z0-9]+", "-", r["topic"].lower()).strip("-")
             if cov == "New Topic / Content Gap":
@@ -1954,7 +1964,6 @@ elif data_source == "Demo Dataset (Live Connext Structure)":
     raw_df, ai_raw_df = generate_demo_data()
     st.sidebar.info("Previewing sample data mapped to live connextglobal.com URLs.")
 
-# Optional Uploads for GSC Generative AI Report & Updated Live Pages Sheet
 st.sidebar.divider()
 st.sidebar.subheader("2. GSC Generative AI & Sitemap Sync")
 if data_source != "Demo Dataset (Live Connext Structure)":
@@ -2274,7 +2283,6 @@ with tab_pages_clusters:
         unsafe_allow_html=True,
     )
 
-    # Site Section Impression Distribution Chart
     sec_col1, sec_col2 = st.columns([1, 1.1])
     with sec_col1:
         st.markdown("**Surging 7d Impressions by Connext Page Section**")
