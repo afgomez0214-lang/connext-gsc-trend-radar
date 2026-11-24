@@ -272,6 +272,59 @@ def inject_connext_brand_css():
 
 inject_connext_brand_css()
 
+import hmac
+
+
+def require_connext_login():
+    """Blocks access to the app until a valid team password from st.secrets is entered."""
+    if st.session_state.get("cnxt_authenticated"):
+        return
+
+    # Hide sidebar while locked
+    st.markdown(
+        "<style>section[data-testid='stSidebar']{display:none;}</style>",
+        unsafe_allow_html=True,
+    )
+
+    _, center_col, _ = st.columns([1, 1.35, 1])
+    with center_col:
+        st.markdown("<div style='height: 36px;'></div>", unsafe_allow_html=True)
+        st.image(CNXT_LOGO_COLOR, width=190)
+        st.markdown(
+            """
+            <div class="cnxt-hero-banner" style="margin-top: 14px; padding: 24px 28px;">
+                <div class="cnxt-eyebrow">INTERNAL TEAM ACCESS</div>
+                <h2 style="color:#FFFFFF !important; margin:0 0 6px 0; font-size:1.5rem;">
+                    Connext Search &amp; AI <span style="color:#E58B25;">Trend Radar</span>
+                </h2>
+                <p class="cnxt-hero-sub" style="font-size:0.88rem;">
+                    Sign in with your Connext team password to access Search Console trend data, page mappings, and Paid Ads keyword queues.
+                </p>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+        if "app_password" not in st.secrets:
+            st.error("`app_password` is not configured in Streamlit Secrets yet. Add it in App Settings → Secrets.")
+            st.stop()
+
+        with st.form("cnxt_login_form"):
+            entered_pwd = st.text_input("Team Password", type="password", placeholder="Enter password...")
+            submitted = st.form_submit_button("Unlock Trend Radar", type="primary", use_container_width=True)
+
+            if submitted:
+                if hmac.compare_digest(entered_pwd, str(st.secrets["app_password"])):
+                    st.session_state["cnxt_authenticated"] = True
+                    st.rerun()
+                else:
+                    st.error("Incorrect password. Please try again.")
+
+    st.stop()
+
+
+require_connext_login()
+
 DEFAULT_SITE_URL = "sc-domain:connextglobal.com"
 DEFAULT_BRAND_REGEX = r"\b(connext|connext\s*global(\s*solutions)?|connextglobal)\b"
 
@@ -1232,6 +1285,9 @@ def build_content_queue(trends_df: pd.DataFrame) -> pd.DataFrame:
 
 # --- SIDEBAR CONTROLS (MIDNIGHT NAVY WITH OFFICIAL WHITE CONNEXT LOGO) ---
 st.sidebar.image(CNXT_LOGO_WHITE, width=185)
+if st.sidebar.button("Lock / Log Out"):
+    st.session_state["cnxt_authenticated"] = False
+    st.rerun()
 st.sidebar.markdown("**Search & AI Visibility Radar**")
 st.sidebar.caption("Property: `connextglobal.com` • Impressions & Organic Rank")
 st.sidebar.divider()
