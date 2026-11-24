@@ -633,6 +633,16 @@ STRICT_NON_INDUSTRY_REGEX = re.compile(
     re.I,
 )
 
+# Optional filter for local PH city directory & student/school searches (e.g., "bpo in baguio", "nursing school")
+LOCAL_PH_AND_STUDENT_REGEX = re.compile(
+    r"\b("
+    r"school|schools|university|universities|college|colleges|student|students|tuition|courses|admission|strand|"
+    r"baguio|clark|bgc|bonifacio global city|makati|ortigas|quezon city|alabang|iloilo|davao|cebu|pampanga|taguig|"
+    r"list of bpo|top bpo companies in|call center companies in"
+    r")\b",
+    re.I,
+)
+
 # Commercial / Transactional B2B Outsourcing Modifiers
 COMMERCIAL_MODIFIERS = re.compile(
     r"\b("
@@ -685,8 +695,8 @@ SECTOR_PATTERNS = [
     (
         "Back Office & Operations Support",
         re.compile(
-            r"\b(back office|back-office|admin|administrative|data entry|document processing|"
-            r"order processing|catalog|content moderation|transcription|indexing|operations support)\b",
+            r"\b(back office|back-office|admin|administrative|data entry|data conversion|document processing|"
+            r"order processing|catalog|content moderation|transcription|indexing|operations support|shared services)\b",
             re.I,
         ),
     ),
@@ -772,7 +782,7 @@ MONEY_PAGE_BOOST_RULES = [
     (re.compile(r"\b(customer support|customer service)\b", re.I), "/teams/customer-support"),
     (re.compile(r"\b(e-commerce|ecommerce)\b", re.I), "/teams/marketing/e-commerce-outsourcing"),
     (re.compile(r"\b(digital marketing|marketing|seo|ppc)\b", re.I), "/teams/marketing/outsource-digital-marketing"),
-    (re.compile(r"\b(back office|operations support|data entry|admin)\b", re.I), "/teams/business-operation-support"),
+    (re.compile(r"\b(back office|operations support|data entry|data conversion|shared services|admin)\b", re.I), "/teams/business-operation-support"),
     (re.compile(r"\b(title|escrow)\b", re.I), "/industries/real-estate/title-escrow"),
     (re.compile(r"\bmortgage\b", re.I), "/industries/real-estate/mortgage"),
     (re.compile(r"\breal estate\b", re.I), "/industries/real-estate"),
@@ -1131,6 +1141,7 @@ def fetch_gsc_api_data(
     lookback_days: int,
     brand_regex: str,
     custom_exclude_regex: str,
+    exclude_local_ph: bool,
 ) -> tuple[pd.DataFrame, str, int]:
     """Pulls live daily query+page impressions & organic position from Google Search Console."""
     creds = service_account.Credentials.from_service_account_info(
@@ -1178,6 +1189,9 @@ def fetch_gsc_api_data(
             if not clean_q:
                 continue
             if STRICT_NON_INDUSTRY_REGEX.search(clean_q):
+                excluded_count += 1
+                continue
+            if exclude_local_ph and LOCAL_PH_AND_STUDENT_REGEX.search(clean_q):
                 excluded_count += 1
                 continue
             if custom_pattern and custom_pattern.search(clean_q):
@@ -1229,11 +1243,9 @@ def cluster_queries(df: pd.DataFrame, distance_threshold: float) -> pd.DataFrame
         non_brand["is_ai_prompt"] = (non_brand["word_count"] >= 7) | non_brand["query"].str.contains(AI_PROMPT_REGEX, na=False)
         return non_brand
 
-    # Use token_pattern capturing words & numbers so stop-word-only queries don't collapse to zero vectors
     vectorizer = TfidfVectorizer(ngram_range=(1, 2), min_df=1, token_pattern=r"(?u)\b\w+\b")
     tfidf_matrix = vectorizer.fit_transform(top_queries["query"]).astype(np.float32).toarray()
 
-    # Guard against any zero-norm rows (e.g., pure symbols/punctuation) before cosine clustering
     row_norms = np.linalg.norm(tfidf_matrix, axis=1)
     valid_mask = row_norms > 1e-9
 
@@ -1695,9 +1707,10 @@ def analyze_ai_pages_and_queries(
     ai_pages_df["recommended_action"] = ai_pages_df.apply(ai_page_action, axis=1)
     ai_pages_df = ai_pages_df.sort_values(["ai_lift_x", "ai_imp_7d"], ascending=False).reset_index(drop=True)
 
+    # Avoid duplicate 'page_role' column during merge (page_queries_grp already carries page_role)
     bridge_df = page_queries_grp[page_queries_grp["top_page"].isin(ai_pages_df["norm_page"])].copy()
     bridge_df = bridge_df.merge(
-        ai_pages_df[["norm_page", "display_url", "page_role", "ai_imp_7d", "ai_lift_x", "ai_share_of_page_%"]],
+        ai_pages_df[["norm_page", "display_url", "ai_imp_7d", "ai_lift_x", "ai_share_of_page_%"]],
         left_on="top_page",
         right_on="norm_page",
         how="inner",
@@ -1896,6 +1909,12 @@ data_source = st.sidebar.radio(
     index=0,
 )
 
+exclude_local_ph = st.sidebar.checkbox(
+    "Exclude Local PH City & Student Queries",
+    value=True,
+    help="Filters out local PH job-market/directory searches (e.g., 'bpo in baguio', 'bpo in bgc', 'nursing school') to focus on B2B buyer demand.",
+)
+
 custom_negatives = st.sidebar.text_input(
     "Extra Negative Keywords (Pipe-separated)",
     placeholder="intern|internship|sample|pdf",
@@ -1925,7 +1944,7 @@ if data_source == "Live Google Search Console API":
             try:
                 creds_dict = dict(st.secrets["gcp_service_account"])
                 raw_df, incomplete_date_note, excluded_rows_count = fetch_gsc_api_data(
-                    creds_dict, site_url, lookback, brand_regex, custom_negatives
+                    creds_dict, site_url, lookback, brand_regex, custom_negatives, exclude_local_ph
                 )
             except Exception as api_err:
                 st.error(f"Google Search Console API Error: {api_err}")
@@ -1940,7 +1959,7 @@ if data_source == "Live Google Search Console API":
             creds_dict = json.load(uploaded_json)
             with st.spinner("Fetching live Google Search Console data for connextglobal.com..."):
                 raw_df, incomplete_date_note, excluded_rows_count = fetch_gsc_api_data(
-                    creds_dict, site_url, lookback, brand_regex, custom_negatives
+                    creds_dict, site_url, lookback, brand_regex, custom_negatives, exclude_local_ph
                 )
 
 elif data_source == "Upload GSC Web CSV":
@@ -1955,6 +1974,8 @@ elif data_source == "Upload GSC Web CSV":
         raw_df["page"] = raw_df["page"].astype(str).apply(normalize_url)
         before_len = len(raw_df)
         raw_df = raw_df[~raw_df["query"].str.contains(STRICT_NON_INDUSTRY_REGEX, regex=True, na=False)]
+        if exclude_local_ph:
+            raw_df = raw_df[~raw_df["query"].str.contains(LOCAL_PH_AND_STUDENT_REGEX, regex=True, na=False)]
         if custom_negatives.strip():
             raw_df = raw_df[~raw_df["query"].str.contains(custom_negatives, regex=True, na=False)]
         excluded_rows_count = before_len - len(raw_df)
@@ -2538,10 +2559,11 @@ with tab_ai_search:
         if filtered_ai_bridge.empty:
             st.info("No query-level matches found for the selected AI pages.")
         else:
-            bridge_cols = [
+            desired_bridge_cols = [
                 "display_url", "page_role", "ai_imp_7d", "ai_lift_x", "topic",
                 "query", "is_ai_prompt", "is_long_tail", "imp_7d", "query_lift_x", "connext_org_pos",
             ]
+            bridge_cols = [c for c in desired_bridge_cols if c in filtered_ai_bridge.columns]
             st.dataframe(
                 filtered_ai_bridge[bridge_cols],
                 use_container_width=True,
