@@ -1,3 +1,4 @@
+import hmac
 import json
 import re
 from datetime import datetime, timedelta
@@ -58,221 +59,45 @@ st.set_page_config(
 
 def inject_connext_brand_css():
     """Applies Connext Global Webflow typography, color tokens, hero banner, and card styles."""
-    st.markdown(
-        """
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Arimo:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-        <style>
-        :root {
-            --cnxt-blue: #005AAC;
-            --cnxt-sun: #E58B25;
-            --cnxt-yellow: #F1C916;
-            --cnxt-red: #FC4301;
-            --cnxt-twilight: #071776;
-            --cnxt-midnight: #071739;
-            --cnxt-teal: #0F818A;
-            --cnxt-teal-blue: #90CBDB;
-            --cnxt-sage: #7E9E7F;
-            --cnxt-cream: #F4F1E2;
-            --cnxt-paper: #FFFFFF;
-            --cnxt-ash: #6B7280;
-            --cnxt-line: #E5E2D2;
-            --cnxt-line-strong: #C7C2A8;
-            --font-display: 'Arimo', Arial, sans-serif;
-            --font-body: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
-            --font-mono: 'JetBrains Mono', ui-monospace, monospace;
-        }
-
-        html, body, [class*="css"] {
-            font-family: var(--font-body);
-            color: var(--cnxt-midnight);
-        }
-
-        h1, h2, h3, h4 {
-            font-family: var(--font-display) !important;
-            color: var(--cnxt-twilight) !important;
-            letter-spacing: -0.015em;
-        }
-
-        /* Main Canvas */
-        .stApp {
-            background-color: var(--cnxt-paper);
-        }
-
-        /* Midnight Navy Sidebar */
-        section[data-testid="stSidebar"] {
-            background-color: var(--cnxt-midnight) !important;
-            border-right: 1px solid rgba(144, 203, 219, 0.18);
-        }
-        section[data-testid="stSidebar"] * {
-            color: var(--cnxt-paper);
-        }
-        section[data-testid="stSidebar"] .stCaption,
-        section[data-testid="stSidebar"] small {
-            color: var(--cnxt-teal-blue) !important;
-        }
-        section[data-testid="stSidebar"] h1,
-        section[data-testid="stSidebar"] h2,
-        section[data-testid="stSidebar"] h3 {
-            color: var(--cnxt-paper) !important;
-        }
-        section[data-testid="stSidebar"] input,
-        section[data-testid="stSidebar"] textarea {
-            background-color: rgba(255, 255, 255, 0.08) !important;
-            border: 1px solid rgba(144, 203, 219, 0.35) !important;
-            color: var(--cnxt-paper) !important;
-            border-radius: 6px !important;
-        }
-        section[data-testid="stSidebar"] [data-testid="stFileUploaderDropzone"] {
-            background-color: rgba(255, 255, 255, 0.06) !important;
-            border: 1px dashed var(--cnxt-teal-blue) !important;
-        }
-        section[data-testid="stSidebar"] [data-testid="stFileUploaderDropzone"] button {
-            background-color: var(--cnxt-blue) !important;
-            color: var(--cnxt-paper) !important;
-            border: none !important;
-        }
-
-        /* Connext Pill Primary CTA Buttons (Sun Orange -> Twilight Navy hover) */
-        .stButton > button[kind="primary"],
-        .stDownloadButton > button {
-            background-color: var(--cnxt-sun) !important;
-            color: var(--cnxt-midnight) !important;
-            font-family: var(--font-body) !important;
-            font-weight: 600 !important;
-            border: none !important;
-            border-radius: 999px !important;
-            padding: 0.55rem 1.4rem !important;
-            box-shadow: 0 6px 18px -8px rgba(229, 139, 37, 0.65) !important;
-            transition: all 0.2s ease !important;
-        }
-        .stButton > button[kind="primary"]:hover,
-        .stDownloadButton > button:hover {
-            background-color: var(--cnxt-twilight) !important;
-            color: var(--cnxt-cream) !important;
-            transform: translateY(-1px);
-        }
-
-        /* Connext Hero Header Card (matches .result-hero in Webflow tools) */
-        .cnxt-hero-banner {
-            background: linear-gradient(135deg, #071776 0%, #071739 100%);
-            color: #FFFFFF;
-            padding: 28px 34px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            position: relative;
-            overflow: hidden;
-            border: 1px solid rgba(144, 203, 219, 0.22);
-        }
-        .cnxt-hero-banner::after {
-            content: "";
-            position: absolute;
-            top: -90px;
-            right: -90px;
-            width: 280px;
-            height: 280px;
-            background: radial-gradient(circle, rgba(241, 201, 22, 0.22), transparent 65%);
-            pointer-events: none;
-        }
-        .cnxt-eyebrow {
-            font-family: var(--font-mono);
-            font-size: 0.74rem;
-            text-transform: uppercase;
-            letter-spacing: 0.18em;
-            color: #F1C916;
-            margin-bottom: 8px;
-            font-weight: 600;
-        }
-        .cnxt-hero-title {
-            font-family: var(--font-display);
-            font-size: clamp(1.55rem, 2.6vw, 2.15rem);
-            font-weight: 700;
-            color: #FFFFFF;
-            line-height: 1.18;
-            margin: 0 0 8px 0;
-        }
-        .cnxt-hero-title span {
-            color: #E58B25;
-        }
-        .cnxt-hero-sub {
-            color: #90CBDB;
-            font-size: 0.94rem;
-            margin: 0;
-            max-width: 880px;
-        }
-
-        /* Stat Tiles (matches .stat-tile in Webflow tools) */
-        div[data-testid="stMetric"] {
-            background-color: var(--cnxt-paper);
-            border: 1px solid var(--cnxt-line);
-            border-top: 3px solid var(--cnxt-blue);
-            border-radius: 8px;
-            padding: 16px 18px;
-            box-shadow: 0 2px 10px rgba(7, 23, 57, 0.04);
-        }
-        div[data-testid="stMetric"] label {
-            font-family: var(--font-mono) !important;
-            font-size: 0.72rem !important;
-            text-transform: uppercase !important;
-            letter-spacing: 0.1em !important;
-            color: var(--cnxt-ash) !important;
-        }
-        div[data-testid="stMetric"] [data-testid="stMetricValue"] {
-            font-family: var(--font-display) !important;
-            color: var(--cnxt-twilight) !important;
-            font-weight: 700 !important;
-        }
-
-        /* Tabs Styling */
-        .stTabs [data-baseweb="tab-list"] {
-            gap: 6px;
-            border-bottom: 2px solid var(--cnxt-line);
-        }
-        .stTabs [data-baseweb="tab"] {
-            font-family: var(--font-display);
-            font-weight: 600;
-            color: var(--cnxt-midnight);
-            background-color: var(--cnxt-cream);
-            border-radius: 6px 6px 0 0;
-            padding: 10px 18px;
-            border: 1px solid var(--cnxt-line);
-            border-bottom: none;
-        }
-        .stTabs [aria-selected="true"] {
-            background-color: var(--cnxt-twilight) !important;
-            color: var(--cnxt-paper) !important;
-            border-color: var(--cnxt-twilight) !important;
-        }
-
-        /* Cream Callout Box (matches .panel-cream) */
-        .cnxt-cream-panel {
-            background-color: var(--cnxt-cream);
-            border: 1px solid var(--cnxt-line-strong);
-            border-left: 4px solid var(--cnxt-sun);
-            border-radius: 6px;
-            padding: 16px 20px;
-            margin: 12px 0;
-            color: var(--cnxt-midnight);
-        }
-        .cnxt-cream-panel strong {
-            color: var(--cnxt-twilight);
-        }
-
-        /* Multiselect Chips */
-        span[data-baseweb="tag"] {
-            background-color: var(--cnxt-twilight) !important;
-            color: var(--cnxt-paper) !important;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
+    css = """<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Arimo:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root { --cnxt-blue: #005AAC; --cnxt-sun: #E58B25; --cnxt-yellow: #F1C916; --cnxt-red: #FC4301; --cnxt-twilight: #071776; --cnxt-midnight: #071739; --cnxt-teal: #0F818A; --cnxt-teal-blue: #90CBDB; --cnxt-sage: #7E9E7F; --cnxt-cream: #F4F1E2; --cnxt-paper: #FFFFFF; --cnxt-ash: #6B7280; --cnxt-line: #E5E2D2; --cnxt-line-strong: #C7C2A8; --font-display: 'Arimo', Arial, sans-serif; --font-body: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif; --font-mono: 'JetBrains Mono', ui-monospace, monospace; }
+html, body, [class*="css"] { font-family: var(--font-body); color: var(--cnxt-midnight); }
+h1, h2, h3, h4 { font-family: var(--font-display) !important; color: var(--cnxt-twilight) !important; letter-spacing: -0.015em; }
+.stApp { background-color: var(--cnxt-paper); }
+section[data-testid="stSidebar"] { background-color: var(--cnxt-midnight) !important; border-right: 1px solid rgba(144, 203, 219, 0.18); }
+section[data-testid="stSidebar"] * { color: var(--cnxt-paper); }
+section[data-testid="stSidebar"] .stCaption, section[data-testid="stSidebar"] small { color: var(--cnxt-teal-blue) !important; }
+section[data-testid="stSidebar"] h1, section[data-testid="stSidebar"] h2, section[data-testid="stSidebar"] h3 { color: var(--cnxt-paper) !important; }
+section[data-testid="stSidebar"] input, section[data-testid="stSidebar"] textarea { background-color: rgba(255, 255, 255, 0.08) !important; border: 1px solid rgba(144, 203, 219, 0.35) !important; color: var(--cnxt-paper) !important; border-radius: 6px !important; }
+section[data-testid="stSidebar"] [data-testid="stFileUploaderDropzone"] { background-color: rgba(255, 255, 255, 0.06) !important; border: 1px dashed var(--cnxt-teal-blue) !important; }
+section[data-testid="stSidebar"] [data-testid="stFileUploaderDropzone"] button { background-color: var(--cnxt-blue) !important; color: var(--cnxt-paper) !important; border: none !important; }
+section[data-testid="stSidebar"] .stButton > button { background-color: rgba(255, 255, 255, 0.10) !important; color: var(--cnxt-teal-blue) !important; border: 1px solid rgba(144, 203, 219, 0.35) !important; border-radius: 999px !important; }
+section[data-testid="stSidebar"] .stButton > button[kind="primary"] { background-color: var(--cnxt-sun) !important; color: var(--cnxt-midnight) !important; border: none !important; }
+.stButton > button[kind="primary"], .stDownloadButton > button { background-color: var(--cnxt-sun) !important; color: var(--cnxt-midnight) !important; font-family: var(--font-body) !important; font-weight: 600 !important; border: none !important; border-radius: 999px !important; padding: 0.55rem 1.4rem !important; box-shadow: 0 6px 18px -8px rgba(229, 139, 37, 0.65) !important; transition: all 0.2s ease !important; }
+.stButton > button[kind="primary"]:hover, .stDownloadButton > button:hover { background-color: var(--cnxt-twilight) !important; color: var(--cnxt-cream) !important; transform: translateY(-1px); }
+.cnxt-hero-banner { background: linear-gradient(135deg, #071776 0%, #071739 100%); color: #FFFFFF; padding: 28px 34px; border-radius: 10px; margin-bottom: 20px; position: relative; overflow: hidden; border: 1px solid rgba(144, 203, 219, 0.22); }
+.cnxt-hero-banner::after { content: ""; position: absolute; top: -90px; right: -90px; width: 280px; height: 280px; background: radial-gradient(circle, rgba(241, 201, 22, 0.22), transparent 65%); pointer-events: none; }
+.cnxt-eyebrow { font-family: var(--font-mono); font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.18em; color: #F1C916; margin-bottom: 8px; font-weight: 600; }
+.cnxt-hero-title { font-family: var(--font-display); font-size: clamp(1.55rem, 2.6vw, 2.15rem); font-weight: 700; color: #FFFFFF; line-height: 1.18; margin: 0 0 8px 0; }
+.cnxt-hero-title span { color: #E58B25; }
+.cnxt-hero-sub { color: #90CBDB; font-size: 0.94rem; margin: 0; max-width: 880px; }
+div[data-testid="stMetric"] { background-color: var(--cnxt-paper); border: 1px solid var(--cnxt-line); border-top: 3px solid var(--cnxt-blue); border-radius: 8px; padding: 16px 18px; box-shadow: 0 2px 10px rgba(7, 23, 57, 0.04); }
+div[data-testid="stMetric"] label { font-family: var(--font-mono) !important; font-size: 0.72rem !important; text-transform: uppercase !important; letter-spacing: 0.1em !important; color: var(--cnxt-ash) !important; }
+div[data-testid="stMetric"] [data-testid="stMetricValue"] { font-family: var(--font-display) !important; color: var(--cnxt-twilight) !important; font-weight: 700 !important; }
+.stTabs [data-baseweb="tab-list"] { gap: 6px; border-bottom: 2px solid var(--cnxt-line); }
+.stTabs [data-baseweb="tab"] { font-family: var(--font-display); font-weight: 600; color: var(--cnxt-midnight); background-color: var(--cnxt-cream); border-radius: 6px 6px 0 0; padding: 10px 18px; border: 1px solid var(--cnxt-line); border-bottom: none; }
+.stTabs [aria-selected="true"] { background-color: var(--cnxt-twilight) !important; color: var(--cnxt-paper) !important; border-color: var(--cnxt-twilight) !important; }
+.cnxt-cream-panel { background-color: var(--cnxt-cream); border: 1px solid var(--cnxt-line-strong); border-left: 4px solid var(--cnxt-sun); border-radius: 6px; padding: 16px 20px; margin: 12px 0; color: var(--cnxt-midnight); }
+.cnxt-cream-panel strong { color: var(--cnxt-twilight); }
+span[data-baseweb="tag"] { background-color: var(--cnxt-twilight) !important; color: var(--cnxt-paper) !important; }
+</style>"""
+    st.markdown(css, unsafe_allow_html=True)
 
 
 inject_connext_brand_css()
-
-import hmac
 
 
 def require_connext_login():
@@ -280,7 +105,6 @@ def require_connext_login():
     if st.session_state.get("cnxt_authenticated"):
         return
 
-    # Hide sidebar while locked
     st.markdown(
         "<style>section[data-testid='stSidebar']{display:none;}</style>",
         unsafe_allow_html=True,
@@ -826,11 +650,10 @@ def analyze_multi_horizon_trends(
     pages_agg["page_org_pos"] = (pages_agg["page_weighted_pos"] / np.maximum(pages_agg["page_imp_7d"], 1)).round(1)
 
     top_page_map = pages_agg.groupby("topic")["page"].first().to_dict()
-    all_pages_map = (
-        pages_agg.groupby("topic")
-        .apply(lambda g: " | ".join(f"{r['page']} (#{r['page_org_pos']})" for _, r in g.iterrows()))
-        .to_dict()
-    )
+    all_pages_map = {
+        t: " | ".join(f"{r['page']} (#{r['page_org_pos']})" for _, r in g.iterrows())
+        for t, g in pages_agg.groupby("topic")
+    }
     page_count_map = pages_agg.groupby("topic")["page"].nunique().to_dict()
 
     results = []
@@ -1020,11 +843,10 @@ def analyze_ai_pages_and_queries(
     web_7d["web_org_pos"] = (web_7d["web_wpos"] / np.maximum(web_7d["web_imp_7d"], 1)).round(1)
 
     page_queries_grp = all_queries_df.sort_values(["query_lift_x", "imp_7d"], ascending=[False, False])
-    connected_qs_map = (
-        page_queries_grp.groupby("norm_page")
-        .apply(lambda g: [f"{r['query']} ({r['query_lift_x']}x, #{r['connext_org_pos']})" for _, r in g.head(6).iterrows()])
-        .to_dict()
-    )
+    connected_qs_map = {
+        p: [f"{r['query']} ({r['query_lift_x']}x, #{r['connext_org_pos']})" for _, r in g.head(6).iterrows()]
+        for p, g in page_queries_grp.groupby("norm_page")
+    }
     raw_qs_map = page_queries_grp.groupby("norm_page")["query"].apply(list).to_dict()
     prompt_qs_map = (
         page_queries_grp[page_queries_grp["is_ai_prompt"]]
@@ -1285,11 +1107,11 @@ def build_content_queue(trends_df: pd.DataFrame) -> pd.DataFrame:
 
 # --- SIDEBAR CONTROLS (MIDNIGHT NAVY WITH OFFICIAL WHITE CONNEXT LOGO) ---
 st.sidebar.image(CNXT_LOGO_WHITE, width=185)
+st.sidebar.markdown("**Search & AI Visibility Radar**")
+st.sidebar.caption("Property: `connextglobal.com` • Impressions & Organic Rank")
 if st.sidebar.button("Lock / Log Out"):
     st.session_state["cnxt_authenticated"] = False
     st.rerun()
-st.sidebar.markdown("**Search & AI Visibility Radar**")
-st.sidebar.caption("Property: `connextglobal.com` • Impressions & Organic Rank")
 st.sidebar.divider()
 
 data_source = st.sidebar.radio(
