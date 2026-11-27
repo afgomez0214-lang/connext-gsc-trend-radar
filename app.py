@@ -224,7 +224,7 @@ def require_connext_login():
         """<div class="cnxt-hero" style="margin-top: 12px; margin-bottom: 20px;">
 <div class="cnxt-eyebrow">CONNEXT GLOBAL INTERNAL MARKETING &amp; GROWTH PLATFORM</div>
 <h1>Connext Search &amp; Topic <span>Trend Radar</span></h1>
-<p>A plain-English intelligence tool that turns live Google Search Console data into actionable priorities for Paid Ads, Content Creation, SEO updates, and Competitor Tracking—no SEO background required.</p>
+<p>100% verified Google Search Console data, live sitemap checks, Competitor US Ads Transparency, and competitor blog intelligence—built in plain English for the whole team.</p>
 </div>""",
         unsafe_allow_html=True,
     )
@@ -259,17 +259,17 @@ def require_connext_login():
         st.markdown(
             """<div class="cnxt-timing-box">
 <strong>Please Expect 30 to 60 Seconds to Load:</strong><br/>
-Right after you click <strong>Unlock Enterprise Radar</strong>, the app connects live to Google Search Console, filters out job-seeker noise, groups thousands of searches into B2B topics, and checks every topic against <code>connextglobal.com/sitemap.xml</code>. <strong>Please keep the tab open and do not refresh while it loads.</strong>
+Right after you click <strong>Unlock Enterprise Radar</strong>, the app connects live to Google Search Console, filters out job-seeker noise, groups searches into B2B topics, and checks every topic against <code>connextglobal.com/sitemap.xml</code>. <strong>Please keep the tab open and do not refresh while it loads.</strong>
 </div>""",
             unsafe_allow_html=True,
         )
 
         st.markdown(
             """<div class="cnxt-info-card" style="padding: 14px 18px; font-size: 0.86rem;">
-<strong>Data Security &amp; Access Guidelines:</strong>
+<strong>Data Integrity &amp; Security:</strong>
 <ul>
-<li><strong>Read-Only Connection:</strong> Nothing you click inside this dashboard can edit Google Search Console, Google Ads, or the live website.</li>
-<li><strong>Internal Use Only:</strong> Do not share the app link or password outside Connext Global. Click <em>Lock / Log Out</em> in the sidebar on shared screens.</li>
+<li><strong>100% Real Data Only:</strong> Every impression, click, CTR, rank, and bid comes directly from Google Search Console, Google Keyword Planner, or live public pages—zero invented numbers.</li>
+<li><strong>Read-Only Access:</strong> Nothing inside this dashboard can edit Google Search Console, Google Ads, or the website.</li>
 </ul>
 </div>""",
             unsafe_allow_html=True,
@@ -280,23 +280,17 @@ Right after you click <strong>Unlock Enterprise Radar</strong>, the app connects
             """<div class="cnxt-info-card">
 <h3>What This Tool Does (In Plain English)</h3>
 <ul>
-<li><strong>Finds Rising Buyer Demand:</strong> Spots B2B outsourcing topics growing right now on Google (3-day spikes, 7-day surges, and 30-day growth) across all Connext verticals.</li>
-<li><strong>Prevents Duplicate Content:</strong> Automatically cross-checks every idea against <code>connextglobal.com/sitemap.xml</code> so we write new articles only for true gaps and refresh existing pages when already covered.</li>
-<li><strong>Catches Slipping Pages Early:</strong> Flags <em>Content Decay</em> when a Connext topic loses search visibility or drops in Google rank.</li>
-<li><strong>Builds Paid Ads &amp; ROI Cases:</strong> Estimates missed monthly clicks and equivalent ad value, plus ready-to-paste keywords, negative keywords, and headlines.</li>
-<li><strong>Tracks 12 Competitors &amp; US Ads Transparency:</strong> Scans new competitor blog posts (extracting their main target keywords) and links directly to their US Google &amp; Microsoft Ads.</li>
-</ul>
-<h3>How Each Team Uses This Data</h3>
-<ul>
-<li><strong>Content &amp; SEO Team:</strong> Use <em>Tab 2 (Decay &amp; On-Page Audit)</em> to rescue slipping pages, <em>Tab 4</em> for new content ideas, internal links, and FAQ schema, and <em>Tab 5</em> to see what competitors just published.</li>
-<li><strong>Paid Media (Google &amp; Bing Ads):</strong> Filter by <em>BOFU — Ready to Buy</em>, open <em>Tab 3</em> to grab high-intent keywords and real GSC negative keywords, and check <em>Tab 5</em> for competitor US Google Ads Transparency.</li>
-<li><strong>Leadership &amp; Strategy:</strong> Check <em>Tab 1 (Executive Overview)</em> for Brand vs. Non-Brand health, copy the <em>1-Click Teams Summary</em>, or download the <em>Full Excel Report (.xlsx)</em>.</li>
+<li><strong>Finds Rising Buyer Demand (Tab 1):</strong> Spots B2B topics growing right now on Google (3-day spikes, 7-day surges, and 30-day growth) with real GSC Impressions, Clicks, CTR, and Rank.</li>
+<li><strong>Catches Slipping Pages &amp; Audits HTML (Tab 2):</strong> Flags <em>Content Decay</em> when real GSC impressions or ranks drop, and grades live pages on SEO &amp; AI readiness.</li>
+<li><strong>Builds Google &amp; Bing Ads Campaigns (Tab 3):</strong> Turns real buyer searches into Exact/Phrase keyword lists, harvests real wasted non-B2B negative keywords, and merges real Google Keyword Planner volumes/bids when uploaded.</li>
+<li><strong>Plans New Content &amp; Internal Links (Tab 4):</strong> Checks <code>connextglobal.com/sitemap.xml</code> to separate brand-new blog topics from existing page refreshes.</li>
+<li><strong>Inspects Competitor US Ads &amp; Blogs (Tabs 5 &amp; 6):</strong> Dedicated <strong>Competitor US Ads Transparency</strong> tab for all 12 BPO rivals plus on-demand competitor new blog &amp; keyword discovery.</li>
 </ul>
 <h3>What to Expect Once Inside</h3>
 <ul>
 <li><strong>Tabs 1–4</strong> load automatically after the initial 30–60s sync (cached for 1 hour so filtering is instant).</li>
-<li><strong>Tabs 5 &amp; 6</strong> (Competitor Blogs, US Ads Transparency, Trends, Reddit) run <strong>only when you click their button</strong> (~10–20s) to keep the main dashboard fast and avoid wasting API credits.</li>
-<li>Open <strong>Tab 7 (User Guide &amp; Glossary)</strong> anytime for plain-English definitions of every metric and step-by-step workflows.</li>
+<li><strong>Tabs 5 &amp; 6</strong> run external checks <strong>only when you click their button</strong> (~10–20s) so the dashboard stays fast and never spends API credits automatically.</li>
+<li>Open <strong>Tab 7 (User Guide &amp; Glossary)</strong> anytime for plain-English definitions of every metric.</li>
 </ul>
 </div>""",
             unsafe_allow_html=True,
@@ -638,24 +632,6 @@ def human_rank_label(pos: float) -> str:
     return f"Page 3+ (#{pos:.1f})"
 
 
-def expected_ctr_by_rank(pos: float) -> float:
-    if pos <= 0:
-        return 0.0
-    if pos <= 1.5:
-        return 0.285
-    if pos <= 2.5:
-        return 0.155
-    if pos <= 3.5:
-        return 0.105
-    if pos <= 5.5:
-        return 0.065
-    if pos <= 10.5:
-        return 0.028
-    if pos <= 20.5:
-        return 0.008
-    return 0.002
-
-
 def classify_sector(text: str) -> str:
     for sector_name, pattern in SECTOR_PATTERNS:
         if pattern.search(text):
@@ -685,7 +661,7 @@ def build_enterprise_excel_bytes(sheets_dict: dict[str, pd.DataFrame]) -> bytes:
 
 @st.cache_data(ttl=3600, show_spinner=False)
 def fetch_live_sitemap_paths() -> tuple[list[str], str]:
-    headers = {"User-Agent": "Mozilla/5.0 (compatible; ConnextTrendRadar/3.1)"}
+    headers = {"User-Agent": "Mozilla/5.0 (compatible; ConnextTrendRadar/3.2)"}
     try:
         with urllib.request.urlopen(urllib.request.Request(SITEMAP_XML_URL, headers=headers), timeout=8) as resp:
             root = ET.fromstring(resp.read())
@@ -911,9 +887,10 @@ def run_live_onpage_seo_audit(url: str, target_keywords: tuple[str, ...]) -> dic
 
 
 # ==============================================================================
-# KEYWORD PLANNER ($0 CSV PARSER) & GSC LOADERS
+# KEYWORD PLANNER ($0 CSV PARSER) & GSC LOADERS (100% REAL CLICKS & IMPRESSIONS)
 # ==============================================================================
 def parse_keyword_planner_csv(uploaded_file) -> dict:
+    """Parses real Avg. Monthly Searches, Competition, and Top-of-Page Bid (Low/High) from Keyword Planner CSV."""
     fname = uploaded_file.name.lower()
     if fname.endswith((".xlsx", ".xls")):
         df = pd.read_excel(uploaded_file)
@@ -935,9 +912,10 @@ def parse_keyword_planner_csv(uploaded_file) -> dict:
     kw_c = next((c for c in df.columns if "keyword" in c), None)
     vol_c = next((c for c in df.columns if "monthly searches" in c or "search volume" in c), None)
     low_c = next((c for c in df.columns if "low range" in c), None)
-    high_c = next((c for c in df.columns if "high range" in c or "cpc" in c), None)
+    high_c = next((c for c in df.columns if "high range" in c), None)
+    comp_c = next((c for c in df.columns if c == "competition"), None)
     if not kw_c:
-        raise ValueError("Missing 'Keyword' column.")
+        raise ValueError("Missing 'Keyword' column in Keyword Planner CSV.")
 
     out = {}
     for _, r in df.iterrows():
@@ -946,9 +924,14 @@ def parse_keyword_planner_csv(uploaded_file) -> dict:
             continue
         vol = int(pd.to_numeric(r[vol_c], errors="coerce") or 0) if vol_c else 0
         low_b = float(pd.to_numeric(r[low_c], errors="coerce") or 0.0) if low_c else 0.0
-        high_b = float(pd.to_numeric(r[high_c], errors="coerce") or 0.0) if high_c else low_b
-        avg_cpc = round((low_b + high_b) / 2.0, 2) if (low_b > 0 and high_b > 0) else round(max(low_b, high_b), 2)
-        out[k] = {"kp_volume": vol, "kp_cpc": avg_cpc, "kp_low_bid": round(low_b, 2), "kp_high_bid": round(high_b, 2)}
+        high_b = float(pd.to_numeric(r[high_c], errors="coerce") or 0.0) if high_c else 0.0
+        comp_s = str(r[comp_c]).strip() if comp_c and pd.notna(r[comp_c]) else "—"
+        out[k] = {
+            "kp_volume": vol,
+            "kp_low_bid": round(low_b, 2),
+            "kp_high_bid": round(high_b, 2),
+            "kp_competition": comp_s,
+        }
     return out
 
 
@@ -974,6 +957,7 @@ def parse_gsc_web_upload(uploaded_file, brand_regex: str, custom_negatives: str,
     df["date"] = pd.to_datetime(df["date"])
     df["query"] = df["query"].astype(str).str.lower().str.strip()
     df["page"] = df["page"].astype(str).apply(normalize_url)
+    df["clicks"] = pd.to_numeric(df["clicks"], errors="coerce").fillna(0).astype(int) if "clicks" in df.columns else 0
     df["impressions"] = pd.to_numeric(df["impressions"], errors="coerce").fillna(0).astype(int)
     df["position"] = pd.to_numeric(df["position"], errors="coerce").fillna(0.0)
     df = df[(df["query"] != "") & (df["impressions"] > 0)].copy()
@@ -1026,8 +1010,12 @@ def fetch_gsc_api_data(creds_dict: dict, site_url: str, lookback_days: int, bran
                 neg_counter[clean_q] = neg_counter.get(clean_q, 0) + int(r["impressions"])
                 continue
             rows.append({
-                "date": date_str, "query": clean_q, "page": normalize_url(page),
-                "impressions": int(r["impressions"]), "position": float(r["position"]),
+                "date": date_str,
+                "query": clean_q,
+                "page": normalize_url(page),
+                "clicks": int(r.get("clicks", 0)),
+                "impressions": int(r["impressions"]),
+                "position": float(r["position"]),
                 "is_branded": bool(brand_pat.search(clean_q)) if brand_pat else False,
             })
         if len(batch) < row_limit:
@@ -1188,7 +1176,7 @@ def scan_competitor_new_blogs_auto(lookback_days: int = 45) -> tuple[pd.DataFram
 def _serpapi_get(params: dict, api_key: str) -> dict:
     q_params = {**params, "api_key": api_key, "output": "json"}
     url = f"https://serpapi.com/search.json?{urllib.parse.urlencode(q_params)}"
-    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (compatible; ConnextTrendRadar/3.1)"})
+    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (compatible; ConnextTrendRadar/3.2)"})
     with urllib.request.urlopen(req, timeout=25) as resp:
         return json.loads(resp.read().decode("utf-8"))
 
@@ -1199,11 +1187,7 @@ def run_on_demand_us_ads_transparency_scan(
     keywords_tuple: tuple[str, ...],
     scan_all_12_transparency: bool = True,
 ) -> tuple[pd.DataFrame, pd.DataFrame, str]:
-    """
-    Strictly button-triggered (never runs automatically on load, cached 7 days):
-      1. Google Ads Transparency Center (region=2840 US, platform=SEARCH) for all 12 competitors.
-      2. Live US Google Search Paid Ads (`ads` array) on selected trending B2B keywords.
-    """
+    """Button-triggered only (never runs on load, cached 7 days)."""
     trans_rows, paid_rows, errors = [], [], []
     credits_used = 0
 
@@ -1464,7 +1448,7 @@ def fetch_free_google_and_bing_suggestions(seed_topic: str) -> pd.DataFrame:
 def fetch_free_reddit_b2b_discussions(seed_topic: str) -> pd.DataFrame:
     try:
         url = f"https://www.reddit.com/search.json?q={urllib.parse.quote(f'{seed_topic} outsourcing OR offshore OR agency')}&sort=relevance&t=year&limit=10"
-        with urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "ConnextTrendRadar/3.1"}), timeout=10) as resp:
+        with urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "ConnextTrendRadar/3.2"}), timeout=10) as resp:
             data = json.loads(resp.read().decode("utf-8", errors="ignore"))
         rows = []
         for child in (data.get("data") or {}).get("children", []):
@@ -1518,6 +1502,7 @@ def cluster_queries(df: pd.DataFrame, distance_threshold: float) -> pd.DataFrame
 
 
 def analyze_trends_and_decay(non_brand_df: pd.DataFrame, live_set: set[str], live_df: pd.DataFrame, live_vec: TfidfVectorizer, live_mat, min_daily_imp: int, min_up_days: int, min_norm_slope: float, min_lift: float):
+    """Uses 100% real GSC clicks, impressions, CTR, and position—zero invented metrics."""
     if non_brand_df.empty:
         return pd.DataFrame(), pd.DataFrame(), pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
     all_dates = sorted(non_brand_df["date"].unique())
@@ -1532,8 +1517,14 @@ def analyze_trends_and_decay(non_brand_df: pd.DataFrame, live_set: set[str], liv
     month_recent, month_prior = all_dates[-month_comp:], (all_dates[-(month_comp * 2):-month_comp] if n_days >= month_comp * 2 else all_dates[:-month_comp])
 
     df = non_brand_df.copy()
+    if "clicks" not in df.columns:
+        df["clicks"] = 0
     df["weighted_pos"] = df["position"] * df["impressions"]
-    daily_topic = df.groupby(["topic", "date"], as_index=False).agg(impressions=("impressions", "sum"), weighted_pos=("weighted_pos", "sum"))
+    daily_topic = df.groupby(["topic", "date"], as_index=False).agg(
+        clicks=("clicks", "sum"),
+        impressions=("impressions", "sum"),
+        weighted_pos=("weighted_pos", "sum"),
+    )
 
     recent_df, prior_df, month_df = df[df["date"].isin(week_dates)], df[df["date"].isin(prior_14_dates)], df[df["date"].isin(month_dates)]
     top_q_map = recent_df.groupby(["topic", "query"], as_index=False)["impressions"].sum().sort_values("impressions", ascending=False).groupby("topic")["query"].apply(list).to_dict()
@@ -1543,7 +1534,13 @@ def analyze_trends_and_decay(non_brand_df: pd.DataFrame, live_set: set[str], liv
     for t_name, grp in recent_df.groupby(["topic", "query"], as_index=False)["impressions"].sum().sort_values("impressions", ascending=False).groupby("topic"):
         topic_q_imp_map[t_name] = list(zip(grp["query"].tolist(), grp["impressions"].tolist()))
 
-    pages_agg = recent_df.groupby(["topic", "norm_page", "path"], as_index=False).agg(page_imp_7d=("impressions", "sum"), page_weighted_pos=("weighted_pos", "sum"), queries_on_page=("query", "nunique")).sort_values(["topic", "page_imp_7d"], ascending=[True, False])
+    pages_agg = recent_df.groupby(["topic", "norm_page", "path"], as_index=False).agg(
+        page_clicks_7d=("clicks", "sum"),
+        page_imp_7d=("impressions", "sum"),
+        page_weighted_pos=("weighted_pos", "sum"),
+        queries_on_page=("query", "nunique"),
+    ).sort_values(["topic", "page_imp_7d"], ascending=[True, False])
+    pages_agg["page_ctr_%"] = ((pages_agg["page_clicks_7d"] / np.maximum(pages_agg["page_imp_7d"], 1)) * 100).round(2)
     pages_agg["page_org_pos"] = (pages_agg["page_weighted_pos"] / np.maximum(pages_agg["page_imp_7d"], 1)).round(1)
     pages_agg["page_role"] = pages_agg["path"].apply(lambda p: classify_page_role(p, live_set))
     pages_agg["is_live_url"] = pages_agg["path"].isin(live_set)
@@ -1566,8 +1563,14 @@ def analyze_trends_and_decay(non_brand_df: pd.DataFrame, live_set: set[str], liv
 
         rec_grp = group[group["date"].isin(week_dates)]
         pri_grp = group[group["date"].isin(prior_14_dates)]
+        mon_grp = group[group["date"].isin(month_dates)]
+
         imp_7d = int(rec_grp["impressions"].sum())
-        imp_30d = int(group[group["date"].isin(month_dates)]["impressions"].sum())
+        clicks_7d = int(rec_grp["clicks"].sum())
+        imp_30d = int(mon_grp["impressions"].sum())
+        clicks_30d = int(mon_grp["clicks"].sum())
+        real_ctr_30d = round((clicks_30d / max(imp_30d, 1)) * 100, 2)
+
         avg_pos_now = float(rec_grp["weighted_pos"].sum() / max(imp_7d, 1)) if imp_7d > 0 else 0.0
         avg_pos_prior = float(pri_grp["weighted_pos"].sum() / max(int(pri_grp["impressions"].sum()), 1)) if not pri_grp.empty else avg_pos_now
         rank_slip = round(avg_pos_now - avg_pos_prior, 1)
@@ -1579,12 +1582,13 @@ def analyze_trends_and_decay(non_brand_df: pd.DataFrame, live_set: set[str], liv
                 "Topic": topic,
                 "Vertical": classify_sector(f"{topic} {gsc_url_d}"),
                 "7d Impr.": imp_7d,
-                "Impr. Drop": f"{drop_pct_7d:.0f}%",
+                "7d Clicks": clicks_7d,
+                "Impr. Change": f"{drop_pct_7d:.0f}%",
                 "Prior Rank": f"#{avg_pos_prior:.1f}",
                 "Current Rank": f"#{avg_pos_now:.1f}" if avg_pos_now > 0 else "Dropped",
-                "Rank Slip": f"{rank_slip:+.1f}" if avg_pos_now > 0 else "Lost",
+                "Rank Change": f"{rank_slip:+.1f}" if avg_pos_now > 0 else "Lost",
                 "Affected Page": gsc_url_d,
-                "Rescue Action": "Refresh H1/H2s, update stats & add internal links immediately" if avg_pos_prior <= 10.0 else "Expand page depth & add supporting blog links",
+                "Recommended Refresh": "Update H1/H2s, refresh stats & add internal links" if avg_pos_prior <= 10.0 else "Expand page depth & add supporting blog links",
             })
 
         if max(m_today, m_week, m_mrec) < min_daily_imp:
@@ -1629,10 +1633,6 @@ def analyze_trends_and_decay(non_brand_df: pd.DataFrame, live_set: set[str], liv
         else:
             action = "Defend Top 3 Rank"
 
-        cur_clicks = round(imp_30d * expected_ctr_by_rank(avg_pos_now), 1)
-        top3_clicks = round(imp_30d * expected_ctr_by_rank(2.5), 1)
-        missed_clicks = max(0.0, round(top3_clicks - cur_clicks, 1))
-
         prio_score = min(100, int(
             (30 if funnel.startswith("BOFU") else (20 if funnel.startswith("MOFU") else 10))
             + min(30, int(np.log1p(imp_7d) * 4.5))
@@ -1649,10 +1649,11 @@ def analyze_trends_and_decay(non_brand_df: pd.DataFrame, live_set: set[str], liv
             "growth_pct_3d": round((lift_today - 1.0) * 100),
             "growth_pct_week": round(((m_week / m_prior) - 1.0) * 100),
             "month_growth_pct": round((lift_month - 1.0) * 100),
-            "impressions_7d": imp_7d, "impressions_30d": imp_30d,
+            "impressions_7d": imp_7d, "clicks_7d": clicks_7d,
+            "impressions_30d": imp_30d, "clicks_30d": clicks_30d,
+            "real_ctr_30d_%": real_ctr_30d,
             "sparkline_7d": [int(v) for v in arr_week],
             "connext_org_pos": round(avg_pos_now, 1), "google_rank_label": human_rank_label(avg_pos_now),
-            "est_cur_clicks_30d": cur_clicks, "est_top3_clicks_30d": top3_clicks, "est_missed_clicks_30d": missed_clicks,
             "commercial_intent": has_comm, "coverage_status": cov_status,
             "already_exists_in_sitemap": site_chk["already_exists_in_sitemap"],
             "closest_existing_url": site_chk["closest_existing_url"],
@@ -1670,9 +1671,14 @@ def analyze_trends_and_decay(non_brand_df: pd.DataFrame, live_set: set[str], liv
 
     trends_df = pd.DataFrame(surge_results).sort_values(["priority_score", "impressions_7d"], ascending=False).reset_index(drop=True)
 
-    q_recent = recent_df.groupby(["topic", "query", "is_long_tail", "is_ai_prompt"], as_index=False).agg(imp_7d=("impressions", "sum"), weighted_pos=("weighted_pos", "sum"), top_page=("norm_page", "first"))
-    q_merged = q_recent.merge(month_df.groupby("query", as_index=False).agg(imp_30d=("impressions", "sum")), on="query", how="left").merge(prior_df.groupby("query", as_index=False).agg(imp_base14=("impressions", "sum")), on="query", how="left").fillna({"imp_30d": 0, "imp_base14": 0})
+    q_recent = recent_df.groupby(["topic", "query", "is_long_tail", "is_ai_prompt"], as_index=False).agg(
+        clicks_7d=("clicks", "sum"), imp_7d=("impressions", "sum"), weighted_pos=("weighted_pos", "sum"), top_page=("norm_page", "first")
+    )
+    q_mon_agg = month_df.groupby("query", as_index=False).agg(clicks_30d=("clicks", "sum"), imp_30d=("impressions", "sum"))
+    q_merged = q_recent.merge(q_mon_agg, on="query", how="left").merge(prior_df.groupby("query", as_index=False).agg(imp_base14=("impressions", "sum")), on="query", how="left").fillna({"clicks_30d": 0, "imp_30d": 0, "imp_base14": 0})
+    q_merged["clicks_30d"] = q_merged["clicks_30d"].astype(int)
     q_merged["imp_30d"] = q_merged["imp_30d"].astype(int)
+    q_merged["real_ctr_%"] = ((q_merged["clicks_30d"] / np.maximum(q_merged["imp_30d"], 1)) * 100).round(2)
     q_merged["daily_7d"] = (q_merged["imp_7d"] / 7.0).round(1)
     q_merged["query_growth_pct"] = (((q_merged["daily_7d"] / np.maximum(q_merged["imp_base14"] / max(len(prior_14_dates), 1), 0.5)) - 1.0) * 100).round(0).astype(int)
     q_merged["connext_org_pos"] = (q_merged["weighted_pos"] / np.maximum(q_merged["imp_7d"], 1)).round(1)
@@ -1687,7 +1693,6 @@ def analyze_trends_and_decay(non_brand_df: pd.DataFrame, live_set: set[str], liv
 
 
 def build_internal_linking_plan(trends_df: pd.DataFrame, all_pages_gsc_df: pd.DataFrame) -> pd.DataFrame:
-    """Finds live Connext blog posts that should add an internal link pointing to a commercial Service/Industry page."""
     page_imp_map = all_pages_gsc_df.groupby("norm_page")["impressions"].sum().to_dict() if not all_pages_gsc_df.empty else {}
     links = []
     for _, r in trends_df.iterrows():
@@ -1700,7 +1705,7 @@ def build_internal_linking_plan(trends_df: pd.DataFrame, all_pages_gsc_df: pd.Da
                 continue
             links.append({
                 "Source Blog Post (Edit This Post)": src_url,
-                "Source Impressions": int(page_imp_map.get(src_url, 0)),
+                "Source GSC Impressions": int(page_imp_map.get(src_url, 0)),
                 "Anchor Text to Add": r["topic"],
                 "Target Service / Industry Page": target_money,
                 "Current Service Rank": r["google_rank_label"],
@@ -1708,56 +1713,64 @@ def build_internal_linking_plan(trends_df: pd.DataFrame, all_pages_gsc_df: pd.Da
             })
     if not links:
         return pd.DataFrame()
-    return pd.DataFrame(links).drop_duplicates(subset=["Source Blog Post (Edit This Post)", "Target Service / Industry Page"]).sort_values("Source Impressions", ascending=False).reset_index(drop=True)
+    return pd.DataFrame(links).drop_duplicates(subset=["Source Blog Post (Edit This Post)", "Target Service / Industry Page"]).sort_values("Source GSC Impressions", ascending=False).reset_index(drop=True)
 
 
-def build_ads_and_roi_tables(trends_df: pd.DataFrame, queries_df: pd.DataFrame, kp_lookup: dict, default_cpc: float, lead_rate: float, deal_ltv: float):
+def build_real_ads_tables(trends_df: pd.DataFrame, queries_df: pd.DataFrame, kp_lookup: dict):
+    """Builds Google/Bing Ads planning tables using 100% real GSC data + real Keyword Planner data (when uploaded)."""
     ads_topics, rec_kws = [], []
     lp_map = trends_df.set_index("topic")["recommended_money_page"].to_dict()
 
     for _, r in trends_df.iterrows():
         pos, comm = r["connext_org_pos"], r["commercial_intent"]
-        kp = kp_lookup.get(r["topic"].lower(), {})
-        cpc = kp.get("kp_cpc", default_cpc) if kp.get("kp_cpc", 0) > 0 else default_cpc
-        missed = r["est_missed_clicks_30d"]
-        lost_ad_val = round(missed * cpc, 0)
-        pipeline_opp = round(missed * lead_rate * deal_ltv, 0)
         prio = "P0 — Launch Today" if (r["is_today"] and comm and pos > 5.0) else ("P1 — Search Ad Group" if (comm and pos > 5.0) else ("P2 — Defend Top 5" if comm else "P2 — Long-Tail"))
         ads_topics.append({
-            "Priority": prio, "Topic": r["topic"], "Funnel": r["funnel"], "Vertical": r["sector"],
-            "Google Rank": r["google_rank_label"], "30d Impr.": r["impressions_30d"],
-            "Missed Clicks/Mo": missed, "CPC ($)": cpc,
-            "Lost Traffic Value/Mo": lost_ad_val, "Pipeline Opp./Mo": pipeline_opp,
+            "Priority": prio,
+            "Topic": r["topic"],
+            "Funnel": r["funnel"],
+            "Vertical": r["sector"],
+            "Google Rank": r["google_rank_label"],
+            "7d Impr. (GSC)": r["impressions_7d"],
+            "30d Impr. (GSC)": r["impressions_30d"],
+            "30d Clicks (GSC)": r["clicks_30d"],
+            "Real CTR (%)": r["real_ctr_30d_%"],
             "Landing Page": r["recommended_money_page"],
         })
 
     for _, q in queries_df.iterrows():
         kw, is_lt, is_comm = q["query"], q["is_long_tail"], q["is_commercial"]
         kp = kp_lookup.get(kw.lower(), {})
-        cpc = kp.get("kp_cpc", default_cpc) if kp.get("kp_cpc", 0) > 0 else default_cpc
-        q_missed = max(0.0, round(q["imp_30d"] * (expected_ctr_by_rank(2.5) - expected_ctr_by_rank(q["connext_org_pos"])), 1))
+        kp_vol = kp.get("kp_volume", 0)
+        kp_low = kp.get("kp_low_bid", 0.0)
+        kp_high = kp.get("kp_high_bid", 0.0)
+        kp_comp = kp.get("kp_competition", "—")
         mtype = '"Phrase" + [Exact]' if (is_comm and not is_lt) else ("[Exact Match]" if is_lt else '"Phrase Match"')
-        rec_kws.append({
-            "Keyword": kw, "7d Impr.": int(q["imp_7d"]), "30d Impr.": int(q["imp_30d"]),
-            "KP Monthly Vol.": kp.get("kp_volume", "—") if kp.get("kp_volume", 0) > 0 else "—",
+
+        row_dict = {
+            "Keyword": kw,
+            "7d Impr. (GSC)": int(q["imp_7d"]),
+            "30d Impr. (GSC)": int(q["imp_30d"]),
+            "30d Clicks (GSC)": int(q["clicks_30d"]),
+            "Real CTR (%)": float(q["real_ctr_%"]),
             "Growth": f"+{int(q['query_growth_pct'])}%" if q["query_growth_pct"] >= 0 else f"{int(q['query_growth_pct'])}%",
             "Google Rank": human_rank_label(q["connext_org_pos"]),
-            "Missed Clicks/Mo": q_missed, "CPC ($)": cpc, "Lost Value/Mo": round(q_missed * cpc, 0),
-            "Match Type": mtype, "Topic": q["topic"], "Landing Page": lp_map.get(q["topic"], q["top_page"]),
-        })
+            "Match Type": mtype,
+            "Topic": q["topic"],
+            "Landing Page": lp_map.get(q["topic"], q["top_page"]),
+        }
+        if kp_lookup:
+            row_dict["KP Monthly Searches"] = kp_vol if kp_vol > 0 else "—"
+            row_dict["KP Top Bid Range (Real)"] = f"${kp_low:.2f} – ${kp_high:.2f}" if kp_high > 0 else "—"
+            row_dict["KP Competition"] = kp_comp
+        rec_kws.append(row_dict)
 
     return (
-        pd.DataFrame(ads_topics).sort_values("Lost Traffic Value/Mo", ascending=False),
-        pd.DataFrame(rec_kws).sort_values(["Lost Value/Mo", "7d Impr."], ascending=False) if rec_kws else pd.DataFrame(),
+        pd.DataFrame(ads_topics).sort_values(["30d Impr. (GSC)", "7d Impr. (GSC)"], ascending=False),
+        pd.DataFrame(rec_kws).sort_values(["7d Impr. (GSC)", "30d Impr. (GSC)"], ascending=False) if rec_kws else pd.DataFrame(),
     )
 
 
 def build_content_tables(trends_df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
-    """
-    Cleanly splits surging topics into two mutually exclusive lists (zero redirect jargon):
-      1. new_ideas: Topics NOT covered in connextglobal.com/sitemap.xml -> Write a brand-new article.
-      2. updates: Topics ALREADY live on Connext -> Expand/refresh the existing page with new H2s & FAQs.
-    """
     new_ideas, updates = [], []
     for _, r in trends_df.iterrows():
         if not r["already_exists_in_sitemap"] and r["coverage_status"] == "New Topic Gap":
@@ -1775,9 +1788,7 @@ def build_content_tables(trends_df: pd.DataFrame) -> tuple[pd.DataFrame, pd.Data
             })
         else:
             prio = "P1 — Quick Win (Rank #4–#15)" if r["is_striking_distance"] else "P2 — Keep Fresh"
-            act = (
-                f"Add new H2 sections for rising queries ({r['top_rising_queries'][:65]}...), add FAQ schema, and link to {r['recommended_money_page']}."
-            )
+            act = f"Add new H2 sections for rising queries ({r['top_rising_queries'][:65]}...), add FAQ schema, and link to {r['recommended_money_page']}."
             updates.append({
                 "Priority": prio,
                 "Topic": r["topic"],
@@ -1801,7 +1812,7 @@ live_set, live_df, live_vec, live_mat = _build_index_from_paths(sitemap_paths)
 
 st.sidebar.image(CNXT_LOGO_WHITE, width=175)
 st.sidebar.markdown("**Enterprise Search Radar**")
-st.sidebar.caption(f"Live GSC + Sitemap • {sitemap_source_label}")
+st.sidebar.caption(f"100% Real Data • {sitemap_source_label}")
 if st.sidebar.button("Lock / Log Out"):
     st.session_state["cnxt_authenticated"] = False
     st.rerun()
@@ -1874,10 +1885,7 @@ preset_mode = st.sidebar.selectbox(
 )
 def_imp, def_up, def_lift, def_slope = (50, 4, 1.40, 10) if preset_mode.startswith("Strict") else ((30, 4, 1.30, 8) if preset_mode.startswith("Balanced") else (15, 3, 1.18, 4))
 
-with st.sidebar.expander("ROI & Threshold Settings", expanded=False):
-    default_cpc_est = st.number_input("Fallback B2B CPC ($)", 1.0, 100.0, 7.50, 0.50, help="Used to estimate Lost Traffic Value when a Keyword Planner CSV is not uploaded.")
-    lead_conv_pct = st.slider("Lead Conv. Rate (%)", 1.0, 15.0, 4.0, 0.5, help="Estimated % of website visitors who submit a B2B lead form.")
-    avg_deal_ltv = st.number_input("Avg Client Value ($)", 1000, 250000, 18000, 1000, help="Estimated B2B pipeline value per closed client.")
+with st.sidebar.expander("Trend Threshold Settings", expanded=False):
     min_daily_imp = st.number_input("Min Avg Daily Impr.", 5, 5000, def_imp, 5)
     min_up_days = st.slider("Weekly Upward Days", 2, 6, def_up)
     min_lift = st.slider("Min Growth Multiplier", 1.05, 3.0, def_lift, 0.05)
@@ -1895,13 +1903,13 @@ with h_col1:
     st.image(CNXT_LOGO_COLOR, width=180)
 with h_col2:
     if not raw_df.empty:
-        st.caption(f"Live GSC Window: **{raw_df['date'].min().strftime('%b %d')} – {raw_df['date'].max().strftime('%b %d, %Y')}** ({raw_df['date'].nunique()} complete days)  •  {sitemap_source_label}  •  12 Competitors & US Ads Transparency")
+        st.caption(f"Live GSC Window: **{raw_df['date'].min().strftime('%b %d')} – {raw_df['date'].max().strftime('%b %d, %Y')}** ({raw_df['date'].nunique()} complete days)  •  {sitemap_source_label}  •  100% Real Verified Data")
 
 st.markdown(
     """<div class="cnxt-hero">
 <div class="cnxt-eyebrow">CONNEXT GLOBAL ENTERPRISE SEARCH &amp; TOPIC INTELLIGENCE</div>
 <h1>Search, Content &amp; Competitor <span>Trend Radar</span></h1>
-<p>Real-time Google Search momentum, content decay early warnings, Brand vs. Non-Brand health, ROI opportunity, new content &amp; internal linking plans, live on-page audits, and competitor blogs + US Google Ads Transparency.</p>
+<p>100% verified Google Search Console Impressions, Clicks, CTR, and Rank—paired with Content Decay alerts, New Content &amp; Internal Linking plans, Competitor US Ads Transparency, and Competitor Blog tracking.</p>
 </div>""",
     unsafe_allow_html=True,
 )
@@ -1919,15 +1927,15 @@ with st.expander("New here? 1-Minute Quick Start (How to Use This Tool & What to
         st.markdown(
             """**2. Pick the Tab for Your Role**
 - **Leadership / Managers:** *Tab 1 (Executive Overview)* → copy the Teams Summary or download the Excel report.
-- **Content / SEO Team:** *Tab 2 (Decay & On-Page Audit)* + *Tab 4 (New Content & Linking)* + *Tab 5 (Competitor Blogs)*.
-- **Paid Ads Team:** *Tab 3 (Paid Ads, ROI & Negatives)* + *Tab 5 (Competitor US Ads Transparency)*."""
+- **Content / SEO Team:** *Tab 2 (Decay & On-Page Audit)* + *Tab 4 (New Content & Linking)* + *Tab 6 (Competitor Blogs)*.
+- **Paid Ads Team:** *Tab 3 (Google & Bing Ads Builder)* + *Tab 5 (Competitor US Ads Transparency)*."""
         )
     with qs3:
         st.markdown(
-            """**3. What to Expect (Speed & Data)**
+            """**3. What to Expect (Speed & Real Data)**
 - Initial load takes **30–60 seconds** (live Google Search Console sync, cached for 1 hour).
-- **Tabs 5 & 6** run **on-demand when you click their button** (~10–20s) so the dashboard stays fast and never spends API credits automatically.
-- Need definitions? Open **Tab 7 (User Guide & Glossary)** for plain-English explanations of every metric."""
+- **Zero guessed numbers:** All impressions, clicks, CTRs, and ranks are real GSC metrics. Keyword Planner bids appear only when you upload a real Keyword Planner CSV.
+- **Tabs 5 & 6** run external scans **only when you click their button** (~10–20s)."""
         )
 
 if raw_df.empty:
@@ -1986,26 +1994,26 @@ f_pages = pages_df[pages_df["topic"].isin(f_trends["topic"])].copy()
 f_decay = decay_df[decay_df["Vertical"] == sel_vert.rsplit(" (", 1)[0]].copy() if (sel_vert != "All Verticals" and not decay_df.empty) else decay_df.copy()
 
 kp_lookup_dict = st.session_state.get("kp_lookup_dict", {})
-ads_topics_df, rec_kws_df = build_ads_and_roi_tables(f_trends, f_queries, kp_lookup_dict, default_cpc_est, lead_conv_pct / 100.0, float(avg_deal_ltv))
+ads_topics_df, rec_kws_df = build_real_ads_tables(f_trends, f_queries, kp_lookup_dict)
 truly_new_df, existing_content_df = build_content_tables(f_trends)
 internal_links_df = build_internal_linking_plan(f_trends, clustered_df)
 
-# --- TOP KPI ROW ---
+# --- TOP KPI ROW (100% REAL GSC DATA) ---
 k1, k2, k3, k4, k5 = st.columns(5)
-k1.metric("Surging Topics", len(f_trends), help="Number of B2B topic groups gaining search visibility on Google right now.")
-k2.metric("Content Decay Alerts", len(f_decay), help="Topics where 7-day impressions dropped >= 22% or Google rank slipped >= 2.5 spots.")
-k3.metric("Weekly Impressions", f"{int(f_trends['impressions_7d'].sum()):,}", help="Total times connextglobal.com appeared on Google for these surging topics in the last 7 days.")
-k4.metric("Est. Missed Clicks/Mo", f"{f_trends['est_missed_clicks_30d'].sum():,.0f}", help="Extra monthly clicks Connext could win by ranking in Google's Top 3 for these topics.")
-k5.metric("Lost Traffic Value/Mo", f"${ads_topics_df['Lost Traffic Value/Mo'].sum():,.0f}", help="Estimated Google Ads spend required to buy those missed organic clicks.")
+k1.metric("Surging Topics", len(f_trends), help="B2B topic groups gaining search visibility on Google right now.")
+k2.metric("Content Decay Alerts", len(f_decay), help="Topics where real 7d GSC impressions dropped >= 22% or Google rank slipped >= 2.5 spots.")
+k3.metric("7d Impressions (Real GSC)", f"{int(f_trends['impressions_7d'].sum()):,}", help="Actual Google Search impressions for these surging topics in the last 7 days.")
+k4.metric("7d Clicks (Real GSC)", f"{int(f_trends['clicks_7d'].sum()):,}", help="Actual organic clicks from Google Search in the last 7 days.")
+k5.metric("Avg Google Rank (Real GSC)", f"#{f_trends['connext_org_pos'].mean():.1f}", help="Impression-weighted average Google organic position across surging topics.")
 
-# --- 7 ENTERPRISE TABS ---
-t_over, t_pages, t_ads, t_content, t_comp, t_trends, t_guide = st.tabs([
+# --- 7 ENTERPRISE TABS (WITH DEDICATED TOP-LEVEL COMPETITOR US ADS TRANSPARENCY TAB) ---
+t_over, t_pages, t_ads, t_content, t_ads_trans, t_comp_blogs, t_guide = st.tabs([
     "1. Executive Overview",
     f"2. Pages, Decay & Audit ({len(f_decay)} Decay)",
-    f"3. Paid Ads & ROI ({len(rec_kws_df)})",
+    f"3. Google & Bing Ads Builder ({len(rec_kws_df)})",
     f"4. New Content & Linking ({len(truly_new_df)} New)",
-    "5. Competitor Blogs & US Ads Transparency",
-    "6. Trends, Bing & Research",
+    "5. Competitor US Ads Transparency (12)",
+    "6. Competitor Blogs & Trends ($0)",
     "7. User Guide & Glossary",
 ])
 
@@ -2015,9 +2023,9 @@ t_over, t_pages, t_ads, t_content, t_comp, t_trends, t_guide = st.tabs([
 with t_over:
     render_tab_guide(
         "Executive Overview",
-        "A high-level radar of which B2B topics are growing fastest on Google, the exact keywords inside each cluster, their TOFU/MOFU/BOFU funnel stage, and Brand vs. Non-Brand health.",
-        "Ranked bar charts, a 0–100 Priority Score per topic, daily trend curves, and a ready-to-download multi-sheet Excel report (.xlsx).",
-        "Start weekly team meetings here: review the top 5 orange/blue bars, copy the 1-Click Teams Executive Summary at the bottom, or export the Excel workbook to share with stakeholders.",
+        "Shows which B2B topics are growing fastest on Google using 100% real GSC Impressions, Clicks, CTR, and Rank, plus each cluster's Top Keywords and TOFU/MOFU/BOFU funnel stage.",
+        "Ranked bar charts, a 0–100 Priority Score per topic, daily trend curves, and a multi-sheet Excel report (.xlsx).",
+        "Start weekly team meetings here: review the top surging topics, copy the 1-Click Teams Executive Summary at the bottom, or export the Excel workbook.",
     )
 
     top_bar1, top_bar2 = st.columns([2.5, 1])
@@ -2028,16 +2036,15 @@ with t_over:
             {"Metric": "Report Date (UTC)", "Value": datetime.now(timezone.utc).strftime("%Y-%m-%d")},
             {"Metric": "Surging B2B Topics", "Value": len(f_trends)},
             {"Metric": "Content Decay Alerts", "Value": len(f_decay)},
-            {"Metric": "Weekly Surging Impressions", "Value": int(f_trends["impressions_7d"].sum())},
-            {"Metric": "Avg Google Rank", "Value": round(float(f_trends["connext_org_pos"].mean()), 1)},
-            {"Metric": "Est. Missed Clicks / Month", "Value": round(float(f_trends["est_missed_clicks_30d"].sum()), 0)},
-            {"Metric": "Lost Traffic Ad Value / Month ($)", "Value": round(float(ads_topics_df["Lost Traffic Value/Mo"].sum()), 0)},
+            {"Metric": "Real 7d Impressions (GSC)", "Value": int(f_trends["impressions_7d"].sum())},
+            {"Metric": "Real 7d Clicks (GSC)", "Value": int(f_trends["clicks_7d"].sum())},
+            {"Metric": "Avg Google Rank (GSC)", "Value": round(float(f_trends["connext_org_pos"].mean()), 1)},
         ])
         excel_bytes = build_enterprise_excel_bytes({
             "Executive Summary": exec_summary_df,
-            "Surging Topics": f_trends[["topic", "top_rising_queries", "sector", "funnel", "funnel_reason", "priority_score", "team_action", "impressions_7d", "impressions_30d", "google_rank_label", "est_missed_clicks_30d", "recommended_money_page"]],
+            "Surging Topics": f_trends[["topic", "top_rising_queries", "sector", "funnel", "funnel_reason", "priority_score", "team_action", "impressions_7d", "clicks_7d", "impressions_30d", "clicks_30d", "real_ctr_30d_%", "google_rank_label", "recommended_money_page"]],
             "Content Decay Alerts": f_decay,
-            "Paid Ads & ROI": ads_topics_df,
+            "Ads Topic Queue": ads_topics_df,
             "Suggested Keywords": rec_kws_df.head(500),
             "New Content Ideas": truly_new_df,
             "Existing Page Refreshes": existing_content_df,
@@ -2071,10 +2078,10 @@ with t_over:
             fig_t = px.bar(
                 vdf.head(10), x="impressions_7d", y="topic", orientation="h", color="team_action", text=g_col,
                 color_discrete_map={"Launch Paid Ads": CNXT_COLORS["sun"], "Update Existing Page": CNXT_COLORS["blue"], "Write New Page": CNXT_COLORS["twilight"], "Defend Top 3 Rank": CNXT_COLORS["teal"]},
-                custom_data=["google_rank_label", "est_missed_clicks_30d", "funnel"],
+                custom_data=["google_rank_label", "clicks_7d", "funnel"],
                 labels={"impressions_7d": "7-Day Impressions", "topic": "", "team_action": ""},
             )
-            fig_t.update_traces(texttemplate="+%{text}%", textposition="outside", hovertemplate="<b>%{y}</b><br>7d Impr: <b>%{x:,}</b><br>Rank: <b>%{customdata[0]}</b><br>Funnel: %{customdata[2]}<br>Missed Clicks/Mo: <b>%{customdata[1]:,.0f}</b><extra></extra>")
+            fig_t.update_traces(texttemplate="+%{text}%", textposition="outside", hovertemplate="<b>%{y}</b><br>7d Impr: <b>%{x:,}</b><br>7d Clicks: <b>%{customdata[1]:,}</b><br>Rank: <b>%{customdata[0]}</b><br>Funnel: %{customdata[2]}<extra></extra>")
             fig_t.update_layout(margin=dict(l=5, r=45, t=10, b=45), yaxis=dict(autorange="reversed"))
             st.plotly_chart(style_plotly_light(fig_t, height=370, legend_bottom=True), use_container_width=True)
 
@@ -2107,7 +2114,7 @@ with t_over:
         sr = vdf[vdf["topic"] == sel_t].iloc[0]
         st.markdown(
             f"""<div class="cnxt-callout">
-<strong>{sr['topic'].title()}</strong> ({sr['sector']} • {sr['funnel']} — <em>{sr['funnel_reason']}</em>) — Priority <strong>{sr['priority_score']}/100</strong> • <strong>{sr['impressions_7d']:,}</strong> weekly impressions (<strong>+{sr[g_col]}%</strong> {g_lbl}) • Currently <strong>{sr['google_rank_label']}</strong> • Est. <strong>{sr['est_missed_clicks_30d']:,.0f} missed clicks/mo</strong> • Next Step: <strong>{sr['team_action']}</strong> → <code>{sr['recommended_money_page']}</code>
+<strong>{sr['topic'].title()}</strong> ({sr['sector']} • {sr['funnel']} — <em>{sr['funnel_reason']}</em>) — Priority <strong>{sr['priority_score']}/100</strong> • <strong>{sr['impressions_7d']:,}</strong> 7d impr. &amp; <strong>{sr['clicks_7d']:,}</strong> 7d clicks (<strong>+{sr[g_col]}%</strong> {g_lbl}) • Rank: <strong>{sr['google_rank_label']}</strong> • Real CTR: <strong>{sr['real_ctr_30d_%']:.2f}%</strong> • Next Step: <strong>{sr['team_action']}</strong> → <code>{sr['recommended_money_page']}</code>
 </div>""",
             unsafe_allow_html=True,
         )
@@ -2120,10 +2127,10 @@ with t_over:
         st.plotly_chart(style_plotly_light(fig_l, height=260, legend_bottom=True), use_container_width=True)
 
         st.markdown(f"#### All Surging Topics ({len(vdf)})")
-        ov_tbl = vdf[["priority_score", "topic", "top_rising_queries", "sector", "funnel", "funnel_reason", "team_action", "sparkline_7d", "impressions_7d", g_col, "google_rank_label", "est_missed_clicks_30d", "recommended_money_page"]].copy()
+        ov_tbl = vdf[["priority_score", "topic", "top_rising_queries", "sector", "funnel", "funnel_reason", "team_action", "sparkline_7d", "impressions_7d", "clicks_7d", "real_ctr_30d_%", g_col, "google_rank_label", "recommended_money_page"]].copy()
         ov_tbl["growth_lbl"] = ov_tbl[g_col].apply(lambda x: f"+{x}%" if x >= 0 else f"{x}%")
         st.dataframe(
-            ov_tbl[["priority_score", "topic", "top_rising_queries", "sector", "funnel", "funnel_reason", "team_action", "sparkline_7d", "impressions_7d", "growth_lbl", "google_rank_label", "est_missed_clicks_30d", "recommended_money_page"]],
+            ov_tbl[["priority_score", "topic", "top_rising_queries", "sector", "funnel", "funnel_reason", "team_action", "sparkline_7d", "impressions_7d", "clicks_7d", "real_ctr_30d_%", "growth_lbl", "google_rank_label", "recommended_money_page"]],
             use_container_width=True, hide_index=True, key="tbl_overview",
             column_config={
                 "priority_score": st.column_config.ProgressColumn("Priority", min_value=0, max_value=100, format="%d"),
@@ -2135,27 +2142,28 @@ with t_over:
                 "team_action": "Next Step",
                 "sparkline_7d": st.column_config.LineChartColumn("7d Trend", width="small"),
                 "impressions_7d": st.column_config.NumberColumn("7d Impr."),
+                "clicks_7d": st.column_config.NumberColumn("7d Clicks"),
+                "real_ctr_30d_%": st.column_config.NumberColumn("Real CTR", format="%.2f%%"),
                 "growth_lbl": g_lbl,
                 "google_rank_label": "Google Rank",
-                "est_missed_clicks_30d": st.column_config.NumberColumn("Missed Clicks/Mo", format="%.0f"),
                 "recommended_money_page": st.column_config.LinkColumn("Target Service Page"),
             },
         )
 
         with st.expander("1-Click Teams Executive Summary (Copy & Paste)", expanded=False):
-            lines = [f"{i+1}. **{r['topic'].title()}** ({r['sector']}, {r['funnel']}) — {r['impressions_7d']:,} weekly impr. (+{r[g_col]}%), Rank {r['google_rank_label']}, ~{r['est_missed_clicks_30d']:,.0f} missed clicks/mo → **{r['team_action']}**" for i, r in vdf.head(5).iterrows()]
+            lines = [f"{i+1}. **{r['topic'].title()}** ({r['sector']}, {r['funnel']}) — {r['impressions_7d']:,} 7d impr., {r['clicks_7d']:,} clicks (+{r[g_col]}%), Rank {r['google_rank_label']} → **{r['team_action']}**" for i, r in vdf.head(5).iterrows()]
             decay_note = f"\n• Content Decay Alerts Requiring Refresh: **{len(f_decay)}** topics" if not f_decay.empty else ""
             st.code(f"Connext Search Trend Summary ({datetime.now(timezone.utc).strftime('%b %d, %Y')}){decay_note}\n\n" + "\n".join(lines), language="markdown")
 
 # ==============================================================================
-# TAB 2: PAGES, CONTENT DECAY, CANNIBALIZATION & LIVE ON-PAGE AUDIT
+# TAB 2: PAGES, CONTENT DECAY & LIVE ON-PAGE AUDIT
 # ==============================================================================
 with t_pages:
     render_tab_guide(
         "Pages, Decay & Live On-Page Audit",
-        "Shows (1) topics losing visibility/rank (Content Decay), (2) topics where 2+ Connext pages compete against each other, (3) exact user searches, and (4) a live On-Page SEO Grader.",
-        "Actionable decay alerts, exact URLs ranking on Google, and a 0–100 SEO/AI-readiness checklist when you click 'Run Live On-Page Audit'.",
-        "Fix Decay pages on Page 1 first to protect current leads. Then select any topic, run the Live On-Page Audit on its URL, and send any 'Fix/Missing' items (Title, H1, FAQ schema) to Content or Webflow dev.",
+        "Shows (1) topics losing real GSC impressions or rank (Content Decay), (2) which Connext URLs rank with their real clicks/CTR, and (3) a live On-Page SEO & AI-Readiness Grader.",
+        "Actionable decay alerts, exact URLs ranking on Google, and a 0–100 HTML audit checklist when you click 'Run Live On-Page Audit'.",
+        "Fix Decay pages on Page 1 first to protect existing organic traffic. Then select any topic, run the Live On-Page Audit on its URL, and send any 'Fix/Missing' items to Content or Webflow dev.",
     )
 
     if not f_decay.empty:
@@ -2167,18 +2175,18 @@ with t_pages:
     cann_df = f_trends[f_trends["is_cannibalized"]]
     if not cann_df.empty:
         with st.expander(f"Multi-URL Check: {len(cann_df)} Surging Topics Have 2+ Connext URLs Ranking", expanded=False):
-            st.dataframe(cann_df[["topic", "sector", "ranking_pages_count", "google_rank_label", "impressions_7d", "primary_page", "closest_existing_url"]], use_container_width=True, hide_index=True, key="tbl_cann", column_config={"primary_page": st.column_config.LinkColumn("Top Ranking URL"), "closest_existing_url": st.column_config.LinkColumn("Main Sitemap URL")})
+            st.dataframe(cann_df[["topic", "sector", "ranking_pages_count", "google_rank_label", "impressions_7d", "clicks_7d", "primary_page", "closest_existing_url"]], use_container_width=True, hide_index=True, key="tbl_cann", column_config={"primary_page": st.column_config.LinkColumn("Top Ranking URL"), "closest_existing_url": st.column_config.LinkColumn("Main Sitemap URL")})
 
     st.divider()
     sel_c = st.selectbox("Inspect Ranking Pages, Exact Queries & Run Live On-Page Audit:", f_trends["topic"].tolist(), key="sel_pages_topic")
     tm = f_trends[f_trends["topic"] == sel_c].iloc[0]
 
-    p1, p2 = st.columns([1.2, 1])
+    p1, p2 = st.columns([1.25, 1])
     with p1:
-        st.markdown("**Connext Pages Currently Ranking on Google**")
+        st.markdown("**Connext Pages Currently Ranking on Google (Real GSC Metrics)**")
         tp = f_pages[f_pages["topic"] == sel_c].sort_values("page_imp_7d", ascending=False).copy()
         tp["rank_lbl"] = tp["page_org_pos"].apply(human_rank_label)
-        st.dataframe(tp[["norm_page", "page_role", "page_imp_7d", "topic_imp_share_%", "rank_lbl"]], use_container_width=True, hide_index=True, key="tbl_tp", column_config={"norm_page": st.column_config.LinkColumn("Ranking URL"), "page_imp_7d": "7d Impr.", "topic_imp_share_%": st.column_config.NumberColumn("Share", format="%.0f%%"), "rank_lbl": "Rank"})
+        st.dataframe(tp[["norm_page", "page_role", "page_imp_7d", "page_clicks_7d", "page_ctr_%", "rank_lbl"]], use_container_width=True, hide_index=True, key="tbl_tp", column_config={"norm_page": st.column_config.LinkColumn("Ranking URL"), "page_imp_7d": "7d Impr.", "page_clicks_7d": "7d Clicks", "page_ctr_%": st.column_config.NumberColumn("CTR", format="%.2f%%"), "rank_lbl": "Rank"})
     with p2:
         st.markdown("**Live Matching Pages in `sitemap.xml`**")
         recs, seen = [], set()
@@ -2203,46 +2211,46 @@ with t_pages:
             st.metric("On-Page SEO & AI-Readiness Score", f"{ares['score']} / 100")
             st.dataframe(ares["checks"], use_container_width=True, hide_index=True, key="tbl_onpage_checks")
 
-    st.markdown("**Exact Search Queries & AI Prompts (7+ Words)**")
+    st.markdown("**Exact Search Queries & AI Prompts (Real GSC Data)**")
     tqs = f_queries[f_queries["topic"] == sel_c].sort_values("imp_7d", ascending=False).copy()
     tqs["growth"] = tqs["query_growth_pct"].apply(lambda x: f"+{x}%" if x >= 0 else f"{x}%")
     tqs["rank"] = tqs["connext_org_pos"].apply(human_rank_label)
-    st.dataframe(tqs[["query", "is_ai_prompt", "imp_7d", "imp_30d", "growth", "rank", "top_page"]], use_container_width=True, hide_index=True, key="tbl_tqs", column_config={"is_ai_prompt": st.column_config.CheckboxColumn("AI Prompt"), "top_page": st.column_config.LinkColumn("Ranking URL")})
+    st.dataframe(tqs[["query", "is_ai_prompt", "imp_7d", "clicks_7d", "imp_30d", "clicks_30d", "real_ctr_%", "growth", "rank", "top_page"]], use_container_width=True, hide_index=True, key="tbl_tqs", column_config={"is_ai_prompt": st.column_config.CheckboxColumn("AI Prompt"), "real_ctr_%": st.column_config.NumberColumn("CTR", format="%.2f%%"), "top_page": st.column_config.LinkColumn("Ranking URL")})
 
 # ==============================================================================
-# TAB 3: PAID ADS, ROI, DAY-OF-WEEK SCHEDULER & LIVE NEGATIVE HARVESTER
+# TAB 3: GOOGLE & BING ADS BUILDER (100% REAL GSC + OPTIONAL REAL KEYWORD PLANNER)
 # ==============================================================================
 with t_ads:
     render_tab_guide(
-        "Paid Ads, ROI & Negative Keywords",
-        "Shows which rising topics make the best Google & Bing Ads campaigns, how much traffic/pipeline value we miss below Top 3, peak B2B search days, and real wasted non-B2B searches.",
-        "Every suggested keyword comes with real 7-day & 30-day organic impressions, estimated CPC/Lost Value, Exact/Phrase lists, Negative Keywords, and 30/90-char RSA ad copy.",
-        "1) Focus on 'P0' and 'BOFU' topics where Connext ranks below #5. 2) Export the .txt list into Google Keyword Planner if you want exact Google CPC bids and upload the CSV back here. 3) Copy Exact/Phrase keywords + Real GSC Negatives straight into Google/Bing Ads.",
+        "Google & Bing Ads Builder",
+        "Turns Connext's real GSC search demand into ready-to-launch Google & Bing Ads keyword lists, real wasted non-B2B negative keywords, day-of-week schedules, and RSA ad copy—with zero invented CPCs or fake estimates.",
+        "Shows real 7d & 30d GSC Impressions, Clicks, CTR, and Rank. If you upload a Google Keyword Planner CSV below, it also displays Google's real Avg. Monthly Searches and Top-of-Page Bid Ranges ($).",
+        "1) Filter to 'BOFU — Ready to Buy' topics where Connext ranks below #5. 2) Optionally export the .txt list into Google Keyword Planner and upload the CSV back here for real bid ranges. 3) Copy Exact/Phrase keywords + Real GSC Negatives into Google/Bing Ads.",
     )
 
-    with st.expander("Optional: Upload Free Google Keyword Planner CSV to Lock In Exact Volume & CPC Bids", expanded=False):
-        kp_up = st.file_uploader("Upload CSV/XLSX exported from Google Keyword Planner ('Get search volume and forecasts')", type=["csv", "xlsx", "xls"], key="inline_kp_upload")
+    with st.expander("Optional: Upload Free Google Keyword Planner CSV for Real Monthly Volume & Top-of-Page Bid Ranges ($)", expanded=bool(kp_lookup_dict)):
+        st.caption("Download the clean .txt keyword list below → paste into Google Ads → Keyword Planner → 'Get search volume and forecasts' → export CSV and upload here.")
+        kp_up = st.file_uploader("Upload Google Keyword Planner CSV / XLSX", type=["csv", "xlsx", "xls"], key="inline_kp_upload")
         if kp_up:
             try:
                 parsed_kp = parse_keyword_planner_csv(kp_up)
                 st.session_state["kp_lookup_dict"] = parsed_kp
-                st.success(f"Synced {len(parsed_kp):,} Keyword Planner metrics! Recalculating ROI...")
+                st.success(f"Loaded {len(parsed_kp):,} real Keyword Planner rows!")
                 st.rerun()
             except Exception as err:
                 st.error(str(err))
 
     o1, o2, o3, o4 = st.columns(4)
-    o1.metric("Current Est. Clicks/Mo", f"{f_trends['est_cur_clicks_30d'].sum():,.0f}")
-    o2.metric("Top-3 Potential Clicks/Mo", f"{f_trends['est_top3_clicks_30d'].sum():,.0f}")
-    o3.metric("Lost Ad Value/Mo", f"${ads_topics_df['Lost Traffic Value/Mo'].sum():,.0f}")
-    o4.metric("Est. Pipeline Opp./Mo", f"${ads_topics_df['Pipeline Opp./Mo'].sum():,.0f}")
+    o1.metric("BOFU Buyer Topics", int((f_trends["funnel"] == "BOFU — Ready to Buy").sum()))
+    o2.metric("Real 30d Impressions (GSC)", f"{int(f_trends['impressions_30d'].sum()):,}")
+    o3.metric("Real 30d Clicks (GSC)", f"{int(f_trends['clicks_30d'].sum()):,}")
+    o4.metric("Keyword Planner Rows Loaded", f"{len(kp_lookup_dict):,}" if kp_lookup_dict else "Not Uploaded")
 
+    st.markdown("#### Priority Ad Topics (Ranked by Real GSC Demand)")
     st.dataframe(
         ads_topics_df, use_container_width=True, hide_index=True, key="tbl_ads_t",
         column_config={
-            "CPC ($)": st.column_config.NumberColumn("CPC ($)", format="$%.2f"),
-            "Lost Traffic Value/Mo": st.column_config.NumberColumn("Lost Value/Mo", format="$%,.0f"),
-            "Pipeline Opp./Mo": st.column_config.NumberColumn("Pipeline Opp./Mo", format="$%,.0f"),
+            "Real CTR (%)": st.column_config.NumberColumn("Real CTR", format="%.2f%%"),
             "Landing Page": st.column_config.LinkColumn("Landing Page"),
         },
     )
@@ -2250,7 +2258,7 @@ with t_ads:
     st.divider()
     ad_e1, ad_e2 = st.columns([1.2, 1])
     with ad_e1:
-        st.markdown("#### Day-of-Week B2B Search Rhythm (Ad Scheduling Guide)")
+        st.markdown("#### Day-of-Week B2B Search Rhythm (Real GSC Impressions)")
         dow_df = clustered_df.groupby("date", as_index=False)["impressions"].sum()
         dow_df["Day"] = dow_df["date"].dt.day_name()
         dow_order = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
@@ -2276,11 +2284,17 @@ with t_ads:
         kf1, kf2 = st.columns([2, 1])
         kw_topics = kf1.multiselect("Filter by Topic:", sorted(rec_kws_df["Topic"].unique().tolist()), default=sorted(rec_kws_df["Topic"].unique().tolist()), key="ms_kw_t")
         min_k_imp = kf2.number_input("Min 7-Day Impressions:", 1, 10000, 5, 5, key="num_min_kw")
-        scoped_kws = rec_kws_df[(rec_kws_df["Topic"].isin(kw_topics)) & (rec_kws_df["7d Impr."] >= min_k_imp)]
-        st.dataframe(scoped_kws[["Keyword", "7d Impr.", "30d Impr.", "KP Monthly Vol.", "Growth", "Google Rank", "Missed Clicks/Mo", "CPC ($)", "Lost Value/Mo", "Match Type", "Landing Page"]], use_container_width=True, hide_index=True, key="tbl_ads_k", column_config={"CPC ($)": st.column_config.NumberColumn("CPC", format="$%.2f"), "Lost Value/Mo": st.column_config.NumberColumn("Lost $/Mo", format="$%,.0f"), "Landing Page": st.column_config.LinkColumn("Landing Page")})
+        scoped_kws = rec_kws_df[(rec_kws_df["Topic"].isin(kw_topics)) & (rec_kws_df["7d Impr. (GSC)"] >= min_k_imp)]
+        st.dataframe(
+            scoped_kws, use_container_width=True, hide_index=True, key="tbl_ads_k",
+            column_config={
+                "Real CTR (%)": st.column_config.NumberColumn("Real CTR", format="%.2f%%"),
+                "Landing Page": st.column_config.LinkColumn("Landing Page"),
+            },
+        )
 
         d1, d2 = st.columns(2)
-        d1.download_button("Download Keywords & Opportunity CSV", scoped_kws.to_csv(index=False).encode("utf-8"), file_name="connext_paid_keywords.csv", mime="text/csv", key="dl_pk")
+        d1.download_button("Download Paid Keywords CSV", scoped_kws.to_csv(index=False).encode("utf-8"), file_name="connext_paid_keywords.csv", mime="text/csv", key="dl_pk")
         d2.download_button("Export Clean List for Google Keyword Planner (.txt)", "\n".join(scoped_kws["Keyword"].head(500).tolist()).encode("utf-8"), file_name="keywords_for_keyword_planner.txt", mime="text/plain", key="dl_kp")
 
         with st.expander("Ad Group Copy-Paste Builder (Exact, Phrase, Real GSC Negatives & RSA Headlines)", expanded=False):
@@ -2383,7 +2397,7 @@ with t_content:
         st.markdown(
             f"""**Writer Brief: {br['topic'].title()}** ({br['sector']} • {br['funnel']})
 - **Deliverable:** {'Write a New Blog Post (Topic not yet in sitemap)' if is_new_post else 'Refresh Existing Page: `' + br['closest_existing_url'] + '`'}
-- **Current Rank & Demand:** {br['google_rank_label']} • **{br['impressions_7d']:,}** 7d impr. • ~**{br['est_missed_clicks_30d']:,.0f}** missed clicks/mo
+- **Current Rank & Demand:** {br['google_rank_label']} • **{br['impressions_7d']:,}** 7d impr. • **{br['clicks_7d']:,}** 7d clicks
 - **Commercial Service Page to Link To:** `{br['recommended_money_page']}`
 - **Exact Rising Searches to Answer (Use as H2s / FAQs):**
 {lt_b}"""
@@ -2393,22 +2407,111 @@ with t_content:
         st.code(build_faq_jsonld(br["topic"], br["queries_list"]), language="html")
 
 # ==============================================================================
-# TAB 5: COMPETITOR NEW BLOGS (+ KEYWORDS) & US GOOGLE ADS TRANSPARENCY
+# TAB 5: DEDICATED COMPETITOR US ADS TRANSPARENCY TAB (ALL 12 COMPETITORS)
 # ==============================================================================
-with t_comp:
+with t_ads_trans:
     render_tab_guide(
-        "Competitor Blogs & US Ads Transparency",
-        "Monitors our 12 BPO competitors (Solvo, Genius, Microsourcing, Emapta, Outsourced, OP360, Lean Solutions, TaskUs, TOA Global, Cloudstaff, Near, BairesDev) for newly published blog posts + their target keywords, and provides direct & automated US Google Ads Transparency checks.",
-        "Sub-Tab 1 scans competitor blogs on demand (~15–20s, $0). Sub-Tab 2 gives instant $0 US Google Ads Transparency Center & Microsoft Ad Library links for all 12 rivals plus an optional button-triggered US Ad Transparency scanner.",
-        "Filter Competitor Blogs to 'Content Gaps Only' to see topics rivals are writing about that Connext lacks. Use Sub-Tab 2 to inspect competitors' active US Google & Microsoft ad creatives before launching campaigns.",
+        "Competitor US Ads Transparency (12 Rivals)",
+        "Dedicated view of all 12 Connext BPO competitors (Solvo, Genius, Microsourcing, Emapta, Outsourced, OP360, Lean Solutions, TaskUs, TOA Global, Cloudstaff, Near, BairesDev) across Google Ads Transparency Center (US Region) and Microsoft Ad Library.",
+        "Section 1 gives instant 1-click links for every competitor ($0, zero API credits). Section 2 runs an optional button-triggered US Google Ads Transparency & Live US Ad Auction scan using your existing SerpApi key (cached 7 days).",
+        "Click any competitor's Google Ads Transparency (US) link to see every Search, Display, and YouTube ad they are currently running in the United States, study their offers, and differentiate Connext's ad copy.",
     )
 
-    c_sub1, c_sub2 = st.tabs([
-        "A. Competitor New Blogs & Main Keywords ($0)",
-        "B. Competitor US Google Ads Transparency & Microsoft Ad Library",
+    st.markdown("#### 1. Direct US Google Ads Transparency Center & Microsoft Ad Library Directory ($0 Free)")
+    st.markdown(
+        """<div class="cnxt-callout">
+<strong>How to Inspect Any Competitor's US Ads ($0):</strong> Click any link in the <strong>Google Ads Transparency (US)</strong> column below to open that competitor's verified advertiser hub filtered to the <strong>United States</strong> (using their bare domain so all agency and subsidiary accounts appear), or open <strong>Microsoft Ad Library</strong> and search their brand name.
+</div>""",
+        unsafe_allow_html=True,
+    )
+    dir_df = pd.DataFrame([
+        {
+            "Competitor": cname,
+            "Domain": dom,
+            "Google Ads Transparency (US)": f"https://adstransparency.google.com/?region=US&domain={dom}",
+            "Microsoft Ad Library": "https://adlibrary.ads.microsoft.com/",
+        }
+        for cname, dom, _ in COMPETITORS_REGISTRY
+    ])
+    st.dataframe(
+        dir_df, use_container_width=True, hide_index=True, key="tbl_ad_dir_main",
+        column_config={
+            "Google Ads Transparency (US)": st.column_config.LinkColumn("Open Google Ads Transparency (US)"),
+            "Microsoft Ad Library": st.column_config.LinkColumn("Open Microsoft Ad Library"),
+        },
+    )
+
+    st.divider()
+    st.markdown("#### 2. Optional Automated US Google Ads Transparency & Live US Ad Auction Scan")
+    if has_serpapi_secret:
+        st.caption("Never runs automatically—uses your existing SerpApi key ONLY when you click the button below (cached 7 days to protect your 1,000 monthly credits).")
+        sc1, sc2 = st.columns([1.4, 1])
+        num_kw_ads = sc1.slider("Top BOFU Surging Keywords to Check for Live US Google Ads:", 0, 10, 5, step=1, key="sl_us_ad_kws")
+        chk_12_trans = sc2.checkbox("Check All 12 Competitors in Google Ads Transparency (+12 credits)", value=True, key="chk_12_trans")
+        est_c = (12 if chk_12_trans else 0) + num_kw_ads
+
+        b_ad1, b_ad2 = st.columns([2, 1])
+        with b_ad1:
+            if st.button(f"Run On-Demand US Google Ads Transparency Scan ({est_c} credits, cached 7d)", type="primary", key="btn_run_us_ads"):
+                bofu_kws = f_queries[f_queries["is_commercial"]]["query"].head(num_kw_ads).tolist() if num_kw_ads > 0 else []
+                with st.spinner("Scanning Google Ads Transparency Center (US) & live US Google Ads..."):
+                    t_df, p_df, s_msg = run_on_demand_us_ads_transparency_scan(
+                        str(st.secrets["serpapi"]["api_key"]).strip(),
+                        tuple(bofu_kws),
+                        scan_all_12_transparency=chk_12_trans,
+                    )
+                    st.session_state["us_trans_df"] = t_df
+                    st.session_state["us_paid_df"] = p_df
+                    st.session_state["us_ads_msg"] = s_msg
+        with b_ad2:
+            if st.button("Clear 7-Day Ad Cache", key="btn_clr_us_ads"):
+                run_on_demand_us_ads_transparency_scan.clear()
+                st.session_state.pop("us_trans_df", None)
+                st.session_state.pop("us_paid_df", None)
+                st.session_state.pop("us_ads_msg", None)
+
+        if "us_ads_msg" in st.session_state:
+            st.success(st.session_state["us_ads_msg"])
+        if "us_trans_df" in st.session_state and not st.session_state["us_trans_df"].empty:
+            st.markdown("**Competitor US Google Search Ads Status (Ads Transparency Center)**")
+            st.dataframe(st.session_state["us_trans_df"], use_container_width=True, hide_index=True, key="tbl_us_trans", column_config={"Google Ads Transparency (US)": st.column_config.LinkColumn("View US Ads")})
+        if "us_paid_df" in st.session_state and not st.session_state["us_paid_df"].empty:
+            st.markdown("**Live US Google Paid Search Ads Detected on Trending Keywords**")
+            st.dataframe(st.session_state["us_paid_df"], use_container_width=True, hide_index=True, key="tbl_us_paid", column_config={"Landing Page": st.column_config.LinkColumn("Ad Landing Page")})
+    else:
+        st.info("To run automated US Google Ads Transparency checks inside this tab, add `[serpapi]` `api_key` in Streamlit Secrets (never runs automatically—only when you click the button).")
+
+    st.divider()
+    st.markdown("#### 3. Official Free Microsoft Ad Library API Scan (EU/EEA Spillover Creatives — $0)")
+    if st.button("Scan 12 Competitors via Free Microsoft Ad Library API ($0)", key="btn_ms_api"):
+        with st.spinner("Querying Microsoft Ad Library API (~10s)..."):
+            st.session_state["ms_api_df"] = fetch_free_microsoft_ad_library_all()
+    if "ms_api_df" in st.session_state:
+        ms_df = st.session_state["ms_api_df"]
+        if ms_df.empty:
+            st.info("No EU/EEA Microsoft Ads returned (use the direct US Ad Library links in Section 1 above for US-only campaigns).")
+        else:
+            st.dataframe(ms_df, use_container_width=True, hide_index=True, key="tbl_ms_ads", column_config={"Ad Library Link": st.column_config.LinkColumn("Open Ad")})
+
+# ==============================================================================
+# TAB 6: ON-DEMAND COMPETITOR NEW BLOGS & B2B INDUSTRY TRENDS ($0)
+# ==============================================================================
+with t_comp_blogs:
+    render_tab_guide(
+        "Competitor New Blogs & Industry Trends ($0)",
+        "Scans our 12 competitors' sitemaps strictly for newly published blog posts + extracts their Main Target Keywords, plus provides industry-filtered Google Trends, Bing Search, and Reddit buyer research.",
+        "Runs on demand (~10–20s per click, $0 cost) so the main dashboard loads quickly.",
+        "Filter Competitor Blogs to 'Content Gaps Only' to spot topics rivals are writing about that Connext lacks, and use the Question & Reddit Finder to uncover real buyer pain points.",
+    )
+
+    r_sub1, r_sub2, r_sub3, r_sub4 = st.tabs([
+        "A. Competitor New Blogs & Keywords ($0)",
+        "B. B2B Google Trends & Industry Feed ($0)",
+        "C. Bing Search Performance ($0)",
+        "D. Question & Reddit Pain-Point Finder ($0)",
     ])
 
-    with c_sub1:
+    with r_sub1:
         b_top1, b_top2, b_top3 = st.columns([2.2, 1.1, 0.9])
         blog_days = b_top1.slider("Competitor Blogs Published / Updated Within (Days):", 14, 90, 45, key="sl_blog_days")
         if b_top2.button("Scan 12 Competitors' New Blogs Now", type="primary", key="btn_scan_blogs"):
@@ -2463,97 +2566,7 @@ with t_comp:
             )
             st.download_button("Download Competitor New Blogs & Keywords CSV", bview[["Competitor", "Published", "Blog Headline", "Main Target Keywords", "Vertical", "Connext Status", "Connext Closest Page", "Blog URL"]].to_csv(index=False).encode("utf-8"), file_name="connext_competitor_new_blogs_keywords.csv", mime="text/csv", key="dl_comp_blogs")
 
-    with c_sub2:
-        st.markdown("#### 1. Direct US Google Ads Transparency Center & Microsoft Ad Library ($0 Free)")
-        st.markdown(
-            """<div class="cnxt-callout">
-<strong>Instant US Ad Lookup ($0):</strong> Click any competitor's link below to open their verified advertiser profile directly in <strong>Google Ads Transparency Center (US Region)</strong>—filtered by bare domain so all agency and subsidiary accounts appear—or open <strong>Microsoft Ad Library</strong> and search their brand name.
-</div>""",
-            unsafe_allow_html=True,
-        )
-        dir_df = pd.DataFrame([
-            {
-                "Competitor": cname,
-                "Domain": dom,
-                "Google Ads Transparency (US)": f"https://adstransparency.google.com/?region=US&domain={dom}",
-                "Microsoft Ad Library": "https://adlibrary.ads.microsoft.com/",
-            }
-            for cname, dom, _ in COMPETITORS_REGISTRY
-        ])
-        st.dataframe(
-            dir_df, use_container_width=True, hide_index=True, key="tbl_ad_dir",
-            column_config={
-                "Google Ads Transparency (US)": st.column_config.LinkColumn("Open Google Ads Transparency (US)"),
-                "Microsoft Ad Library": st.column_config.LinkColumn("Open Microsoft Ad Library"),
-            },
-        )
-
-        st.divider()
-        st.markdown("#### 2. Optional Automated US Google Ads Transparency & Live US Ad Auction Scan")
-        if has_serpapi_secret:
-            st.caption("Uses your existing SerpApi key ONLY when you click the button below (cached 7 days so it never wastes your 1,000 monthly credits).")
-            sc1, sc2 = st.columns([1.4, 1])
-            num_kw_ads = sc1.slider("Top BOFU Surging Keywords to Check for Live US Google Ads:", 0, 10, 5, step=1, key="sl_us_ad_kws")
-            chk_12_trans = sc2.checkbox("Check All 12 Competitors in Google Ads Transparency (+12 credits)", value=True, key="chk_12_trans")
-            est_c = (12 if chk_12_trans else 0) + num_kw_ads
-
-            b_ad1, b_ad2 = st.columns([2, 1])
-            with b_ad1:
-                if st.button(f"Run On-Demand US Google Ads Transparency Scan ({est_c} credits, cached 7d)", type="primary", key="btn_run_us_ads"):
-                    bofu_kws = f_queries[f_queries["is_commercial"]]["query"].head(num_kw_ads).tolist() if num_kw_ads > 0 else []
-                    with st.spinner("Scanning Google Ads Transparency Center (US) & live US Google Ads..."):
-                        t_df, p_df, s_msg = run_on_demand_us_ads_transparency_scan(
-                            str(st.secrets["serpapi"]["api_key"]).strip(),
-                            tuple(bofu_kws),
-                            scan_all_12_transparency=chk_12_trans,
-                        )
-                        st.session_state["us_trans_df"] = t_df
-                        st.session_state["us_paid_df"] = p_df
-                        st.session_state["us_ads_msg"] = s_msg
-            with b_ad2:
-                if st.button("Clear 7-Day Ad Cache", key="btn_clr_us_ads"):
-                    run_on_demand_us_ads_transparency_scan.clear()
-                    st.session_state.pop("us_trans_df", None)
-                    st.session_state.pop("us_paid_df", None)
-                    st.session_state.pop("us_ads_msg", None)
-
-            if "us_ads_msg" in st.session_state:
-                st.success(st.session_state["us_ads_msg"])
-            if "us_trans_df" in st.session_state and not st.session_state["us_trans_df"].empty:
-                st.markdown("**Competitor US Google Search Ads Status (Ads Transparency Center)**")
-                st.dataframe(st.session_state["us_trans_df"], use_container_width=True, hide_index=True, key="tbl_us_trans", column_config={"Google Ads Transparency (US)": st.column_config.LinkColumn("View US Ads")})
-            if "us_paid_df" in st.session_state and not st.session_state["us_paid_df"].empty:
-                st.markdown("**Live US Google Paid Search Ads Detected on Trending Keywords**")
-                st.dataframe(st.session_state["us_paid_df"], use_container_width=True, hide_index=True, key="tbl_us_paid", column_config={"Landing Page": st.column_config.LinkColumn("Ad Landing Page")})
-        else:
-            st.info("To run automated US Google Ads Transparency checks inside this tab, add `[serpapi]` `api_key` in Streamlit Secrets (never runs automatically—only when you click the button).")
-
-        st.divider()
-        st.markdown("#### 3. Official Free Microsoft Ad Library API Scan (EU/EEA Spillover Creatives — $0)")
-        if st.button("Scan 12 Competitors via Free Microsoft Ad Library API ($0)", key="btn_ms_api"):
-            with st.spinner("Querying Microsoft Ad Library API (~10s)..."):
-                st.session_state["ms_api_df"] = fetch_free_microsoft_ad_library_all()
-        if "ms_api_df" in st.session_state:
-            ms_df = st.session_state["ms_api_df"]
-            if ms_df.empty:
-                st.info("No EU/EEA Microsoft Ads returned (use the direct US Ad Library links in Section 1 above for US-only campaigns).")
-            else:
-                st.dataframe(ms_df, use_container_width=True, hide_index=True, key="tbl_ms_ads", column_config={"Ad Library Link": st.column_config.LinkColumn("Open Ad")})
-
-# ==============================================================================
-# TAB 6: ON-DEMAND INDUSTRY-FILTERED TRENDS, BING & TOPIC RESEARCH ($0)
-# ==============================================================================
-with t_trends:
-    render_tab_guide(
-        "Industry Trends, Bing & Buyer Research",
-        "External $0 research feeds strictly scoped to Connext's B2B industry: Google Trends curves + B2B industry news headlines, Bing Webmaster performance (also powers Copilot/ChatGPT Search), and Google/Bing Autocomplete + Reddit buyer questions.",
-        "Runs on demand (~10 seconds per click). Google Trends may occasionally show a brief cloud rate-limit notice, while the B2B Industry Feed, Autocomplete, and Reddit remain available.",
-        "Use Sub-Tab 1 to spot emerging industry shifts before they hit Search Console. Use Sub-Tab 3 to pull real customer questions and objections from Google, Bing, and Reddit for blog H2s and ad hooks.",
-    )
-
-    r_sub1, r_sub2, r_sub3 = st.tabs(["B2B Google Trends & Industry Feed", "Bing Search Performance", "Question & Reddit Pain-Point Finder"])
-
-    with r_sub1:
+    with r_sub2:
         tc1, tc2, tc3 = st.columns([2.2, 0.9, 0.9])
         gt_seeds = tc1.text_input("Compare up to 5 B2B Topics in Google Trends:", value="medical billing outsourcing, offshore accounting, virtual assistant outsourcing, nearshore software developers, bpo outsourcing", key="gt_in")
         gt_geo = tc2.selectbox("Region:", ["US", "CA", "AU", "GB"], index=0, key="gt_geo")
@@ -2595,7 +2608,7 @@ with t_trends:
             st.markdown("**Live B2B Industry Trend Headlines (Strictly Industry-Filtered)**")
             st.dataframe(b2b_news_df, use_container_width=True, hide_index=True, key="tbl_b2b_news", column_config={"Article Link": st.column_config.LinkColumn("Read Article")})
 
-    with r_sub2:
+    with r_sub3:
         if has_bing_secret:
             if st.button("Load / Refresh Bing Webmaster Queries", type="primary", key="btn_ref_bing"):
                 with st.spinner("Syncing Bing Webmaster Tools (~8s)..."):
@@ -2611,7 +2624,7 @@ with t_trends:
         else:
             st.markdown("""<div class="cnxt-callout"><strong>Connect Free Bing Webmaster Tools ($0):</strong> Go to <strong>bing.com/webmasters → Settings → API Access → Generate API Key</strong>, then add <code>[bing]</code> with <code>api_key</code> and <code>site_url = "https://connextglobal.com/"</code> in Streamlit Secrets.</div>""", unsafe_allow_html=True)
 
-    with r_sub3:
+    with r_sub4:
         rc1, rc2, rc3 = st.columns([1.2, 1.4, 0.8])
         picked_seed = rc1.selectbox("Pick Surging GSC Topic:", f_trends["topic"].tolist(), key="sel_res_seed")
         custom_seed = rc2.text_input("Or Type Custom B2B Topic:", placeholder="e.g., dental billing outsourcing", key="in_res_seed")
@@ -2647,19 +2660,18 @@ with t_trends:
 # ==============================================================================
 with t_guide:
     st.markdown("### Complete User Guide for Non-SEO Reviewers")
-    st.markdown('<p class="cnxt-sec-sub">Everything you need to know about how this radar works, what each number means, and how to turn insights into leads and traffic.</p>', unsafe_allow_html=True)
+    st.markdown('<p class="cnxt-sec-sub">Everything you need to know about how this radar works, what each real metric means, and how to turn insights into leads and traffic.</p>', unsafe_allow_html=True)
 
     g_row1_c1, g_row1_c2 = st.columns(2)
     with g_row1_c1:
         st.markdown(
             """<div class="cnxt-info-card">
-<h3>1. What to Expect (Speed, Data &amp; Freshness)</h3>
+<h3>1. What to Expect (Speed &amp; 100% Real Data)</h3>
 <ul>
 <li><strong>Initial Login Load (30–60 seconds):</strong> After unlocking, the app pulls up to 45–90 days of live Google Search Console rows, filters out job-seeker/applicant searches, groups queries into topics, and indexes <code>connextglobal.com/sitemap.xml</code>.</li>
-<li><strong>Instant Filtering After Load:</strong> Once loaded, data is cached for 1 hour so switching verticals, funnel stages, or tabs happens instantly.</li>
-<li><strong>On-Demand Tabs (Tabs 5 &amp; 6):</strong> Competitor Blog Scans, US Google Ads Transparency Scans, On-Page Audits, Google Trends, Bing, and Reddit run only when you click their button (typically 10–20 seconds) so the main dashboard stays fast and never wastes API credits.</li>
-<li><strong>2-Day Google Reporting Lag:</strong> Google Search Console data normally finalizes 48 hours behind today. This tool automatically trims partial/incomplete days so charts never show fake sudden drops.</li>
-<li><strong>Read-Only Security:</strong> Nothing in this tool modifies Connext's live website, Google Ads, or Search Console settings.</li>
+<li><strong>Zero Invented Numbers:</strong> Every impression, click, CTR, and Google rank comes directly from Google Search Console. Keyword Planner search volumes and bid ranges appear only when you upload an actual Keyword Planner CSV.</li>
+<li><strong>On-Demand Tabs (Tabs 5 &amp; 6):</strong> Competitor US Ads Transparency Scans, Competitor Blog Scans, On-Page Audits, Google Trends, Bing, and Reddit run only when you click their button (typically 10–20 seconds).</li>
+<li><strong>2-Day Google Reporting Lag:</strong> Google Search Console data normally finalizes 48 hours behind today. This tool automatically trims incomplete days so charts never show fake sudden drops.</li>
 </ul>
 </div>""",
             unsafe_allow_html=True,
@@ -2670,10 +2682,10 @@ with t_guide:
 <h3>2. Step-by-Step: How to Use the Tool in 5 Minutes</h3>
 <ul>
 <li><strong>Step 1 — Narrow Your Focus:</strong> Use the top filter bar to pick a <strong>Business Vertical</strong> (e.g., <em>Healthcare &amp; RCM</em>) or a <strong>Funnel Stage</strong> (e.g., <em>BOFU — Ready to Buy</em>).</li>
-<li><strong>Step 2 — Spot Priorities (Tab 1):</strong> Sort by <strong>Priority (0–100)</strong> or <strong>Missed Clicks/Mo</strong>. Click any topic in the Trend Inspector to verify whether demand is steadily growing or a one-day spike.</li>
+<li><strong>Step 2 — Spot Priorities (Tab 1):</strong> Sort by <strong>Priority (0–100)</strong> or <strong>7d Impr.</strong> Click any topic in the Trend Inspector to verify whether demand is steadily growing or a one-day spike.</li>
 <li><strong>Step 3 — Protect Existing Rankings (Tab 2):</strong> Review <strong>Content Decay Alerts</strong> and run the <strong>Live On-Page Audit</strong> on slipping Page-1 URLs.</li>
 <li><strong>Step 4 — Take Action (Tabs 3 &amp; 4):</strong> Export ready-to-bid keywords &amp; negative keywords for Paid Ads, or grab New Blog Topics, Existing Page Refreshes, Internal Links, and FAQ Schema for Content.</li>
-<li><strong>Step 5 — Check Competitors &amp; US Ads (Tabs 5 &amp; 6):</strong> Scan our 12 rivals' newest blogs for missing topics and inspect their US Google Ads Transparency profiles.</li>
+<li><strong>Step 5 — Check Competitors &amp; US Ads (Tabs 5 &amp; 6):</strong> Open <strong>Tab 5</strong> for Competitor US Ads Transparency and <strong>Tab 6</strong> for Competitor New Blogs.</li>
 </ul>
 </div>""",
             unsafe_allow_html=True,
@@ -2681,16 +2693,15 @@ with t_guide:
 
     st.markdown("### 3. Plain-English Metrics Glossary (No SEO Jargon)")
     glossary_df = pd.DataFrame([
-        {"Metric / Term": "Impressions (7d / 30d)", "Plain-English Meaning": "How many times a connextglobal.com page appeared on someone's Google screen. Rising impressions = growing buyer demand, even before they click."},
-        {"Metric / Term": "Google Rank (Top 3 / Page 1 / Page 2)", "Plain-English Meaning": "Where Connext appears organically (unpaid). Top 3 (#1–3) gets the most clicks; #4–#15 ('Striking Distance') are quick wins; Page 2+ (#11+) rarely gets organic clicks without Ads or a page update."},
+        {"Metric / Term": "Impressions (7d / 30d)", "Plain-English Meaning": "Real Google Search Console count of how many times a connextglobal.com link appeared on a searcher's screen."},
+        {"Metric / Term": "Clicks (7d / 30d) & Real CTR (%)", "Plain-English Meaning": "Actual organic clicks from Google Search and the exact Click-Through Rate (Clicks ÷ Impressions) recorded by Google Search Console."},
+        {"Metric / Term": "Google Rank (Top 3 / Page 1 / Page 2)", "Plain-English Meaning": "Where Connext appears organically (unpaid). Top 3 (#1–3) gets the highest CTR; #4–#15 ('Striking Distance') are quick wins; Page 2+ (#11+) needs Ads or a page refresh."},
         {"Metric / Term": "3d / 7d / 30d Growth (%)", "Plain-English Meaning": "How much faster daily impressions grew compared to the prior 2-week baseline. Example: +100% means daily visibility doubled."},
-        {"Metric / Term": "Priority Score (0–100)", "Plain-English Meaning": "Combines buyer intent (BOFU/MOFU/TOFU), search volume, surge speed, and rank gap into a single score so you know what matters most first."},
+        {"Metric / Term": "Priority Score (0–100)", "Plain-English Meaning": "Combines buyer intent (BOFU/MOFU/TOFU), real search volume, surge speed, and rank gap into a single score so you know what matters most first."},
         {"Metric / Term": "Funnel Stage (BOFU / MOFU / TOFU)", "Plain-English Meaning": "BOFU = Ready to buy ('pricing', 'hire', 'outsourcing company'); MOFU = Comparing options ('best', 'vs', 'dedicated team', 'employee rebadging'); TOFU = Early awareness/definitions ('what is', 'meaning', 'trends')."},
-        {"Metric / Term": "Content Decay Alert", "Plain-English Meaning": "Early warning for topics where Connext lost >=22% of impressions or slipped >=2.5 rank spots. Refreshing these pages protects existing organic leads."},
-        {"Metric / Term": "Missed Clicks/Mo & Lost Traffic Value ($)", "Plain-English Meaning": "Estimated extra monthly clicks we would win by moving a topic into Google's Top 3, multiplied by CPC to show what those clicks would cost in Google Ads."},
-        {"Metric / Term": "New Content vs. Existing Page Refresh", "Plain-English Meaning": "Checks connextglobal.com/sitemap.xml automatically. If no article covers the topic, Tab 4 puts it in 'New Content to Write'. If a page already exists, Tab 4 puts it in 'Existing Pages to Refresh' so we never create duplicate posts."},
-        {"Metric / Term": "Internal Linking (Blogs → Service Pages)", "Plain-English Meaning": "Adding a link inside an educational blog post pointing to a commercial Service/Industry page so Google ranks the Service Page higher and readers can request pricing."},
-        {"Metric / Term": "AI Prompts (7+ Words)", "Plain-English Meaning": "Long, question-style searches (e.g., 'how much does offshore medical billing cost in the philippines') that frequently trigger Google AI Overviews & AI Mode."},
+        {"Metric / Term": "Content Decay Alert", "Plain-English Meaning": "Early warning for topics where Connext lost >=22% of real impressions or slipped >=2.5 rank spots. Refreshing these pages protects existing organic traffic."},
+        {"Metric / Term": "New Content vs. Existing Page Refresh", "Plain-English Meaning": "Checks connextglobal.com/sitemap.xml automatically. If no article covers the topic, Tab 4 puts it in 'New Content to Write'. If a page already exists, Tab 4 puts it in 'Existing Pages to Refresh'."},
+        {"Metric / Term": "Internal Linking (Blogs → Service Pages)", "Plain-English Meaning": "Adding a hyperlink inside an educational blog post pointing to a commercial Service/Industry page so Google ranks the Service Page higher and readers can request pricing."},
     ])
     st.dataframe(glossary_df, use_container_width=True, hide_index=True, key="tbl_glossary")
 
@@ -2703,7 +2714,7 @@ with t_guide:
 <ul>
 <li><strong>Monday (10 min):</strong> Open <strong>Tab 2</strong> → check <em>Content Decay Alerts</em> and run the <em>Live On-Page Audit</em> on any slipping Page-1 URL.</li>
 <li><strong>Tuesday (15 min):</strong> Open <strong>Tab 4</strong> → pick new topics from <em>1. New Content to Write</em>, refresh pages in <em>2. Existing Pages to Refresh</em>, add the <em>3. Internal Links</em> in Webflow, and paste the <em>FAQPage JSON-LD</em> schema.</li>
-<li><strong>Thursday (10 min):</strong> Open <strong>Tab 5</strong> → scan our 12 competitors' new blogs, filter to <em>Content Gaps Only</em>, and add the best topics to the editorial calendar.</li>
+<li><strong>Thursday (10 min):</strong> Open <strong>Tab 6</strong> → scan our 12 competitors' new blogs, filter to <em>Content Gaps Only</em>, and add the best topics to the editorial calendar.</li>
 </ul>
 </div>""",
             unsafe_allow_html=True,
@@ -2714,9 +2725,9 @@ with t_guide:
 <h3>Paid Media (Google &amp; Bing Ads)</h3>
 <ul>
 <li><strong>Find High-ROI Campaigns:</strong> Set <em>Funnel Stage</em> to <strong>BOFU — Ready to Buy</strong> and open <strong>Tab 3</strong>. Focus on <em>P0 / P1</em> topics where Connext ranks below #5 organically.</li>
-<li><strong>Verify Exact CPC Bids ($0):</strong> Click <em>Export Clean List for Google Keyword Planner (.txt)</em>, paste into Google Keyword Planner, download the forecast CSV, and upload it back into Tab 3.</li>
+<li><strong>Verify Real CPC Bids ($0):</strong> Click <em>Export Clean List for Google Keyword Planner (.txt)</em>, paste into Google Keyword Planner, download the forecast CSV, and upload it back into Tab 3.</li>
 <li><strong>Cut Wasted Spend:</strong> Copy the <em>Real GSC Negative Keywords</em> and check the <em>Day-of-Week Chart</em> to weight ad budgets toward peak Mon–Fri B2B search days.</li>
-<li><strong>Spy on Rival US Ads:</strong> Open <strong>Tab 5 → Sub-Tab B</strong> for direct US Google Ads Transparency links and on-demand US auction checks.</li>
+<li><strong>Spy on Rival US Ads:</strong> Open <strong>Tab 5 (Competitor US Ads Transparency)</strong> for direct US Google Ads Transparency links and optional US auction checks.</li>
 </ul>
 </div>""",
             unsafe_allow_html=True,
@@ -2726,20 +2737,10 @@ with t_guide:
             """<div class="cnxt-info-card">
 <h3>Leadership &amp; Marketing Managers</h3>
 <ul>
-<li><strong>Weekly Pulse Check:</strong> Open <strong>Tab 1 (Executive Overview)</strong> to see total surging topics, Content Decay count, and monthly missed traffic value.</li>
+<li><strong>Weekly Pulse Check:</strong> Open <strong>Tab 1 (Executive Overview)</strong> to see total surging topics, real 7d impressions &amp; clicks, and Content Decay count.</li>
 <li><strong>Brand vs. Acquisition Health:</strong> Check the <em>Brand vs. Non-Brand</em> area chart to verify new-buyer search demand is growing alongside brand awareness.</li>
 <li><strong>Share in 10 Seconds:</strong> Expand <em>1-Click Teams Executive Summary</em> to copy a clean bulleted update into Microsoft Teams, or click <em>Download Full Executive Report (.xlsx)</em> for leadership decks.</li>
 </ul>
 </div>""",
             unsafe_allow_html=True,
-        )
-
-    with st.expander("5. Quick Troubleshooting & FAQ", expanded=False):
-        st.markdown(
-            """
-- **"Why did the app say 'No topics match those filters'?"** — You likely combined a narrow vertical with a narrow action or funnel stage. Reset **Business Vertical**, **Recommended Next Step**, and **Funnel Stage** back to *All*, or switch **Trend Sensitivity** in the sidebar to **Broad (All Verticals)**.
-- **"Why do some competitors show `blocked` in Tab 5?"** — A few competitor websites use Cloudflare/bot protection on their `sitemap.xml`. The remaining competitors still scan cleanly, and you can still inspect any blocked rival's US ads via the direct Google Ads Transparency links.
-- **"Why did Google Trends say 'rate-limited'?"** — Free Google Trends occasionally throttles shared cloud servers. Wait a few minutes and try again, or use the **Live B2B Industry News Feed** and **Google/Bing Autocomplete** in Tab 6, which do not rate-limit.
-- **"How do I get fresh data?"** — Click **Refresh Live GSC Data** in the left sidebar (takes 30–60 seconds).
-            """
         )
