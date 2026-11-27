@@ -120,139 +120,67 @@ st.set_page_config(
 
 
 def inject_connext_brand_css():
-    """Hardened light-surface styling that prevents dark-mode text/input clashes on login & dashboard."""
-    css = """<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Arimo:wght@500;600;700&family=Roboto:wght@400;500;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
-<style>
-:root {
-    --cnxt-blue: #005AAC; --cnxt-sun: #E58B25; --cnxt-yellow: #F1C916;
-    --cnxt-twilight: #071776; --cnxt-midnight: #071739; --cnxt-teal: #0F818A;
-    --cnxt-teal-blue: #90CBDB; --cnxt-bg: #F7F8FB; --cnxt-paper: #FFFFFF;
-    --cnxt-ink: #0F172A; --cnxt-ash: #64748B; --cnxt-line: #E2E8F0;
-    --font-display: 'Arimo', Arial, sans-serif;
-    --font-body: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
-    --font-mono: 'JetBrains Mono', ui-monospace, monospace;
-}
-html, body, .stApp { font-family: var(--font-body); background-color: var(--cnxt-bg) !important; color: var(--cnxt-ink) !important; }
-header[data-testid="stHeader"] { background-color: var(--cnxt-bg) !important; border-bottom: 1px solid var(--cnxt-line); }
-.block-container { padding-top: 1.5rem; padding-bottom: 2.5rem; max-width: 1440px; }
-h1, h2, h3, h4 { font-family: var(--font-display) !important; color: var(--cnxt-twilight) !important; letter-spacing: -0.015em; }
-
-/* Main Canvas Form & Input Contrast */
-.stApp [data-testid="stForm"] {
-    background-color: #FFFFFF !important; border: 1px solid var(--cnxt-line) !important;
-    border-radius: 12px !important; padding: 22px 24px !important;
-    box-shadow: 0 4px 16px rgba(7, 23, 57, 0.06) !important;
-}
-.stApp .main label, .stApp [data-testid="stWidgetLabel"] p { color: #1E293B !important; font-weight: 500 !important; }
-.stApp .main input, .stApp .main textarea {
-    background-color: #FFFFFF !important; color: #0F172A !important;
-    border: 1px solid #CBD5E1 !important; border-radius: 8px !important;
-}
-.stApp .main [data-baseweb="select"] > div {
-    background-color: #FFFFFF !important; color: #0F172A !important;
-    border: 1px solid #CBD5E1 !important; border-radius: 8px !important;
-}
-.stApp .main [data-baseweb="select"] span, .stApp .main [data-baseweb="select"] input { color: #0F172A !important; }
-[data-baseweb="popover"], [data-baseweb="menu"] { background-color: #FFFFFF !important; color: #0F172A !important; }
-[data-baseweb="menu"] li { color: #0F172A !important; }
-.stApp .main [data-testid="stRadio"] label p, .stApp .main [data-testid="stCheckbox"] label p { color: #1E293B !important; }
-.stApp .main [data-testid="stExpander"] {
-    background-color: #FFFFFF !important; border: 1px solid var(--cnxt-line) !important; border-radius: 10px !important;
-}
-.stApp .main [data-testid="stExpander"] summary p { color: var(--cnxt-twilight) !important; font-weight: 600 !important; }
-.stApp .main [data-testid="stCodeBlock"] pre { background-color: #0F172A !important; color: #F8FAFC !important; border-radius: 8px !important; }
-
-/* Primary & Form Submit Buttons */
-.stButton > button[kind="primary"],
-div[data-testid="stFormSubmitButton"] > button,
-.stDownloadButton > button {
-    background-color: var(--cnxt-sun) !important; color: #071739 !important;
-    font-family: var(--font-body) !important; font-weight: 700 !important;
-    border: none !important; border-radius: 999px !important; padding: 0.52rem 1.35rem !important;
-    box-shadow: 0 4px 12px rgba(229, 139, 37, 0.30) !important;
-}
-.stButton > button[kind="primary"]:hover,
-div[data-testid="stFormSubmitButton"] > button:hover,
-.stDownloadButton > button:hover {
-    background-color: var(--cnxt-twilight) !important; color: #FFFFFF !important;
-}
-.stButton > button:not([kind="primary"]) {
-    background-color: #FFFFFF !important; color: var(--cnxt-twilight) !important;
-    border: 1px solid #CBD5E1 !important; border-radius: 999px !important; font-weight: 600 !important;
-}
-.stButton > button:not([kind="primary"]):hover {
-    border-color: var(--cnxt-twilight) !important; background-color: #F1F5F9 !important;
-}
-
-/* Sidebar */
-section[data-testid="stSidebar"] { background-color: var(--cnxt-midnight) !important; border-right: 1px solid rgba(144, 203, 219, 0.16); }
-section[data-testid="stSidebar"] label, section[data-testid="stSidebar"] p, section[data-testid="stSidebar"] span { color: #F8FAFC !important; }
-section[data-testid="stSidebar"] .stCaption, section[data-testid="stSidebar"] small { color: var(--cnxt-teal-blue) !important; }
-section[data-testid="stSidebar"] h1, section[data-testid="stSidebar"] h2, section[data-testid="stSidebar"] h3 { color: #FFFFFF !important; }
-section[data-testid="stSidebar"] input, section[data-testid="stSidebar"] textarea { background-color: #FFFFFF !important; color: #071739 !important; border-radius: 6px !important; }
-section[data-testid="stSidebar"] [data-baseweb="select"] > div { background-color: #FFFFFF !important; color: #071739 !important; }
-section[data-testid="stSidebar"] [data-baseweb="select"] span { color: #071739 !important; }
-section[data-testid="stSidebar"] [data-testid="stExpander"] { background-color: rgba(255,255,255,0.06) !important; border: 1px solid rgba(144,203,219,0.22) !important; }
-section[data-testid="stSidebar"] [data-testid="stExpander"] summary p { color: #F1C916 !important; }
-section[data-testid="stSidebar"] .stButton > button { background-color: rgba(255,255,255,0.10) !important; color: var(--cnxt-teal-blue) !important; border: 1px solid rgba(144,203,219,0.32) !important; border-radius: 999px !important; }
-section[data-testid="stSidebar"] .stButton > button[kind="primary"] { background-color: var(--cnxt-sun) !important; color: var(--cnxt-midnight) !important; border: none !important; font-weight: 700 !important; }
-
-/* Hero Banner */
-.cnxt-hero {
-    background: linear-gradient(135deg, #071776 0%, #071739 100%);
-    color: #FFFFFF; padding: 22px 28px; border-radius: 12px; margin-bottom: 16px;
-    border: 1px solid rgba(144,203,219,0.2); box-shadow: 0 6px 20px rgba(7,23,57,0.08);
-}
-.cnxt-eyebrow { font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.16em; color: #F1C916; margin-bottom: 5px; font-weight: 600; }
-.cnxt-hero h1 { font-size: clamp(1.35rem, 2.2vw, 1.9rem) !important; color: #FFFFFF !important; margin: 0 0 6px 0 !important; }
-.cnxt-hero h1 span { color: #E58B25; }
-.cnxt-hero p { color: #CBD5E1 !important; font-size: 0.93rem; margin: 0; max-width: 900px; line-height: 1.5; }
-
-/* Metric Cards */
-div[data-testid="stMetric"] {
-    background-color: var(--cnxt-paper); border: 1px solid var(--cnxt-line);
-    border-top: 3px solid var(--cnxt-blue); border-radius: 10px; padding: 14px 16px;
-    box-shadow: 0 1px 4px rgba(15, 23, 42, 0.04);
-}
-div[data-testid="stMetric"] label { font-family: var(--font-mono) !important; font-size: 0.70rem !important; text-transform: uppercase !important; letter-spacing: 0.07em !important; color: var(--cnxt-ash) !important; }
-div[data-testid="stMetric"] [data-testid="stMetricValue"] { font-family: var(--font-display) !important; color: var(--cnxt-twilight) !important; font-weight: 700 !important; font-size: 1.6rem !important; }
-
-/* Tabs */
-.stTabs [data-baseweb="tab-list"] { gap: 6px; border-bottom: 2px solid var(--cnxt-line); margin-bottom: 14px; flex-wrap: wrap; }
-.stTabs [data-baseweb="tab"] {
-    font-family: var(--font-display); font-weight: 600; font-size: 0.89rem;
-    color: #334155 !important; background-color: #FFFFFF !important; border-radius: 8px 8px 0 0;
-    padding: 10px 14px; border: 1px solid var(--cnxt-line); border-bottom: none;
-}
-.stTabs [aria-selected="true"] { background-color: var(--cnxt-twilight) !important; color: #FFFFFF !important; border-color: var(--cnxt-twilight) !important; }
-
-/* Callout & Info Cards */
-.cnxt-callout {
-    background-color: #FFFFFF; border: 1px solid var(--cnxt-line);
-    border-left: 4px solid var(--cnxt-sun); border-radius: 8px;
-    padding: 14px 18px; margin: 8px 0 14px 0; color: #1E293B; font-size: 0.92rem; line-height: 1.55;
-    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
-}
-.cnxt-callout strong { color: var(--cnxt-twilight); }
-.cnxt-info-card {
-    background-color: #FFFFFF; border: 1px solid var(--cnxt-line); border-radius: 12px;
-    padding: 20px 22px; margin-bottom: 14px; color: #1E293B; font-size: 0.92rem; line-height: 1.6;
-    box-shadow: 0 2px 10px rgba(7, 23, 57, 0.04);
-}
-.cnxt-info-card h3 { margin-top: 0 !important; margin-bottom: 10px !important; font-size: 1.08rem !important; }
-.cnxt-info-card ul { margin: 6px 0 10px 18px; padding: 0; }
-.cnxt-info-card li { margin-bottom: 6px; }
-.cnxt-timing-box {
-    background-color: #FFFBEB; border: 1px solid #FDE68A; border-left: 4px solid #E58B25;
-    border-radius: 8px; padding: 12px 16px; margin: 12px 0; color: #78350F; font-size: 0.9rem; line-height: 1.5;
-}
-.cnxt-sec-sub { color: #64748B !important; font-size: 0.9rem; margin-top: -8px; margin-bottom: 12px; }
-span[data-baseweb="tag"] { background-color: var(--cnxt-twilight) !important; color: #FFFFFF !important; }
-</style>"""
-    st.markdown(css, unsafe_allow_html=True)
-
+    """Renders Connext corporate styles via st.html() with zero blank lines so CSS never leaks as text."""
+    css_rules = [
+        "@import url('https://fonts.googleapis.com/css2?family=Arimo:wght@500;600;700&family=Roboto:wght@400;500;700&family=JetBrains+Mono:wght@500;600&display=swap');",
+        ":root { --cnxt-blue: #005AAC; --cnxt-sun: #E58B25; --cnxt-yellow: #F1C916; --cnxt-twilight: #071776; --cnxt-midnight: #071739; --cnxt-teal: #0F818A; --cnxt-teal-blue: #90CBDB; --cnxt-bg: #F7F8FB; --cnxt-paper: #FFFFFF; --cnxt-ink: #0F172A; --cnxt-ash: #64748B; --cnxt-line: #E2E8F0; --font-display: 'Arimo', Arial, sans-serif; --font-body: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif; --font-mono: 'JetBrains Mono', ui-monospace, monospace; }",
+        "html, body, .stApp { font-family: var(--font-body); background-color: var(--cnxt-bg) !important; color: var(--cnxt-ink) !important; }",
+        'header[data-testid="stHeader"] { background-color: var(--cnxt-bg) !important; border-bottom: 1px solid var(--cnxt-line); }',
+        ".block-container { padding-top: 1.5rem; padding-bottom: 2.5rem; max-width: 1440px; }",
+        "h1, h2, h3, h4 { font-family: var(--font-display) !important; color: var(--cnxt-twilight) !important; letter-spacing: -0.015em; }",
+        '.stApp [data-testid="stForm"] { background-color: #FFFFFF !important; border: 1px solid var(--cnxt-line) !important; border-radius: 12px !important; padding: 22px 24px !important; box-shadow: 0 4px 16px rgba(7, 23, 57, 0.06) !important; }',
+        '.stApp .main label, .stApp [data-testid="stWidgetLabel"] p { color: #1E293B !important; font-weight: 500 !important; }',
+        ".stApp .main input, .stApp .main textarea { background-color: #FFFFFF !important; color: #0F172A !important; border: 1px solid #CBD5E1 !important; border-radius: 8px !important; }",
+        '.stApp .main [data-baseweb="select"] > div { background-color: #FFFFFF !important; color: #0F172A !important; border: 1px solid #CBD5E1 !important; border-radius: 8px !important; }',
+        '.stApp .main [data-baseweb="select"] span, .stApp .main [data-baseweb="select"] input { color: #0F172A !important; }',
+        '[data-baseweb="popover"], [data-baseweb="menu"] { background-color: #FFFFFF !important; color: #0F172A !important; }',
+        '[data-baseweb="menu"] li { color: #0F172A !important; }',
+        '.stApp .main [data-testid="stRadio"] label p, .stApp .main [data-testid="stCheckbox"] label p { color: #1E293B !important; }',
+        '.stApp .main [data-testid="stExpander"] { background-color: #FFFFFF !important; border: 1px solid var(--cnxt-line) !important; border-radius: 10px !important; }',
+        '.stApp .main [data-testid="stExpander"] summary p { color: var(--cnxt-twilight) !important; font-weight: 600 !important; }',
+        '.stApp .main [data-testid="stCodeBlock"] pre { background-color: #0F172A !important; color: #F8FAFC !important; border-radius: 8px !important; }',
+        '.stButton > button[kind="primary"], div[data-testid="stFormSubmitButton"] > button, .stDownloadButton > button { background-color: var(--cnxt-sun) !important; color: #071739 !important; font-family: var(--font-body) !important; font-weight: 700 !important; border: none !important; border-radius: 999px !important; padding: 0.52rem 1.35rem !important; box-shadow: 0 4px 12px rgba(229, 139, 37, 0.30) !important; }',
+        '.stButton > button[kind="primary"]:hover, div[data-testid="stFormSubmitButton"] > button:hover, .stDownloadButton > button:hover { background-color: var(--cnxt-twilight) !important; color: #FFFFFF !important; }',
+        '.stButton > button:not([kind="primary"]) { background-color: #FFFFFF !important; color: var(--cnxt-twilight) !important; border: 1px solid #CBD5E1 !important; border-radius: 999px !important; font-weight: 600 !important; }',
+        '.stButton > button:not([kind="primary"]):hover { border-color: var(--cnxt-twilight) !important; background-color: #F1F5F9 !important; }',
+        'section[data-testid="stSidebar"] { background-color: var(--cnxt-midnight) !important; border-right: 1px solid rgba(144, 203, 219, 0.16); }',
+        'section[data-testid="stSidebar"] label, section[data-testid="stSidebar"] p, section[data-testid="stSidebar"] span { color: #F8FAFC !important; }',
+        'section[data-testid="stSidebar"] .stCaption, section[data-testid="stSidebar"] small { color: var(--cnxt-teal-blue) !important; }',
+        'section[data-testid="stSidebar"] h1, section[data-testid="stSidebar"] h2, section[data-testid="stSidebar"] h3 { color: #FFFFFF !important; }',
+        'section[data-testid="stSidebar"] input, section[data-testid="stSidebar"] textarea { background-color: #FFFFFF !important; color: #071739 !important; border-radius: 6px !important; }',
+        'section[data-testid="stSidebar"] [data-baseweb="select"] > div { background-color: #FFFFFF !important; color: #071739 !important; }',
+        'section[data-testid="stSidebar"] [data-baseweb="select"] span { color: #071739 !important; }',
+        'section[data-testid="stSidebar"] [data-testid="stExpander"] { background-color: rgba(255,255,255,0.06) !important; border: 1px solid rgba(144,203,219,0.22) !important; }',
+        'section[data-testid="stSidebar"] [data-testid="stExpander"] summary p { color: #F1C916 !important; }',
+        'section[data-testid="stSidebar"] .stButton > button { background-color: rgba(255,255,255,0.10) !important; color: var(--cnxt-teal-blue) !important; border: 1px solid rgba(144,203,219,0.32) !important; border-radius: 999px !important; }',
+        'section[data-testid="stSidebar"] .stButton > button[kind="primary"] { background-color: var(--cnxt-sun) !important; color: var(--cnxt-midnight) !important; border: none !important; font-weight: 700 !important; }',
+        ".cnxt-hero { background: linear-gradient(135deg, #071776 0%, #071739 100%); color: #FFFFFF; padding: 22px 28px; border-radius: 12px; margin-bottom: 16px; border: 1px solid rgba(144,203,219,0.2); box-shadow: 0 6px 20px rgba(7,23,57,0.08); }",
+        ".cnxt-eyebrow { font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.16em; color: #F1C916; margin-bottom: 5px; font-weight: 600; }",
+        ".cnxt-hero h1 { font-size: clamp(1.35rem, 2.2vw, 1.9rem) !important; color: #FFFFFF !important; margin: 0 0 6px 0 !important; }",
+        ".cnxt-hero h1 span { color: #E58B25; }",
+        ".cnxt-hero p { color: #CBD5E1 !important; font-size: 0.93rem; margin: 0; max-width: 900px; line-height: 1.5; }",
+        'div[data-testid="stMetric"] { background-color: var(--cnxt-paper); border: 1px solid var(--cnxt-line); border-top: 3px solid var(--cnxt-blue); border-radius: 10px; padding: 14px 16px; box-shadow: 0 1px 4px rgba(15, 23, 42, 0.04); }',
+        'div[data-testid="stMetric"] label { font-family: var(--font-mono) !important; font-size: 0.70rem !important; text-transform: uppercase !important; letter-spacing: 0.07em !important; color: var(--cnxt-ash) !important; }',
+        'div[data-testid="stMetric"] [data-testid="stMetricValue"] { font-family: var(--font-display) !important; color: var(--cnxt-twilight) !important; font-weight: 700 !important; font-size: 1.6rem !important; }',
+        '.stTabs [data-baseweb="tab-list"] { gap: 6px; border-bottom: 2px solid var(--cnxt-line); margin-bottom: 14px; flex-wrap: wrap; }',
+        '.stTabs [data-baseweb="tab"] { font-family: var(--font-display); font-weight: 600; font-size: 0.89rem; color: #334155 !important; background-color: #FFFFFF !important; border-radius: 8px 8px 0 0; padding: 10px 14px; border: 1px solid var(--cnxt-line); border-bottom: none; }',
+        '.stTabs [aria-selected="true"] { background-color: var(--cnxt-twilight) !important; color: #FFFFFF !important; border-color: var(--cnxt-twilight) !important; }',
+        ".cnxt-callout { background-color: #FFFFFF; border: 1px solid var(--cnxt-line); border-left: 4px solid var(--cnxt-sun); border-radius: 8px; padding: 14px 18px; margin: 8px 0 14px 0; color: #1E293B; font-size: 0.92rem; line-height: 1.55; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03); }",
+        ".cnxt-callout strong { color: var(--cnxt-twilight); }",
+        ".cnxt-info-card { background-color: #FFFFFF; border: 1px solid var(--cnxt-line); border-radius: 12px; padding: 20px 22px; margin-bottom: 14px; color: #1E293B; font-size: 0.92rem; line-height: 1.6; box-shadow: 0 2px 10px rgba(7, 23, 57, 0.04); }",
+        ".cnxt-info-card h3 { margin-top: 0 !important; margin-bottom: 10px !important; font-size: 1.08rem !important; }",
+        ".cnxt-info-card ul { margin: 6px 0 10px 18px; padding: 0; }",
+        ".cnxt-info-card li { margin-bottom: 6px; }",
+        ".cnxt-timing-box { background-color: #FFFBEB; border: 1px solid #FDE68A; border-left: 4px solid #E58B25; border-radius: 8px; padding: 12px 16px; margin: 12px 0; color: #78350F; font-size: 0.9rem; line-height: 1.5; }",
+        ".cnxt-sec-sub { color: #64748B !important; font-size: 0.9rem; margin-top: -8px; margin-bottom: 12px; }",
+        'span[data-baseweb="tag"] { background-color: var(--cnxt-twilight) !important; color: #FFFFFF !important; }',
+    ]
+    css_block = "<style>\n" + "\n".join(css_rules) + "\n</style>"
+    if hasattr(st, "html"):
+        st.html(css_block)
+    else:
+        st.markdown(css_block, unsafe_allow_html=True)
+   
 
 inject_connext_brand_css()
 
