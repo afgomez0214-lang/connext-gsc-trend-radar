@@ -35,7 +35,7 @@ CNXT_COLORS = {
     "blue": "#005AAC",
     "sun": "#E58B25",
     "yellow": "#F1C916",
-    "red": "#FC4301",
+    "red": "#DC2626",
     "twilight": "#071776",
     "midnight": "#071739",
     "teal": "#0F818A",
@@ -43,9 +43,9 @@ CNXT_COLORS = {
     "cream": "#F4F1E2",
     "bg": "#F7F8FB",
     "paper": "#FFFFFF",
+    "ink": "#0F172A",
     "ash": "#64748B",
     "line": "#E2E8F0",
-    "line_strong": "#CBD5E1",
 }
 
 CNXT_LOGO_COLOR = "https://cdn.prod.website-files.com/6a5abaee04ee2fd8ff22a3ec/6a72a1e48c2cd52f0e5f2578_CONNEXT%20MAIN%20LOGO%20COLOR.png"
@@ -70,9 +70,6 @@ COMPETITORS_REGISTRY = [
     ("BairesDev", "bairesdev.com", r"\bbaires\s*dev\b"),
 ]
 
-COMPETITOR_BRAND_REGEX = re.compile("|".join(pat for _, _, pat in COMPETITORS_REGISTRY), re.I)
-
-# Strict Competitor Blog URL Filters (Only editorial blog/article/insight posts)
 BLOG_INCLUDE_PATH_RE = re.compile(
     r"/(blog|blogs|insights|articles|article|resources/blog|learn/blog|news|guides|learning-center|knowledge-base|posts)/[^/]+",
     re.I,
@@ -105,7 +102,6 @@ COMP_BRAND_WORDS = {
     "hirewithnear", "bairesdev", "global", "solutions", "group", "inc", "llc",
 }
 
-# Strictly B2B Industry-Relevant News/Trend Queries (zero sports/celebrity macro noise)
 INDUSTRY_NEWS_FEEDS = {
     "All B2B Outsourcing & Staffing": '("BPO outsourcing" OR "offshore staffing" OR "nearshore staffing" OR "staff augmentation") when:14d',
     "Healthcare & RCM": '("medical billing outsourcing" OR "revenue cycle management" OR "prior authorization" OR "healthcare BPO") when:14d',
@@ -116,7 +112,7 @@ INDUSTRY_NEWS_FEEDS = {
 
 # --- PAGE CONFIGURATION ---
 st.set_page_config(
-    page_title="Connext Global | Search & Topic Radar",
+    page_title="Connext Global | Enterprise Search & Topic Radar",
     page_icon=CNXT_FAVICON,
     layout="wide",
     initial_sidebar_state="expanded",
@@ -124,6 +120,7 @@ st.set_page_config(
 
 
 def inject_connext_brand_css():
+    """Hardened light-surface styling that prevents dark-mode text/input clashes on login & dashboard."""
     css = """<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Arimo:wght@500;600;700&family=Roboto:wght@400;500;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
@@ -131,16 +128,63 @@ def inject_connext_brand_css():
 :root {
     --cnxt-blue: #005AAC; --cnxt-sun: #E58B25; --cnxt-yellow: #F1C916;
     --cnxt-twilight: #071776; --cnxt-midnight: #071739; --cnxt-teal: #0F818A;
-    --cnxt-teal-blue: #90CBDB; --cnxt-cream: #F4F1E2; --cnxt-bg: #F7F8FB;
-    --cnxt-paper: #FFFFFF; --cnxt-ash: #64748B; --cnxt-line: #E2E8F0;
+    --cnxt-teal-blue: #90CBDB; --cnxt-bg: #F7F8FB; --cnxt-paper: #FFFFFF;
+    --cnxt-ink: #0F172A; --cnxt-ash: #64748B; --cnxt-line: #E2E8F0;
     --font-display: 'Arimo', Arial, sans-serif;
     --font-body: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
     --font-mono: 'JetBrains Mono', ui-monospace, monospace;
 }
-html, body, [class*="css"] { font-family: var(--font-body); color: #0F172A; }
-.stApp { background-color: var(--cnxt-bg); }
-.block-container { padding-top: 1.4rem; padding-bottom: 2.5rem; max-width: 1440px; }
+html, body, .stApp { font-family: var(--font-body); background-color: var(--cnxt-bg) !important; color: var(--cnxt-ink) !important; }
+header[data-testid="stHeader"] { background-color: var(--cnxt-bg) !important; border-bottom: 1px solid var(--cnxt-line); }
+.block-container { padding-top: 1.5rem; padding-bottom: 2.5rem; max-width: 1440px; }
 h1, h2, h3, h4 { font-family: var(--font-display) !important; color: var(--cnxt-twilight) !important; letter-spacing: -0.015em; }
+
+/* Main Canvas Form & Input Contrast (Fixes Dark Mode Clashes on Login + Dashboard) */
+.stApp [data-testid="stForm"] {
+    background-color: #FFFFFF !important; border: 1px solid var(--cnxt-line) !important;
+    border-radius: 12px !important; padding: 22px 24px !important;
+    box-shadow: 0 4px 16px rgba(7, 23, 57, 0.06) !important;
+}
+.stApp .main label, .stApp [data-testid="stWidgetLabel"] p { color: #1E293B !important; font-weight: 500 !important; }
+.stApp .main input, .stApp .main textarea {
+    background-color: #FFFFFF !important; color: #0F172A !important;
+    border: 1px solid #CBD5E1 !important; border-radius: 8px !important;
+}
+.stApp .main [data-baseweb="select"] > div {
+    background-color: #FFFFFF !important; color: #0F172A !important;
+    border: 1px solid #CBD5E1 !important; border-radius: 8px !important;
+}
+.stApp .main [data-baseweb="select"] span, .stApp .main [data-baseweb="select"] input { color: #0F172A !important; }
+[data-baseweb="popover"], [data-baseweb="menu"] { background-color: #FFFFFF !important; color: #0F172A !important; }
+[data-baseweb="menu"] li { color: #0F172A !important; }
+.stApp .main [data-testid="stRadio"] label p, .stApp .main [data-testid="stCheckbox"] label p { color: #1E293B !important; }
+.stApp .main [data-testid="stExpander"] {
+    background-color: #FFFFFF !important; border: 1px solid var(--cnxt-line) !important; border-radius: 10px !important;
+}
+.stApp .main [data-testid="stExpander"] summary p { color: var(--cnxt-twilight) !important; font-weight: 600 !important; }
+.stApp .main [data-testid="stCodeBlock"] pre { background-color: #0F172A !important; color: #F8FAFC !important; border-radius: 8px !important; }
+
+/* Primary & Form Submit Buttons (Login + Actions) */
+.stButton > button[kind="primary"],
+div[data-testid="stFormSubmitButton"] > button,
+.stDownloadButton > button {
+    background-color: var(--cnxt-sun) !important; color: #071739 !important;
+    font-family: var(--font-body) !important; font-weight: 700 !important;
+    border: none !important; border-radius: 999px !important; padding: 0.52rem 1.35rem !important;
+    box-shadow: 0 4px 12px rgba(229, 139, 37, 0.30) !important;
+}
+.stButton > button[kind="primary"]:hover,
+div[data-testid="stFormSubmitButton"] > button:hover,
+.stDownloadButton > button:hover {
+    background-color: var(--cnxt-twilight) !important; color: #FFFFFF !important;
+}
+.stButton > button:not([kind="primary"]) {
+    background-color: #FFFFFF !important; color: var(--cnxt-twilight) !important;
+    border: 1px solid #CBD5E1 !important; border-radius: 999px !important; font-weight: 600 !important;
+}
+.stButton > button:not([kind="primary"]):hover {
+    border-color: var(--cnxt-twilight) !important; background-color: #F1F5F9 !important;
+}
 
 /* Sidebar */
 section[data-testid="stSidebar"] { background-color: var(--cnxt-midnight) !important; border-right: 1px solid rgba(144, 203, 219, 0.16); }
@@ -150,18 +194,10 @@ section[data-testid="stSidebar"] h1, section[data-testid="stSidebar"] h2, sectio
 section[data-testid="stSidebar"] input, section[data-testid="stSidebar"] textarea { background-color: #FFFFFF !important; color: #071739 !important; border-radius: 6px !important; }
 section[data-testid="stSidebar"] [data-baseweb="select"] > div { background-color: #FFFFFF !important; color: #071739 !important; }
 section[data-testid="stSidebar"] [data-baseweb="select"] span { color: #071739 !important; }
+section[data-testid="stSidebar"] [data-testid="stExpander"] { background-color: rgba(255,255,255,0.06) !important; border: 1px solid rgba(144,203,219,0.22) !important; }
+section[data-testid="stSidebar"] [data-testid="stExpander"] summary p { color: #F1C916 !important; }
 section[data-testid="stSidebar"] .stButton > button { background-color: rgba(255,255,255,0.10) !important; color: var(--cnxt-teal-blue) !important; border: 1px solid rgba(144,203,219,0.32) !important; border-radius: 999px !important; }
-section[data-testid="stSidebar"] .stButton > button[kind="primary"] { background-color: var(--cnxt-sun) !important; color: var(--cnxt-midnight) !important; border: none !important; font-weight: 600 !important; }
-
-/* Buttons */
-.stButton > button[kind="primary"], .stDownloadButton > button {
-    background-color: var(--cnxt-sun) !important; color: var(--cnxt-midnight) !important;
-    font-weight: 600 !important; border: none !important; border-radius: 999px !important;
-    padding: 0.48rem 1.25rem !important; box-shadow: 0 4px 12px rgba(229,139,37,0.28) !important;
-}
-.stButton > button[kind="primary"]:hover, .stDownloadButton > button:hover {
-    background-color: var(--cnxt-twilight) !important; color: #FFFFFF !important;
-}
+section[data-testid="stSidebar"] .stButton > button[kind="primary"] { background-color: var(--cnxt-sun) !important; color: var(--cnxt-midnight) !important; border: none !important; font-weight: 700 !important; }
 
 /* Hero Banner */
 .cnxt-hero {
@@ -172,7 +208,7 @@ section[data-testid="stSidebar"] .stButton > button[kind="primary"] { background
 .cnxt-eyebrow { font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.16em; color: #F1C916; margin-bottom: 5px; font-weight: 600; }
 .cnxt-hero h1 { font-size: clamp(1.35rem, 2.2vw, 1.9rem) !important; color: #FFFFFF !important; margin: 0 0 6px 0 !important; }
 .cnxt-hero h1 span { color: #E58B25; }
-.cnxt-hero p { color: #CBD5E1; font-size: 0.93rem; margin: 0; max-width: 880px; line-height: 1.5; }
+.cnxt-hero p { color: #CBD5E1 !important; font-size: 0.93rem; margin: 0; max-width: 900px; line-height: 1.5; }
 
 /* Metric Cards */
 div[data-testid="stMetric"] {
@@ -181,14 +217,14 @@ div[data-testid="stMetric"] {
     box-shadow: 0 1px 4px rgba(15, 23, 42, 0.04);
 }
 div[data-testid="stMetric"] label { font-family: var(--font-mono) !important; font-size: 0.70rem !important; text-transform: uppercase !important; letter-spacing: 0.07em !important; color: var(--cnxt-ash) !important; }
-div[data-testid="stMetric"] [data-testid="stMetricValue"] { font-family: var(--font-display) !important; color: var(--cnxt-twilight) !important; font-weight: 700 !important; font-size: 1.65rem !important; }
+div[data-testid="stMetric"] [data-testid="stMetricValue"] { font-family: var(--font-display) !important; color: var(--cnxt-twilight) !important; font-weight: 700 !important; font-size: 1.6rem !important; }
 
-/* Clean Tabs */
-.stTabs [data-baseweb="tab-list"] { gap: 8px; border-bottom: 2px solid var(--cnxt-line); margin-bottom: 14px; }
+/* Tabs */
+.stTabs [data-baseweb="tab-list"] { gap: 8px; border-bottom: 2px solid var(--cnxt-line); margin-bottom: 14px; flex-wrap: wrap; }
 .stTabs [data-baseweb="tab"] {
-    font-family: var(--font-display); font-weight: 600; font-size: 0.92rem;
-    color: #334155; background-color: #FFFFFF; border-radius: 8px 8px 0 0;
-    padding: 10px 18px; border: 1px solid var(--cnxt-line); border-bottom: none;
+    font-family: var(--font-display); font-weight: 600; font-size: 0.91rem;
+    color: #334155 !important; background-color: #FFFFFF !important; border-radius: 8px 8px 0 0;
+    padding: 10px 16px; border: 1px solid var(--cnxt-line); border-bottom: none;
 }
 .stTabs [aria-selected="true"] { background-color: var(--cnxt-twilight) !important; color: #FFFFFF !important; border-color: var(--cnxt-twilight) !important; }
 
@@ -200,9 +236,7 @@ div[data-testid="stMetric"] [data-testid="stMetricValue"] { font-family: var(--f
     box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
 }
 .cnxt-callout strong { color: var(--cnxt-twilight); }
-
-/* Section Subtitle */
-.cnxt-sec-sub { color: #64748B; font-size: 0.9rem; margin-top: -8px; margin-bottom: 12px; }
+.cnxt-sec-sub { color: #64748B !important; font-size: 0.9rem; margin-top: -8px; margin-bottom: 12px; }
 span[data-baseweb="tag"] { background-color: var(--cnxt-twilight) !important; color: #FFFFFF !important; }
 </style>"""
     st.markdown(css, unsafe_allow_html=True)
@@ -211,34 +245,63 @@ span[data-baseweb="tag"] { background-color: var(--cnxt-twilight) !important; co
 inject_connext_brand_css()
 
 
+def style_plotly_light(fig: go.Figure, height: int = 360, legend_bottom: bool = False) -> go.Figure:
+    """Enforces crisp light-surface typography and axis readability in all browser modes."""
+    layout_kwargs = dict(
+        height=height,
+        plot_bgcolor="#FFFFFF",
+        paper_bgcolor="#FFFFFF",
+        font=dict(family="Roboto, sans-serif", color="#0F172A", size=12),
+        xaxis=dict(gridcolor="#E2E8F0", tickfont=dict(color="#334155"), title_font=dict(color="#334155")),
+        yaxis=dict(gridcolor="#E2E8F0", tickfont=dict(color="#334155"), title_font=dict(color="#334155")),
+    )
+    if legend_bottom:
+        layout_kwargs["legend"] = dict(orientation="h", y=-0.22, font=dict(color="#0F172A"), title="")
+    fig.update_layout(**layout_kwargs)
+    return fig
+
+
 def require_connext_login():
+    """Clean, high-contrast team login screen with failed-attempt safeguard."""
     if st.session_state.get("cnxt_authenticated"):
         return
 
-    st.markdown("<style>section[data-testid='stSidebar']{display:none;}</style>", unsafe_allow_html=True)
+    st.markdown("<style>section[data-testid='stSidebar']{display:none !important;}</style>", unsafe_allow_html=True)
     _, center_col, _ = st.columns([1, 1.25, 1])
     with center_col:
-        st.markdown("<div style='height: 44px;'></div>", unsafe_allow_html=True)
+        st.markdown("<div style='height: 36px;'></div>", unsafe_allow_html=True)
         st.image(CNXT_LOGO_COLOR, width=185)
         st.markdown(
-            """<div class="cnxt-hero" style="margin-top: 14px;">
-<div class="cnxt-eyebrow">INTERNAL TEAM ACCESS</div>
+            """<div class="cnxt-hero" style="margin-top: 14px; margin-bottom: 16px;">
+<div class="cnxt-eyebrow">INTERNAL CONNEXT TEAM ACCESS</div>
 <h1>Connext Search &amp; <span>Topic Radar</span></h1>
-<p>Sign in with your Connext team password to view live Google Search trends, Keyword Planner opportunity forecasts, competitor blog topics, and Bing/Trends research.</p>
+<p>Sign in with your Connext team password to view live Google Search trends, content decay alerts, ROI opportunity forecasts, internal linking plans, and competitor blog intelligence.</p>
 </div>""",
             unsafe_allow_html=True,
         )
+
         if "app_password" not in st.secrets:
-            st.error("`app_password` is not set in Streamlit Secrets. Add it in App Settings → Secrets.")
+            st.error("`app_password` is not configured in Streamlit Secrets yet. Add it in App Settings → Secrets.")
             st.stop()
-        with st.form("cnxt_login_form"):
-            entered_pwd = st.text_input("Team Password", type="password", placeholder="Enter team password...")
-            if st.form_submit_button("Unlock Radar", type="primary", use_container_width=True):
-                if hmac.compare_digest(entered_pwd, str(st.secrets["app_password"])):
+
+        attempts = int(st.session_state.get("cnxt_login_attempts", 0))
+        if attempts >= 5:
+            st.error("Too many failed attempts in this browser session. Refresh the page and verify your team password.")
+            st.stop()
+
+        with st.form("cnxt_login_form", clear_on_submit=False):
+            entered_pwd = st.text_input("Team Password", type="password", placeholder="Enter password and press Enter...")
+            submitted = st.form_submit_button("Unlock Enterprise Radar", type="primary", use_container_width=True)
+            if submitted:
+                if hmac.compare_digest(entered_pwd.strip(), str(st.secrets["app_password"]).strip()):
                     st.session_state["cnxt_authenticated"] = True
+                    st.session_state["cnxt_login_attempts"] = 0
                     st.rerun()
                 else:
-                    st.error("Incorrect password. Please try again.")
+                    st.session_state["cnxt_login_attempts"] = attempts + 1
+                    rem = max(0, 5 - (attempts + 1))
+                    st.error(f"Incorrect password. ({rem} attempt{'s' if rem != 1 else ''} remaining)")
+        st.caption("For internal Connext Global use only • Read-only GSC connection")
     st.stop()
 
 
@@ -309,33 +372,17 @@ LOCAL_PH_AND_STUDENT_REGEX = re.compile(
     re.I,
 )
 
-COMMERCIAL_MODIFIERS = re.compile(
-    r"\b("
-    r"outsourcing|outsource|staffing|offshore|nearshore|dedicated|bpo|agency|company|firm|"
-    r"services|solutions|cost|pricing|rates|quote|remote team|vs|versus|best|top|partner|provider|hire"
-    r")\b",
-    re.I,
-)
-
-AI_PROMPT_REGEX = re.compile(
-    r"^(how|what|why|when|where|which|can|does|is|are|should|compare|difference between|pros and cons|steps to|best way to)\b",
-    re.I,
-)
+BOFU_REGEX = re.compile(r"\b(cost|pricing|rates|quote|hire|agency|company|companies|provider|partner|firm|services|outsourcing|outsource|staffing)\b", re.I)
+MOFU_REGEX = re.compile(r"\b(best|top|vs|versus|compare|comparison|solutions|dedicated|offshore|nearshore|remote team|bpo)\b", re.I)
+COMMERCIAL_MODIFIERS = re.compile(r"\b(outsourcing|outsource|staffing|offshore|nearshore|dedicated|bpo|agency|company|firm|services|solutions|cost|pricing|rates|quote|remote team|vs|versus|best|top|partner|provider|hire)\b", re.I)
+AI_PROMPT_REGEX = re.compile(r"^(how|what|why|when|where|which|can|does|is|are|should|compare|difference between|pros and cons|steps to|best way to)\b", re.I)
 
 ALL_CONNEXT_VERTICALS = [
-    "Healthcare & RCM",
-    "Finance, Accounting & Tax",
-    "Tech, IT & AI Staffing",
-    "Customer Experience (CX) & VAs",
-    "Back Office & Operations Support",
-    "Real Estate, Mortgage & Title/Escrow",
-    "Insurance & Claims",
-    "Legal & Compliance",
-    "Fintech & Private Equity",
-    "Engineering & Construction",
-    "Sales, Marketing & E-Commerce",
-    "Hospitality, Education & HR",
-    "General B2B Outsourcing & Staffing",
+    "Healthcare & RCM", "Finance, Accounting & Tax", "Tech, IT & AI Staffing",
+    "Customer Experience (CX) & VAs", "Back Office & Operations Support",
+    "Real Estate, Mortgage & Title/Escrow", "Insurance & Claims", "Legal & Compliance",
+    "Fintech & Private Equity", "Engineering & Construction", "Sales, Marketing & E-Commerce",
+    "Hospitality, Education & HR", "General B2B Outsourcing & Staffing",
 ]
 
 SECTOR_PATTERNS = [
@@ -426,14 +473,11 @@ def normalize_url(url: str) -> str:
         u = f"https://connextglobal.com{u}"
     u = u.replace("http://", "https://").replace("https://www.", "https://")
     u = u.split("?")[0].split("#")[0]
-    if u.endswith("/") and len(u) > len("https://connextglobal.com/"):
-        u = u.rstrip("/")
-    return u
+    return u.rstrip("/") if u.endswith("/") and len(u) > len("https://connextglobal.com/") else u
 
 
 def url_to_path(url: str) -> str:
-    norm = normalize_url(url)
-    path = urlparse(norm).path
+    path = urlparse(normalize_url(url)).path
     if not path:
         return "/"
     return path.rstrip("/") if path != "/" and path.endswith("/") else path
@@ -465,6 +509,14 @@ def classify_page_role(path: str, live_paths_set: set[str]) -> str:
     if path.startswith("/blog/") or path.startswith("/general-outsourcing") or path in {"/bpo-glossary", "/insights/faq", "/insights"}:
         return "Blog / Guide"
     return "Core Brand Page"
+
+
+def classify_funnel_stage(text: str) -> str:
+    if BOFU_REGEX.search(text):
+        return "BOFU — Ready to Buy"
+    if MOFU_REGEX.search(text):
+        return "MOFU — Evaluating"
+    return "TOFU — Research"
 
 
 def human_rank_label(pos: float) -> str:
@@ -504,19 +556,39 @@ def classify_sector(text: str) -> str:
     return "General B2B Outsourcing & Staffing"
 
 
+def build_enterprise_excel_bytes(sheets_dict: dict[str, pd.DataFrame]) -> bytes:
+    """Exports a formatted multi-sheet Excel Executive Workbook using openpyxl ($0)."""
+    buf = io.BytesIO()
+    with pd.ExcelWriter(buf, engine="openpyxl") as writer:
+        for name, df in sheets_dict.items():
+            if df is None or df.empty:
+                continue
+            safe_name = re.sub(r"[\[\]:*?/\\]", "", name)[:31]
+            out_df = df.copy()
+            drop_cols = [c for c in out_df.columns if out_df[c].apply(lambda x: isinstance(x, (list, dict))).any()]
+            if drop_cols:
+                out_df = out_df.drop(columns=drop_cols)
+            out_df.to_excel(writer, sheet_name=safe_name, index=False)
+            ws = writer.sheets[safe_name]
+            for col_cells in ws.columns:
+                max_len = max((len(str(c.value or "")) for c in col_cells), default=10)
+                ws.column_dimensions[col_cells[0].column_letter].width = min(max(max_len + 3, 12), 48)
+    buf.seek(0)
+    return buf.getvalue()
+
+
 @st.cache_data(ttl=3600, show_spinner=False)
 def fetch_live_sitemap_paths() -> tuple[list[str], str]:
-    headers = {"User-Agent": "Mozilla/5.0 (compatible; ConnextTrendRadar/2.0)"}
+    headers = {"User-Agent": "Mozilla/5.0 (compatible; ConnextTrendRadar/3.0)"}
     try:
-        req = urllib.request.Request(SITEMAP_XML_URL, headers=headers)
-        with urllib.request.urlopen(req, timeout=10) as resp:
+        with urllib.request.urlopen(urllib.request.Request(SITEMAP_XML_URL, headers=headers), timeout=8) as resp:
             root = ET.fromstring(resp.read())
         locs = [el.text.strip() for el in root.iter() if el.tag.endswith("loc") and el.text]
         child_sitemaps = [u for u in locs if u.lower().endswith(".xml")]
         if child_sitemaps:
             all_urls = []
             for sm_url in child_sitemaps[:10]:
-                with urllib.request.urlopen(urllib.request.Request(sm_url, headers=headers), timeout=10) as c_resp:
+                with urllib.request.urlopen(urllib.request.Request(sm_url, headers=headers), timeout=8) as c_resp:
                     c_root = ET.fromstring(c_resp.read())
                 all_urls.extend([el.text.strip() for el in c_root.iter() if el.tag.endswith("loc") and el.text])
             locs = all_urls
@@ -527,11 +599,9 @@ def fetch_live_sitemap_paths() -> tuple[list[str], str]:
         pass
 
     try:
-        req = urllib.request.Request(SITEMAP_HTML_URL, headers=headers)
-        with urllib.request.urlopen(req, timeout=10) as resp:
+        with urllib.request.urlopen(urllib.request.Request(SITEMAP_HTML_URL, headers=headers), timeout=8) as resp:
             html_text = resp.read().decode("utf-8", errors="ignore")
-        hrefs = re.findall(r'href=["\']((?:https?://(?:www\.)?connextglobal\.com)?/[^"\'#?]*)["\']', html_text, re.I)
-        paths = sorted({url_to_path(h) for h in hrefs})
+        paths = sorted({url_to_path(h) for h in re.findall(r'href=["\']((?:https?://(?:www\.)?connextglobal\.com)?/[^"\'#?]*)["\']', html_text, re.I)})
         if len(paths) >= 50:
             return paths, f"Live /sitemap ({len(paths):,} URLs)"
     except Exception:
@@ -541,7 +611,7 @@ def fetch_live_sitemap_paths() -> tuple[list[str], str]:
     return fallback, f"Core Pages Fallback ({len(fallback)} URLs)"
 
 
-def _build_index_from_paths(all_paths: list[str]) -> tuple[set[str], pd.DataFrame, TfidfVectorizer, object]:
+def _build_index_from_paths(all_paths: list[str]):
     live_set = set(all_paths)
     live_df = pd.DataFrame({"path": sorted(live_set)})
     live_df["full_url"] = live_df["path"].apply(lambda p: "https://connextglobal.com/" if p == "/" else f"https://connextglobal.com{p}")
@@ -665,7 +735,78 @@ def build_faq_jsonld(topic: str, queries_list: list[str]) -> str:
 
 
 # ==============================================================================
-# KEYWORD PLANNER ($0 CSV PARSER) & GSC LOADERS
+# ENTERPRISE FREE FUNCTION: LIVE ON-PAGE SEO & AI-READINESS GRADER ($0)
+# ==============================================================================
+@st.cache_data(ttl=3600, show_spinner=False)
+def run_live_onpage_seo_audit(url: str, target_keywords: tuple[str, ...]) -> dict:
+    """Fetches a live connextglobal.com page and grades SEO & AI Overview readiness (0-100)."""
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+    try:
+        with urllib.request.urlopen(urllib.request.Request(url, headers=headers), timeout=10) as resp:
+            raw_html = resp.read(250000).decode("utf-8", errors="ignore")
+    except Exception as exc:
+        return {"error": f"Could not fetch live page: {exc}"}
+
+    clean_html = re.sub(r"<(script|style|noscript|svg)[^>]*>.*?</\1>", " ", raw_html, flags=re.I | re.S)
+    m_t = re.search(r"<title[^>]*>(.*?)</title>", raw_html, re.I | re.S)
+    title = re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", "", m_t.group(1)))).strip() if m_t else ""
+
+    m_d = re.search(r'<meta[^>]+name=["\']description["\'][^>]+content=["\'](.*?)["\']', raw_html, re.I | re.S)
+    if not m_d:
+        m_d = re.search(r'<meta[^>]+content=["\'](.*?)["\'][^>]+name=["\']description["\']', raw_html, re.I | re.S)
+    meta_desc = re.sub(r"\s+", " ", html.unescape(m_d.group(1))).strip() if m_d else ""
+
+    h1s = [re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", "", x))).strip() for x in re.findall(r"<h1[^>]*>(.*?)</h1>", clean_html, re.I | re.S)]
+    h2s = [re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", "", x))).strip() for x in re.findall(r"<h2[^>]*>(.*?)</h2>", clean_html, re.I | re.S)]
+    word_count = len(re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", clean_html))).split())
+
+    has_jsonld = bool(re.search(r"application/ld\+json", raw_html, re.I))
+    has_faq_schema = bool(re.search(r'"FAQPage"', raw_html, re.I))
+    primary_kw = target_keywords[0].lower() if target_keywords else ""
+    kw_in_title = bool(primary_kw and primary_kw in title.lower())
+    kw_in_h1 = bool(primary_kw and any(primary_kw in h.lower() for h in h1s))
+
+    checks, score = [], 0
+    if 30 <= len(title) <= 65:
+        score += 18; checks.append({"Check": "Title Tag Length", "Status": "Pass", "Detail": f"{len(title)} chars — {title[:75]}"})
+    else:
+        checks.append({"Check": "Title Tag Length", "Status": "Optimize", "Detail": f"{len(title)} chars (target 30–65) — {title[:75]}"})
+
+    if 110 <= len(meta_desc) <= 165:
+        score += 14; checks.append({"Check": "Meta Description", "Status": "Pass", "Detail": f"{len(meta_desc)} chars"})
+    else:
+        checks.append({"Check": "Meta Description", "Status": "Optimize", "Detail": f"{len(meta_desc)} chars (target 110–165)"})
+
+    if len(h1s) == 1:
+        score += 14; checks.append({"Check": "H1 Structure", "Status": "Pass", "Detail": f"1 H1: {h1s[0][:75]}"})
+    else:
+        checks.append({"Check": "H1 Structure", "Status": "Fix", "Detail": f"Found {len(h1s)} H1 tags (use exactly 1)"})
+
+    if len(h2s) >= 3:
+        score += 14; checks.append({"Check": "H2 Scannability / AEO", "Status": "Pass", "Detail": f"{len(h2s)} H2 subheadings detected"})
+    else:
+        checks.append({"Check": "H2 Scannability / AEO", "Status": "Optimize", "Detail": f"Only {len(h2s)} H2 tags (add 3+ question H2s)"})
+
+    if kw_in_title or kw_in_h1:
+        score += 16; checks.append({"Check": "Target Keyword Match", "Status": "Pass", "Detail": f"'{primary_kw}' appears in Title/H1"})
+    else:
+        checks.append({"Check": "Target Keyword Match", "Status": "Missing", "Detail": f"Include '{primary_kw}' in Title or H1"})
+
+    if word_count >= 600:
+        score += 12; checks.append({"Check": "Content Depth", "Status": "Pass", "Detail": f"~{word_count:,} words"})
+    else:
+        checks.append({"Check": "Content Depth", "Status": "Thin", "Detail": f"~{word_count:,} words (expand to 700+ words)"})
+
+    if has_jsonld:
+        score += 12; checks.append({"Check": "JSON-LD / AI Schema", "Status": "Pass" if has_faq_schema else "Partial", "Detail": "FAQPage + JSON-LD active" if has_faq_schema else "JSON-LD found; add FAQPage from Tab 4"})
+    else:
+        checks.append({"Check": "JSON-LD / AI Schema", "Status": "Missing", "Detail": "Add FAQPage JSON-LD from Tab 4"})
+
+    return {"score": score, "checks": pd.DataFrame(checks)}
+
+
+# ==============================================================================
+# KEYWORD PLANNER ($0 CSV PARSER) & GSC LOADERS (WITH NEGATIVE HARVESTER)
 # ==============================================================================
 def parse_keyword_planner_csv(uploaded_file) -> dict:
     fname = uploaded_file.name.lower()
@@ -690,9 +831,8 @@ def parse_keyword_planner_csv(uploaded_file) -> dict:
     vol_c = next((c for c in df.columns if "monthly searches" in c or "search volume" in c), None)
     low_c = next((c for c in df.columns if "low range" in c), None)
     high_c = next((c for c in df.columns if "high range" in c or "cpc" in c), None)
-    comp_c = next((c for c in df.columns if c == "competition"), None)
     if not kw_c:
-        raise ValueError("Missing 'Keyword' column in Keyword Planner export.")
+        raise ValueError("Missing 'Keyword' column.")
 
     out = {}
     for _, r in df.iterrows():
@@ -703,13 +843,7 @@ def parse_keyword_planner_csv(uploaded_file) -> dict:
         low_b = float(pd.to_numeric(r[low_c], errors="coerce") or 0.0) if low_c else 0.0
         high_b = float(pd.to_numeric(r[high_c], errors="coerce") or 0.0) if high_c else low_b
         avg_cpc = round((low_b + high_b) / 2.0, 2) if (low_b > 0 and high_b > 0) else round(max(low_b, high_b), 2)
-        out[k] = {
-            "kp_volume": vol,
-            "kp_cpc": avg_cpc,
-            "kp_low_bid": round(low_b, 2),
-            "kp_high_bid": round(high_b, 2),
-            "kp_competition": str(r[comp_c]).strip() if comp_c and pd.notna(r[comp_c]) else "Medium",
-        }
+        out[k] = {"kp_volume": vol, "kp_cpc": avg_cpc, "kp_low_bid": round(low_b, 2), "kp_high_bid": round(high_b, 2)}
     return out
 
 
@@ -725,7 +859,7 @@ def _read_csv_or_zip(uploaded_file, preferred_names: list[str]) -> pd.DataFrame:
     return pd.read_csv(uploaded_file)
 
 
-def parse_gsc_web_upload(uploaded_file, brand_regex: str, custom_negatives: str, exclude_local_ph: bool) -> pd.DataFrame:
+def parse_gsc_web_upload(uploaded_file, brand_regex: str, custom_negatives: str, exclude_local_ph: bool) -> tuple[pd.DataFrame, pd.DataFrame]:
     df = _read_csv_or_zip(uploaded_file, ["quer", "page", "chart", "date"])
     df.columns = [c.lower().strip() for c in df.columns]
     df = df.rename(columns={"top queries": "query", "top pages": "page"})
@@ -738,23 +872,28 @@ def parse_gsc_web_upload(uploaded_file, brand_regex: str, custom_negatives: str,
     df["impressions"] = pd.to_numeric(df["impressions"], errors="coerce").fillna(0).astype(int)
     df["position"] = pd.to_numeric(df["position"], errors="coerce").fillna(0.0)
     df = df[(df["query"] != "") & (df["impressions"] > 0)].copy()
-    df = df[~df["query"].str.contains(STRICT_NON_INDUSTRY_REGEX, regex=True, na=False)]
+
+    noise_mask = df["query"].str.contains(STRICT_NON_INDUSTRY_REGEX, regex=True, na=False)
     if exclude_local_ph:
-        df = df[~df["query"].str.contains(LOCAL_PH_AND_STUDENT_REGEX, regex=True, na=False)]
+        noise_mask = noise_mask | df["query"].str.contains(LOCAL_PH_AND_STUDENT_REGEX, regex=True, na=False)
     if custom_negatives.strip():
-        df = df[~df["query"].str.contains(custom_negatives, regex=True, na=False)]
-    df["is_branded"] = df["query"].str.contains(brand_regex, regex=True, na=False) if brand_regex else False
-    return df
+        noise_mask = noise_mask | df["query"].str.contains(custom_negatives, regex=True, na=False)
+
+    neg_df = df[noise_mask].groupby("query", as_index=False)["impressions"].sum().sort_values("impressions", ascending=False).head(100)
+    clean_df = df[~noise_mask].copy()
+    clean_df["is_branded"] = clean_df["query"].str.contains(brand_regex, regex=True, na=False) if brand_regex else False
+    return clean_df, neg_df
 
 
 @st.cache_data(ttl=3600, show_spinner=False)
-def fetch_gsc_api_data(creds_dict: dict, site_url: str, lookback_days: int, brand_regex: str, custom_exclude_regex: str, exclude_local_ph: bool) -> pd.DataFrame:
+def fetch_gsc_api_data(creds_dict: dict, site_url: str, lookback_days: int, brand_regex: str, custom_exclude_regex: str, exclude_local_ph: bool) -> tuple[pd.DataFrame, pd.DataFrame]:
     creds = service_account.Credentials.from_service_account_info(creds_dict, scopes=["https://www.googleapis.com/auth/webmasters.readonly"])
     service = build("searchconsole", "v1", credentials=creds)
     end_dt = datetime.now(timezone.utc).date()
     start_dt = end_dt - timedelta(days=lookback_days)
 
-    rows, start_row, row_limit, max_rows = [], 0, 25000, 250000
+    rows, neg_counter = [], {}
+    start_row, row_limit, max_rows = 0, 25000, 250000
     first_incomplete = None
     brand_pat = re.compile(brand_regex, re.I) if brand_regex.strip() else None
     custom_pat = re.compile(custom_exclude_regex, re.I) if custom_exclude_regex.strip() else None
@@ -774,11 +913,11 @@ def fetch_gsc_api_data(creds_dict: dict, site_url: str, lookback_days: int, bran
             if (first_incomplete != "None" and date_str >= first_incomplete) or r["impressions"] <= 0:
                 continue
             clean_q = query.lower().strip()
-            if not clean_q or STRICT_NON_INDUSTRY_REGEX.search(clean_q):
+            if not clean_q:
                 continue
-            if exclude_local_ph and LOCAL_PH_AND_STUDENT_REGEX.search(clean_q):
-                continue
-            if custom_pat and custom_pat.search(clean_q):
+            is_noise = bool(STRICT_NON_INDUSTRY_REGEX.search(clean_q)) or (exclude_local_ph and bool(LOCAL_PH_AND_STUDENT_REGEX.search(clean_q))) or (custom_pat and bool(custom_pat.search(clean_q)))
+            if is_noise:
+                neg_counter[clean_q] = neg_counter.get(clean_q, 0) + int(r["impressions"])
                 continue
             rows.append({
                 "date": date_str, "query": clean_q, "page": normalize_url(page),
@@ -792,11 +931,12 @@ def fetch_gsc_api_data(creds_dict: dict, site_url: str, lookback_days: int, bran
     df = pd.DataFrame(rows)
     if not df.empty:
         df["date"] = pd.to_datetime(df["date"])
-    return df
+    neg_df = pd.DataFrame(sorted(neg_counter.items(), key=lambda x: -x[1])[:100], columns=["Wasted Non-B2B Query", "Wasted GSC Impr."])
+    return df, neg_df
 
 
 # ==============================================================================
-# COMPETITOR NEW BLOGS ONLY + MAIN TARGET KEYWORD EXTRACTOR ($0 FREE)
+# ON-DEMAND COMPETITOR NEW BLOGS + TARGET KEYWORD EXTRACTOR ($0)
 # ==============================================================================
 def is_competitor_blog_url(url: str) -> bool:
     path = urlparse(url).path.strip()
@@ -805,30 +945,20 @@ def is_competitor_blog_url(url: str) -> bool:
     parts = [p for p in path.split("/") if p]
     if len(parts) < 2:
         return False
-    if BLOG_INCLUDE_PATH_RE.search(path):
-        slug = parts[-1]
-        return len(slug) >= 5 and not slug.isdigit()
-    return False
+    return bool(BLOG_INCLUDE_PATH_RE.search(path) and len(parts[-1]) >= 5 and not parts[-1].isdigit())
 
 
 def extract_blog_keywords(slug: str, title: str, h1: str, meta_desc: str, h2s: list[str]) -> str:
-    """Extracts 3-4 clean target keywords from a competitor blog's slug, title, H1, H2s, and meta description."""
     sources = [
         (slug.replace("-", " ").replace("_", " "), 3.2),
-        (title, 3.0),
-        (h1, 2.8),
-        (" | ".join(h2s[:8]), 2.0),
-        (meta_desc, 1.4),
+        (title, 3.0), (h1, 2.8), (" | ".join(h2s[:8]), 2.0), (meta_desc, 1.4),
     ]
     phrase_scores = {}
     for text, weight in sources:
         if not text:
             continue
         for chunk in re.split(r"[:|–—\-?,.;!()\[\]]+", text.lower()):
-            tokens = [
-                t for t in re.findall(r"[a-z0-9]+", chunk)
-                if (len(t) > 2 or t in {"ai", "it", "hr", "qa", "va", "ap", "ar"}) and t not in COMP_BRAND_WORDS
-            ]
+            tokens = [t for t in re.findall(r"[a-z0-9]+", chunk) if (len(t) > 2 or t in {"ai", "it", "hr", "qa", "va", "ap", "ar"}) and t not in COMP_BRAND_WORDS]
             for n in (3, 2):
                 for i in range(len(tokens) - n + 1):
                     gram = tokens[i:i + n]
@@ -847,7 +977,6 @@ def extract_blog_keywords(slug: str, title: str, h1: str, meta_desc: str, h2s: l
         selected_sets.append(ptoks)
         if len(selected) >= 4:
             break
-
     if not selected:
         fallback = [w for w in re.findall(r"[a-z]{3,}", slug.lower()) if w not in BLOG_KW_STOPWORDS and w not in COMP_BRAND_WORDS]
         return ", ".join(fallback[:4]) or slug.replace("-", " ")
@@ -855,53 +984,39 @@ def extract_blog_keywords(slug: str, title: str, h1: str, meta_desc: str, h2s: l
 
 
 def _scrape_blog_metadata(url: str, slug: str) -> tuple[str, str]:
-    """Scrapes live blog title, H1, meta description, and H2s to return (Clean Headline, Main Keywords)."""
     headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
     title_txt, h1_txt, meta_txt, h2_list = "", "", "", []
     try:
-        req = urllib.request.Request(url, headers=headers)
-        with urllib.request.urlopen(req, timeout=6) as resp:
+        with urllib.request.urlopen(urllib.request.Request(url, headers=headers), timeout=6) as resp:
             raw_html = resp.read(75000).decode("utf-8", errors="ignore")
-        # Strip scripts/styles for clean heading extraction
         clean_html = re.sub(r"<(script|style|noscript)[^>]*>.*?</\1>", " ", raw_html, flags=re.I | re.S)
-
         m_t = re.search(r"<title[^>]*>(.*?)</title>", clean_html, re.I | re.S)
         if m_t:
-            t_raw = re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", "", m_t.group(1)))).strip()
-            title_txt = re.split(r"\s+[|\-–—]\s+", t_raw)[0].strip()
-
+            title_txt = re.split(r"\s+[|\-–—]\s+", re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", "", m_t.group(1)))).strip())[0].strip()
         m_h1 = re.search(r"<h1[^>]*>(.*?)</h1>", clean_html, re.I | re.S)
         if m_h1:
             h1_txt = re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", "", m_h1.group(1)))).strip()
-
-        m_desc = re.search(r'<meta[^>]+name=["\']description["\'][^>]+content=["\'](.*?)["\']', clean_html, re.I | re.S)
-        if not m_desc:
-            m_desc = re.search(r'<meta[^>]+content=["\'](.*?)["\'][^>]+name=["\']description["\']', clean_html, re.I | re.S)
+        m_desc = re.search(r'<meta[^>]+name=["\']description["\'][^>]+content=["\'](.*?)["\']', clean_html, re.I | re.S) or re.search(r'<meta[^>]+content=["\'](.*?)["\'][^>]+name=["\']description["\']', clean_html, re.I | re.S)
         if m_desc:
             meta_txt = re.sub(r"\s+", " ", html.unescape(m_desc.group(1))).strip()
-
         for h2_m in re.findall(r"<h2[^>]*>(.*?)</h2>", clean_html, re.I | re.S)[:8]:
             h2_c = re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", "", h2_m))).strip()
             if 4 <= len(h2_c) <= 120:
                 h2_list.append(h2_c)
     except Exception:
         pass
-
     headline = h1_txt if len(h1_txt) >= 8 else (title_txt if len(title_txt) >= 8 else slug.replace("-", " ").title())
-    main_kws = extract_blog_keywords(slug, title_txt, h1_txt, meta_txt, h2_list)
-    return headline, main_kws
+    return headline, extract_blog_keywords(slug, title_txt, h1_txt, meta_txt, h2_list)
 
 
 @st.cache_data(ttl=86400, show_spinner=False)
 def scan_competitor_new_blogs_auto(lookback_days: int = 45) -> tuple[pd.DataFrame, list[str]]:
-    """Scans all 12 competitors' sitemaps strictly for NEW BLOG ARTICLES and extracts their main keywords."""
     headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
     cutoff_date = datetime.now(timezone.utc).date() - timedelta(days=lookback_days)
 
-    def scan_one(comp_tuple: tuple[str, str, str]) -> tuple[list[dict], str]:
+    def scan_one(comp_tuple):
         cname, domain, _ = comp_tuple
-        found = []
-        parsed_any = False
+        found, parsed_any = [], False
         for sm_url in [f"https://{domain}/sitemap_index.xml", f"https://{domain}/sitemap.xml", f"https://www.{domain}/sitemap_index.xml", f"https://www.{domain}/sitemap.xml"]:
             try:
                 with urllib.request.urlopen(urllib.request.Request(sm_url, headers=headers), timeout=7) as resp:
@@ -910,10 +1025,8 @@ def scan_competitor_new_blogs_auto(lookback_days: int = 45) -> tuple[pd.DataFram
                 child_locs = [el.text.strip() for el in root.iter() if el.tag.endswith("loc") and el.text and el.text.strip().lower().endswith(".xml")]
                 sub_roots = []
                 if child_locs:
-                    # Strictly prioritize blog / post / article / insight child sitemaps
                     blog_children = [u for u in child_locs if any(k in u.lower() for k in ["post", "blog", "article", "insight", "news", "resource"])]
-                    target_children = blog_children[:4] if blog_children else child_locs[:3]
-                    for sub_u in target_children:
+                    for sub_u in (blog_children[:4] if blog_children else child_locs[:3]):
                         try:
                             with urllib.request.urlopen(urllib.request.Request(sub_u, headers=headers), timeout=7) as s_resp:
                                 sub_roots.append(ET.fromstring(s_resp.read()))
@@ -935,19 +1048,13 @@ def scan_competitor_new_blogs_auto(lookback_days: int = 45) -> tuple[pd.DataFram
                         if not loc_txt or not mod_txt or not is_competitor_blog_url(loc_txt):
                             continue
                         try:
-                            mod_dt = datetime.strptime(mod_txt, "%Y-%m-%d").date()
+                            if datetime.strptime(mod_txt, "%Y-%m-%d").date() >= cutoff_date:
+                                slug = [p for p in urlparse(loc_txt).path.split("/") if p][-1]
+                                found.append({"Competitor": cname, "Published": mod_txt, "slug": slug, "Blog URL": loc_txt})
                         except ValueError:
                             continue
-                        if mod_dt >= cutoff_date:
-                            slug = [p for p in urlparse(loc_txt).path.split("/") if p][-1]
-                            found.append({
-                                "Competitor": cname,
-                                "Published": mod_txt,
-                                "slug": slug,
-                                "Blog URL": loc_txt,
-                            })
-                            if len(found) >= 15:
-                                break
+                        if len(found) >= 15:
+                            break
                     if len(found) >= 15:
                         break
                 break
@@ -956,23 +1063,16 @@ def scan_competitor_new_blogs_auto(lookback_days: int = 45) -> tuple[pd.DataFram
         return found, (f"{cname}: {len(found)} blogs" if parsed_any else f"{cname}: blocked")
 
     all_found, notes = [], []
-    with concurrent.futures.ThreadPoolExecutor(max_workers=6) as executor:
-        for f_rows, n_txt in executor.map(scan_one, COMPETITORS_REGISTRY):
+    with concurrent.futures.ThreadPoolExecutor(max_workers=6) as ex:
+        for f_rows, n_txt in ex.map(scan_one, COMPETITORS_REGISTRY):
             all_found.extend(f_rows)
             notes.append(n_txt)
-
     if not all_found:
         return pd.DataFrame(), notes
 
     out_df = pd.DataFrame(all_found).drop_duplicates(subset=["Blog URL"]).sort_values("Published", ascending=False).head(45).reset_index(drop=True)
-
-    # Scrape headlines & main target keywords in parallel
-    def enrich_row(pair):
-        return _scrape_blog_metadata(pair[0], pair[1])
-
-    with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
-        meta_results = list(executor.map(enrich_row, zip(out_df["Blog URL"], out_df["slug"])))
-
+    with concurrent.futures.ThreadPoolExecutor(max_workers=8) as ex:
+        meta_results = list(ex.map(lambda p: _scrape_blog_metadata(p[0], p[1]), zip(out_df["Blog URL"], out_df["slug"])))
     out_df["Blog Headline"] = [m[0] for m in meta_results]
     out_df["Main Target Keywords"] = [m[1] for m in meta_results]
     out_df["Vertical"] = out_df.apply(lambda r: classify_sector(f"{r['Blog Headline']} {r['Main Target Keywords']} {r['slug']}"), axis=1)
@@ -980,11 +1080,10 @@ def scan_competitor_new_blogs_auto(lookback_days: int = 45) -> tuple[pd.DataFram
 
 
 # ==============================================================================
-# 100% FREE DISCOVERY: INDUSTRY TRENDS, B2B NEWS RSS, BING, SUGGEST & REDDIT
+# ON-DEMAND FREE DISCOVERY (TRENDS, INDUSTRY NEWS, BING, SUGGEST & REDDIT)
 # ==============================================================================
 @st.cache_data(ttl=86400, show_spinner=False)
-def fetch_free_google_trends_b2b(seed_queries: tuple[str, ...], geo: str = "US", timeframe: str = "today 1-m") -> tuple[pd.DataFrame, pd.DataFrame, list[str]]:
-    """100% Free B2B-Scoped Google Trends (no unrelated macro news)."""
+def fetch_free_google_trends_b2b(seed_queries: tuple[str, ...], geo: str = "US", timeframe: str = "today 1-m"):
     interest_rows, rising_rows, notes = [], [], []
     if HAS_TRENDSPY and seed_queries:
         try:
@@ -998,8 +1097,7 @@ def fetch_free_google_trends_b2b(seed_queries: tuple[str, ...], geo: str = "US",
                     if kw in iot_reset.columns:
                         for _, r in iot_reset.iterrows():
                             interest_rows.append({"date": pd.to_datetime(r[date_col]), "keyword": kw, "interest_score": int(r[kw])})
-                notes.append("Relative Interest loaded live via free Google Trends")
-
+                notes.append("Relative Interest loaded via free Google Trends")
             for kw in batch_kws[:3]:
                 try:
                     rq_dict = tr.related_queries(kw, geo=geo, timeframe=timeframe)
@@ -1015,39 +1113,29 @@ def fetch_free_google_trends_b2b(seed_queries: tuple[str, ...], geo: str = "US",
                 except Exception:
                     continue
         except Exception:
-            notes.append("Google Trends chart temporarily rate-limited on cloud IP — Live B2B Industry Trends below remain active.")
-
-    return (
-        pd.DataFrame(interest_rows),
-        pd.DataFrame(rising_rows).drop_duplicates(subset=["Rising B2B Query"]).reset_index(drop=True) if rising_rows else pd.DataFrame(),
-        notes,
-    )
+            notes.append("Google Trends chart rate-limited on cloud IP — B2B Industry Feed below remains active.")
+    return pd.DataFrame(interest_rows), (pd.DataFrame(rising_rows).drop_duplicates(subset=["Rising B2B Query"]).reset_index(drop=True) if rising_rows else pd.DataFrame()), notes
 
 
 @st.cache_data(ttl=21600, show_spinner=False)
 def fetch_b2b_industry_trending_feed(vertical_key: str) -> pd.DataFrame:
-    """100% Free Industry-Filtered Google News RSS (Strictly BPO/Outsourcing/Connext verticals — zero sports/celebrity noise)."""
     query = INDUSTRY_NEWS_FEEDS.get(vertical_key, INDUSTRY_NEWS_FEEDS["All B2B Outsourcing & Staffing"])
     url = f"https://news.google.com/rss/search?q={urllib.parse.quote(query, safe='')}&hl=en-US&gl=US&ceid=US:en"
     rows = []
     try:
-        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (compatible; ConnextTrendRadar/2.0)"})
-        with urllib.request.urlopen(req, timeout=12) as resp:
+        with urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"}), timeout=10) as resp:
             root = ET.fromstring(resp.read())
         for item in root.iter("item"):
             raw_title = (item.findtext("title") or "").strip()
-            link = (item.findtext("link") or "").strip()
-            pub = (item.findtext("pubDate") or "").strip()[:16]
-            src_el = item.find("source")
-            publisher = src_el.text.strip() if src_el is not None and src_el.text else "Industry News"
             clean_title = raw_title.rsplit(" - ", 1)[0].strip() if " - " in raw_title else raw_title
+            src_el = item.find("source")
             if clean_title:
                 rows.append({
-                    "Date": pub,
+                    "Date": (item.findtext("pubDate") or "").strip()[:16],
                     "Trending B2B Headline": clean_title,
                     "Vertical": classify_sector(clean_title),
-                    "Source": publisher,
-                    "Article Link": link,
+                    "Source": src_el.text.strip() if src_el is not None and src_el.text else "Industry News",
+                    "Article Link": (item.findtext("link") or "").strip(),
                 })
             if len(rows) >= 20:
                 break
@@ -1079,8 +1167,7 @@ def fetch_free_microsoft_ad_library_all() -> pd.DataFrame:
                 ads = json.loads(r2.read().decode("utf-8"))
             for a in (ads if isinstance(ads, list) else ads.get("value", []))[:6]:
                 found.append({
-                    "Competitor": cname,
-                    "Advertiser": adv_name,
+                    "Competitor": cname, "Advertiser": adv_name,
                     "Ad Headline": str(a.get("Title") or a.get("title") or "—"),
                     "Active Dates": f"{str(a.get('StartDate') or a.get('startDate') or '')[:10]} → {str(a.get('EndDate') or a.get('endDate') or '')[:10]}",
                     "Ad Library Link": f"https://adlibrary.ads.microsoft.com/advertiser/{adv_id}",
@@ -1097,10 +1184,10 @@ def fetch_free_microsoft_ad_library_all() -> pd.DataFrame:
 
 
 @st.cache_data(ttl=86400, show_spinner=False)
-def fetch_free_bing_webmaster_queries(api_key: str, site_url: str, brand_regex: str, exclude_local_ph: bool, custom_negatives: str) -> tuple[pd.DataFrame, str]:
+def fetch_free_bing_webmaster_queries(api_key: str, site_url: str, brand_regex: str, exclude_local_ph: bool, custom_negatives: str):
     url = f"https://ssl.bing.com/webmaster/api.svc/json/GetQueryStats?siteUrl={urllib.parse.quote(site_url.strip(), safe='')}&apikey={urllib.parse.quote(api_key.strip(), safe='')}"
     try:
-        with urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"}), timeout=20) as resp:
+        with urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"}), timeout=18) as resp:
             payload = json.loads(resp.read().decode("utf-8"))
     except Exception as exc:
         return pd.DataFrame(), f"Bing Webmaster API Error: {exc}"
@@ -1147,10 +1234,8 @@ def fetch_free_bing_webmaster_queries(api_key: str, site_url: str, brand_regex: 
 
 @st.cache_data(ttl=86400, show_spinner=False)
 def fetch_free_google_and_bing_suggestions(seed_topic: str) -> pd.DataFrame:
-    """Pulls free live autocomplete questions & modifiers from both Google Suggest and Bing Suggest."""
     rows, seen = [], set()
-    g_patterns = [seed_topic, f"how to {seed_topic}", f"cost of {seed_topic}", f"best {seed_topic}", f"{seed_topic} vs ", f"{seed_topic} pricing"]
-    for q_str in g_patterns:
+    for q_str in [seed_topic, f"how to {seed_topic}", f"cost of {seed_topic}", f"best {seed_topic}", f"{seed_topic} vs ", f"{seed_topic} pricing"]:
         try:
             url = f"https://suggestqueries.google.com/complete/search?client=firefox&hl=en&gl=us&q={urllib.parse.quote(q_str)}"
             with urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"}), timeout=6) as resp:
@@ -1163,10 +1248,8 @@ def fetch_free_google_and_bing_suggestions(seed_topic: str) -> pd.DataFrame:
                         rows.append({"Search Suggestion": sc, "Engine": "Google", "Intent": "Commercial / Pricing" if COMMERCIAL_MODIFIERS.search(sc) else "Question / Guide"})
         except Exception:
             continue
-
     try:
-        b_url = f"https://api.bing.com/osjson.aspx?query={urllib.parse.quote(seed_topic)}"
-        with urllib.request.urlopen(urllib.request.Request(b_url, headers={"User-Agent": "Mozilla/5.0"}), timeout=6) as resp:
+        with urllib.request.urlopen(urllib.request.Request(f"https://api.bing.com/osjson.aspx?query={urllib.parse.quote(seed_topic)}", headers={"User-Agent": "Mozilla/5.0"}), timeout=6) as resp:
             b_data = json.loads(resp.read().decode("utf-8", errors="ignore"))
         if isinstance(b_data, list) and len(b_data) >= 2:
             for s in b_data[1]:
@@ -1182,9 +1265,8 @@ def fetch_free_google_and_bing_suggestions(seed_topic: str) -> pd.DataFrame:
 @st.cache_data(ttl=86400, show_spinner=False)
 def fetch_free_reddit_b2b_discussions(seed_topic: str) -> pd.DataFrame:
     try:
-        q_enc = urllib.parse.quote(f"{seed_topic} outsourcing OR offshore OR agency")
-        url = f"https://www.reddit.com/search.json?q={q_enc}&sort=relevance&t=year&limit=10"
-        with urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "ConnextTrendRadar/2.0"}), timeout=10) as resp:
+        url = f"https://www.reddit.com/search.json?q={urllib.parse.quote(f'{seed_topic} outsourcing OR offshore OR agency')}&sort=relevance&t=year&limit=10"
+        with urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "ConnextTrendRadar/3.0"}), timeout=10) as resp:
             data = json.loads(resp.read().decode("utf-8", errors="ignore"))
         rows = []
         for child in (data.get("data") or {}).get("children", []):
@@ -1192,8 +1274,7 @@ def fetch_free_reddit_b2b_discussions(seed_topic: str) -> pd.DataFrame:
             title = str(p.get("title") or "").strip()
             if title:
                 rows.append({
-                    "Community": f"r/{p.get('subreddit', '')}",
-                    "Buyer Question / Discussion": title,
+                    "Community": f"r/{p.get('subreddit', '')}", "Buyer Question / Discussion": title,
                     "Comments": int(p.get("num_comments") or 0),
                     "Date": datetime.fromtimestamp(float(p.get("created_utc") or 0), tz=timezone.utc).strftime("%Y-%m-%d"),
                     "Thread": f"https://www.reddit.com{p.get('permalink', '')}",
@@ -1204,7 +1285,7 @@ def fetch_free_reddit_b2b_discussions(seed_topic: str) -> pd.DataFrame:
 
 
 # ==============================================================================
-# CLUSTERING & MULTI-HORIZON TREND SCORING
+# CLUSTERING, SURGE + CONTENT DECAY ENGINE & INTERNAL LINKING ARCHITECT
 # ==============================================================================
 @st.cache_data(show_spinner=False)
 def cluster_queries(df: pd.DataFrame, distance_threshold: float) -> pd.DataFrame:
@@ -1238,13 +1319,14 @@ def cluster_queries(df: pd.DataFrame, distance_threshold: float) -> pd.DataFrame
     return merged
 
 
-def analyze_multi_horizon_trends(non_brand_df: pd.DataFrame, live_set: set[str], live_df: pd.DataFrame, live_vec: TfidfVectorizer, live_mat, min_daily_imp: int, min_up_days: int, min_norm_slope: float, min_lift: float):
+def analyze_trends_and_decay(non_brand_df: pd.DataFrame, live_set: set[str], live_df: pd.DataFrame, live_vec: TfidfVectorizer, live_mat, min_daily_imp: int, min_up_days: int, min_norm_slope: float, min_lift: float):
+    """Detects BOTH Surging Topics AND Decaying / Slipping Topics in one pass."""
     if non_brand_df.empty:
-        return pd.DataFrame(), pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
+        return pd.DataFrame(), pd.DataFrame(), pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
     all_dates = sorted(non_brand_df["date"].unique())
     n_days = len(all_dates)
     if n_days < 14:
-        return pd.DataFrame(), pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
+        return pd.DataFrame(), pd.DataFrame(), pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
 
     today_dates, week_dates = all_dates[-3:], all_dates[-7:]
     prior_14_dates = all_dates[-21:-7] if n_days >= 21 else all_dates[:-7]
@@ -1271,7 +1353,8 @@ def analyze_multi_horizon_trends(non_brand_df: pd.DataFrame, live_set: set[str],
     has_legacy_map = (~pages_agg["is_live_url"]).groupby(pages_agg["topic"]).any().to_dict()
     page_cnt_map = pages_agg.groupby("topic")["norm_page"].nunique().to_dict()
 
-    results = []
+    surge_results, decay_results = [], []
+
     for topic, group in daily_topic.groupby("topic"):
         series = group.set_index("date")["impressions"].reindex(all_dates, fill_value=0)
         arr_today, arr_week, arr_prior14 = series.loc[today_dates].values, series.loc[week_dates].values, series.loc[prior_14_dates].values
@@ -1279,9 +1362,34 @@ def analyze_multi_horizon_trends(non_brand_df: pd.DataFrame, live_set: set[str],
 
         m_today, m_week, m_prior = float(np.mean(arr_today)), float(np.mean(arr_week)), max(float(np.mean(arr_prior14)), 1.0)
         m_mrec, m_mbase = float(np.mean(arr_m_rec)), max(float(np.mean(arr_m_base)), 1.0)
+
+        rec_grp = group[group["date"].isin(week_dates)]
+        pri_grp = group[group["date"].isin(prior_14_dates)]
+        imp_7d = int(rec_grp["impressions"].sum())
+        imp_30d = int(group[group["date"].isin(month_dates)]["impressions"].sum())
+        avg_pos_now = float(rec_grp["weighted_pos"].sum() / max(imp_7d, 1)) if imp_7d > 0 else 0.0
+        avg_pos_prior = float(pri_grp["weighted_pos"].sum() / max(int(pri_grp["impressions"].sum()), 1)) if not pri_grp.empty else avg_pos_now
+        rank_slip = round(avg_pos_now - avg_pos_prior, 1)  # positive = rank dropped worse
+
+        # --- CONTENT DECAY DETECTOR ---
+        drop_pct_7d = round(((m_week / m_prior) - 1.0) * 100, 1)
+        if m_prior >= max(min_daily_imp, 15) and (drop_pct_7d <= -22.0 or (rank_slip >= 2.5 and avg_pos_prior <= 15.0)):
+            gsc_url_d = top_page_map.get(topic, "")
+            decay_results.append({
+                "Topic": topic,
+                "Vertical": classify_sector(f"{topic} {gsc_url_d}"),
+                "7d Impr.": imp_7d,
+                "Impr. Drop": f"{drop_pct_7d:.0f}%",
+                "Prior Rank": f"#{avg_pos_prior:.1f}",
+                "Current Rank": f"#{avg_pos_now:.1f}" if avg_pos_now > 0 else "Dropped",
+                "Rank Slip": f"{rank_slip:+.1f}" if avg_pos_now > 0 else "Lost",
+                "Affected Page": gsc_url_d,
+                "Rescue Action": "Refresh H1/H2s, update stats & add internal links immediately" if avg_pos_prior <= 10.0 else "Audit competing SERP pages & consolidate thin content",
+            })
+
+        # --- SURGING TOPIC DETECTOR ---
         if max(m_today, m_week, m_mrec) < min_daily_imp:
             continue
-
         lift_today = m_today / m_prior
         is_today = bool(m_today >= min_daily_imp and lift_today >= (min_lift + 0.15) and arr_today[-1] > arr_today[0])
         up_days = int(np.sum(np.diff(arr_week) > 0))
@@ -1293,15 +1401,11 @@ def analyze_multi_horizon_trends(non_brand_df: pd.DataFrame, live_set: set[str],
         if not (is_today or is_week or is_month):
             continue
 
-        rec_grp = group[group["date"].isin(week_dates)]
-        imp_7d = int(rec_grp["impressions"].sum())
-        imp_30d = int(group[group["date"].isin(month_dates)]["impressions"].sum())
-        avg_pos = float(rec_grp["weighted_pos"].sum() / max(imp_7d, 1))
-
         q_list = top_q_map.get(topic, [topic])
         lt_list = lt_q_map.get(topic, [])
         joined_q = ", ".join(q_list[:6])
         has_comm = bool(COMMERCIAL_MODIFIERS.search(joined_q))
+        funnel = classify_funnel_stage(joined_q)
         u_pages = int(page_cnt_map.get(topic, 1))
         gsc_url = top_page_map.get(topic, "")
         sector = classify_sector(f"{joined_q} {gsc_url}")
@@ -1317,31 +1421,38 @@ def analyze_multi_horizon_trends(non_brand_df: pd.DataFrame, live_set: set[str],
         else:
             cov_status = "New Topic Gap"
 
-        if has_comm and avg_pos > 5.0:
+        if has_comm and avg_pos_now > 5.0:
             action = "Launch Paid Ads"
-        elif site_chk["already_exists_in_sitemap"] or (4.0 <= avg_pos <= 15.0):
+        elif site_chk["already_exists_in_sitemap"] or (4.0 <= avg_pos_now <= 15.0):
             action = "Update Existing Page"
         elif not site_chk["already_exists_in_sitemap"]:
             action = "Write New Page"
         else:
             action = "Defend Top 3 Rank"
 
-        cur_clicks = round(imp_30d * expected_ctr_by_rank(avg_pos), 1)
+        cur_clicks = round(imp_30d * expected_ctr_by_rank(avg_pos_now), 1)
         top3_clicks = round(imp_30d * expected_ctr_by_rank(2.5), 1)
         missed_clicks = max(0.0, round(top3_clicks - cur_clicks, 1))
-        ads_fit = min(100, (30 if avg_pos > 8 else (20 if avg_pos > 4 else 5)) + (35 if has_comm else 10) + min(35, int((lift_today - 1.0) * 18)))
 
-        results.append({
-            "topic": topic, "sector": sector,
+        # Enterprise Priority Score (0-100)
+        prio_score = min(100, int(
+            (30 if funnel.startswith("BOFU") else (20 if funnel.startswith("MOFU") else 10))
+            + min(30, int(np.log1p(imp_7d) * 4.5))
+            + min(25, int(max(lift_today - 1.0, 0) * 18))
+            + (15 if 4.0 <= avg_pos_now <= 15.0 else (10 if avg_pos_now > 15.0 else 5))
+        ))
+
+        surge_results.append({
+            "topic": topic, "sector": sector, "funnel": funnel, "priority_score": prio_score,
             "is_today": is_today, "is_week": is_week, "is_month": is_month,
-            "is_striking_distance": bool(4.0 <= avg_pos <= 15.0), "is_cannibalized": bool(u_pages >= 2),
-            "team_action": action, "ads_fit_score": ads_fit,
+            "is_striking_distance": bool(4.0 <= avg_pos_now <= 15.0), "is_cannibalized": bool(u_pages >= 2),
+            "team_action": action,
             "growth_pct_3d": round((lift_today - 1.0) * 100),
             "growth_pct_week": round(((m_week / m_prior) - 1.0) * 100),
             "month_growth_pct": round((lift_month - 1.0) * 100),
             "impressions_7d": imp_7d, "impressions_30d": imp_30d,
             "sparkline_7d": [int(v) for v in arr_week],
-            "connext_org_pos": round(avg_pos, 1), "google_rank_label": human_rank_label(avg_pos),
+            "connext_org_pos": round(avg_pos_now, 1), "google_rank_label": human_rank_label(avg_pos_now),
             "est_cur_clicks_30d": cur_clicks, "est_top3_clicks_30d": top3_clicks, "est_missed_clicks_30d": missed_clicks,
             "commercial_intent": has_comm, "coverage_status": cov_status,
             "already_exists_in_sitemap": site_chk["already_exists_in_sitemap"],
@@ -1354,9 +1465,11 @@ def analyze_multi_horizon_trends(non_brand_df: pd.DataFrame, live_set: set[str],
             "total_queries": len(q_list), "long_tail_count": len(lt_list), "top_rising_queries": joined_q,
         })
 
-    if not results:
-        return pd.DataFrame(), daily_topic, pd.DataFrame(), pd.DataFrame()
-    trends_df = pd.DataFrame(results).sort_values("impressions_7d", ascending=False).reset_index(drop=True)
+    decay_df = pd.DataFrame(decay_results).sort_values("7d Impr.", ascending=False).reset_index(drop=True) if decay_results else pd.DataFrame()
+    if not surge_results:
+        return pd.DataFrame(), decay_df, daily_topic, pd.DataFrame(), pd.DataFrame()
+
+    trends_df = pd.DataFrame(surge_results).sort_values(["priority_score", "impressions_7d"], ascending=False).reset_index(drop=True)
 
     q_recent = recent_df.groupby(["topic", "query", "is_long_tail", "is_ai_prompt"], as_index=False).agg(imp_7d=("impressions", "sum"), weighted_pos=("weighted_pos", "sum"), top_page=("norm_page", "first"))
     q_merged = q_recent.merge(month_df.groupby("query", as_index=False).agg(imp_30d=("impressions", "sum")), on="query", how="left").merge(prior_df.groupby("query", as_index=False).agg(imp_base14=("impressions", "sum")), on="query", how="left").fillna({"imp_30d": 0, "imp_base14": 0})
@@ -1371,7 +1484,33 @@ def analyze_multi_horizon_trends(non_brand_df: pd.DataFrame, live_set: set[str],
     pages_merged = pages_agg[pages_agg["topic"].isin(trends_df["topic"])].copy()
     tot_map = trends_df.set_index("topic")["impressions_7d"].to_dict()
     pages_merged["topic_imp_share_%"] = ((pages_merged["page_imp_7d"] / pages_merged["topic"].map(tot_map).replace(0, 1)) * 100).round(1)
-    return trends_df, daily_topic, q_merged, pages_merged
+    return trends_df, decay_df, daily_topic, q_merged, pages_merged
+
+
+def build_internal_linking_plan(trends_df: pd.DataFrame, all_pages_gsc_df: pd.DataFrame) -> pd.DataFrame:
+    """Enterprise $0 Internal Linking Architect: matches high-visibility live blog posts to target money pages."""
+    page_imp_map = all_pages_gsc_df.groupby("norm_page")["impressions"].sum().to_dict() if not all_pages_gsc_df.empty else {}
+    links = []
+    for _, r in trends_df.iterrows():
+        target_money = r["recommended_money_page"]
+        if not target_money or r["connext_org_pos"] <= 3.0:
+            continue
+        for c_page in r["matching_content_pages"][:3]:
+            src_url = c_page["full_url"]
+            if src_url == target_money:
+                continue
+            links.append({
+                "Source Blog / Guide (Add Link Here)": src_url,
+                "Source Page Type": c_page["role"],
+                "Source GSC Impr.": int(page_imp_map.get(src_url, 0)),
+                "Suggested Anchor Text": r["topic"],
+                "Target Service / Industry Page": target_money,
+                "Target Topic Rank": r["google_rank_label"],
+                "Vertical": r["sector"],
+            })
+    if not links:
+        return pd.DataFrame()
+    return pd.DataFrame(links).drop_duplicates(subset=["Source Blog / Guide (Add Link Here)", "Target Service / Industry Page"]).sort_values("Source GSC Impr.", ascending=False).reset_index(drop=True)
 
 
 def build_ads_and_roi_tables(trends_df: pd.DataFrame, queries_df: pd.DataFrame, kp_lookup: dict, default_cpc: float, lead_rate: float, deal_ltv: float):
@@ -1387,7 +1526,7 @@ def build_ads_and_roi_tables(trends_df: pd.DataFrame, queries_df: pd.DataFrame, 
         pipeline_opp = round(missed * lead_rate * deal_ltv, 0)
         prio = "P0 — Launch Today" if (r["is_today"] and comm and pos > 5.0) else ("P1 — Search Ad Group" if (comm and pos > 5.0) else ("P2 — Defend Top 5" if comm else "P2 — Long-Tail"))
         ads_topics.append({
-            "Priority": prio, "Topic": r["topic"], "Vertical": r["sector"],
+            "Priority": prio, "Topic": r["topic"], "Funnel": r["funnel"], "Vertical": r["sector"],
             "Google Rank": r["google_rank_label"], "30d Impr.": r["impressions_30d"],
             "Missed Clicks/Mo": missed, "CPC ($)": cpc,
             "Lost Traffic Value/Mo": lost_ad_val, "Pipeline Opp./Mo": pipeline_opp,
@@ -1451,8 +1590,8 @@ sitemap_paths, sitemap_source_label = fetch_live_sitemap_paths()
 live_set, live_df, live_vec, live_mat = _build_index_from_paths(sitemap_paths)
 
 st.sidebar.image(CNXT_LOGO_WHITE, width=175)
-st.sidebar.markdown("**Search & Topic Radar**")
-st.sidebar.caption(f"100% Free Mode • {sitemap_source_label}")
+st.sidebar.markdown("**Enterprise Search Radar**")
+st.sidebar.caption(f"$0 Paid APIs • {sitemap_source_label}")
 if st.sidebar.button("Lock / Log Out"):
     st.session_state["cnxt_authenticated"] = False
     st.rerun()
@@ -1463,18 +1602,18 @@ data_source = st.sidebar.radio("Search Console Source", ["Live GSC API", "Upload
 exclude_local_ph = st.sidebar.checkbox("Filter Out Local PH / Student Noise", value=True)
 custom_negatives = st.sidebar.text_input("Extra Excluded Words", placeholder="intern|sample|pdf")
 
-raw_df = pd.DataFrame()
+raw_df, harvested_neg_df = pd.DataFrame(), pd.DataFrame()
 if data_source == "Live GSC API":
     if has_secrets:
         site_url = st.secrets["gsc_config"].get("site_url", DEFAULT_SITE_URL)
         brand_regex = st.secrets["gsc_config"].get("brand_regex", DEFAULT_BRAND_REGEX)
         lookback = st.sidebar.slider("GSC History Window (Days)", 28, 90, 45)
-        if st.sidebar.button("Refresh Live Data", type="primary"):
+        if st.sidebar.button("Refresh Live GSC Data", type="primary"):
             fetch_gsc_api_data.clear()
             fetch_live_sitemap_paths.clear()
         with st.spinner("Syncing Google Search Console..."):
             try:
-                raw_df = fetch_gsc_api_data(dict(st.secrets["gcp_service_account"]), site_url, lookback, brand_regex, custom_negatives, exclude_local_ph)
+                raw_df, harvested_neg_df = fetch_gsc_api_data(dict(st.secrets["gcp_service_account"]), site_url, lookback, brand_regex, custom_negatives, exclude_local_ph)
             except Exception as err:
                 st.error(f"GSC API Error: {err}")
                 st.stop()
@@ -1484,13 +1623,13 @@ if data_source == "Live GSC API":
         brand_regex = DEFAULT_BRAND_REGEX
         lookback = st.sidebar.slider("GSC History Window (Days)", 28, 90, 45)
         if uploaded_json:
-            raw_df = fetch_gsc_api_data(json.load(uploaded_json), site_url, lookback, brand_regex, custom_negatives, exclude_local_ph)
+            raw_df, harvested_neg_df = fetch_gsc_api_data(json.load(uploaded_json), site_url, lookback, brand_regex, custom_negatives, exclude_local_ph)
 else:
     uploaded_csv = st.sidebar.file_uploader("Upload GSC Web CSV / ZIP", type=["csv", "zip"])
     brand_regex = DEFAULT_BRAND_REGEX
     if uploaded_csv:
         try:
-            raw_df = parse_gsc_web_upload(uploaded_csv, brand_regex, custom_negatives, exclude_local_ph)
+            raw_df, harvested_neg_df = parse_gsc_web_upload(uploaded_csv, brand_regex, custom_negatives, exclude_local_ph)
         except Exception as err:
             st.sidebar.error(str(err))
 
@@ -1498,7 +1637,7 @@ st.sidebar.divider()
 preset_mode = st.sidebar.selectbox("Trend Sensitivity", ["Broad (All Verticals)", "Balanced", "Strict Breakouts"], index=0)
 def_imp, def_up, def_lift, def_slope = (50, 4, 1.40, 10) if preset_mode.startswith("Strict") else ((30, 4, 1.30, 8) if preset_mode.startswith("Balanced") else (15, 3, 1.18, 4))
 
-with st.sidebar.expander("Advanced Settings & ROI Assumptions", expanded=False):
+with st.sidebar.expander("ROI & Threshold Settings", expanded=False):
     default_cpc_est = st.number_input("Fallback B2B CPC ($)", 1.0, 100.0, 7.50, 0.50)
     lead_conv_pct = st.slider("Lead Conv. Rate (%)", 1.0, 15.0, 4.0, 0.5)
     avg_deal_ltv = st.number_input("Avg Client Value ($)", 1000, 250000, 18000, 1000)
@@ -1518,13 +1657,13 @@ with h_col1:
     st.image(CNXT_LOGO_COLOR, width=180)
 with h_col2:
     if not raw_df.empty:
-        st.caption(f"Live GSC Window: **{raw_df['date'].min().strftime('%b %d')} – {raw_df['date'].max().strftime('%b %d, %Y')}** ({raw_df['date'].nunique()} days)  •  {sitemap_source_label}  •  $0 Credit-Free Mode")
+        st.caption(f"Live GSC Window: **{raw_df['date'].min().strftime('%b %d')} – {raw_df['date'].max().strftime('%b %d, %Y')}** ({raw_df['date'].nunique()} days)  •  {sitemap_source_label}  •  100% Free Enterprise Mode")
 
 st.markdown(
     """<div class="cnxt-hero">
-<div class="cnxt-eyebrow">CONNEXT GLOBAL GROWTH &amp; TOPIC RESEARCH</div>
+<div class="cnxt-eyebrow">CONNEXT GLOBAL ENTERPRISE SEARCH &amp; TOPIC INTELLIGENCE</div>
 <h1>Search, Content &amp; Competitor <span>Trend Radar</span></h1>
-<p>Plain-English search demand from Google Search Console, Keyword Planner traffic &amp; ROI opportunity, new competitor blog topics with extracted target keywords, and industry-filtered Google &amp; Bing trends.</p>
+<p>Real-time Google Search momentum, content decay early warnings, Brand vs. Non-Brand health, ROI opportunity, internal linking plans, live on-page audits, and on-demand competitor blog &amp; trend research.</p>
 </div>""",
     unsafe_allow_html=True,
 )
@@ -1533,9 +1672,9 @@ if raw_df.empty:
     st.info("Connect your Google Search Console API or upload a GSC CSV in the sidebar to begin.")
     st.stop()
 
-with st.spinner("Analyzing live B2B search demand..."):
+with st.spinner("Computing live trends, content decay alerts & internal linking graph..."):
     clustered_df = cluster_queries(raw_df, cluster_dist)
-    trends_df, daily_topic_df, all_queries_df, pages_df = analyze_multi_horizon_trends(
+    trends_df, decay_df, daily_topic_df, all_queries_df, pages_df = analyze_trends_and_decay(
         clustered_df, live_set, live_df, live_vec, live_mat,
         min_daily_imp, min_up_days, min_slope_pct / 100.0, min_lift,
     )
@@ -1561,60 +1700,87 @@ a_opts = [
 fc1, fc2, fc3, fc4 = st.columns([1.4, 1.4, 1.0, 1.2])
 sel_vert = fc1.selectbox("Business Vertical", v_opts, index=0)
 sel_act = fc2.selectbox("Recommended Next Step", a_opts, index=0)
-sel_intent = fc3.selectbox("Buyer Intent", ["All Searches", "Commercial / Ready-to-Buy", "Research / How-To"])
+sel_funnel = fc3.selectbox("Funnel Stage", ["All Funnel Stages", "BOFU — Ready to Buy", "MOFU — Evaluating", "TOFU — Research"])
 search_box = fc4.text_input("Filter by Keyword or URL", placeholder="e.g., medical billing, cpa...")
 
 f_trends = trends_df.copy()
 if sel_vert != "All Verticals":
     f_trends = f_trends[f_trends["sector"] == sel_vert.rsplit(" (", 1)[0]]
 if sel_act != "All Actions":
-    if sel_act.startswith("Striking Distance"):
-        f_trends = f_trends[f_trends["is_striking_distance"]]
-    else:
-        f_trends = f_trends[f_trends["team_action"] == sel_act.rsplit(" (", 1)[0]]
-if sel_intent == "Commercial / Ready-to-Buy":
-    f_trends = f_trends[f_trends["commercial_intent"]]
-elif sel_intent == "Research / How-To":
-    f_trends = f_trends[~f_trends["commercial_intent"]]
+    f_trends = f_trends[f_trends["is_striking_distance"]] if sel_act.startswith("Striking Distance") else f_trends[f_trends["team_action"] == sel_act.rsplit(" (", 1)[0]]
+if sel_funnel != "All Funnel Stages":
+    f_trends = f_trends[f_trends["funnel"] == sel_funnel]
 if search_box.strip():
     pat = re.escape(search_box.strip())
     f_trends = f_trends[f_trends["topic"].str.contains(pat, case=False, na=False) | f_trends["top_rising_queries"].str.contains(pat, case=False, na=False) | f_trends["primary_page"].str.contains(pat, case=False, na=False)]
 f_trends = f_trends.reset_index(drop=True)
 
 if f_trends.empty:
-    st.info("No topics match those filters. Reset **Business Vertical** or **Recommended Next Step** above.")
+    st.info("No topics match those filters. Reset **Business Vertical**, **Next Step**, or **Funnel Stage** above.")
     st.stop()
 
 f_queries = all_queries_df[all_queries_df["topic"].isin(f_trends["topic"])].copy()
 f_pages = pages_df[pages_df["topic"].isin(f_trends["topic"])].copy()
+f_decay = decay_df[decay_df["Vertical"] == sel_vert.rsplit(" (", 1)[0]].copy() if (sel_vert != "All Verticals" and not decay_df.empty) else decay_df.copy()
 
 kp_lookup_dict = st.session_state.get("kp_lookup_dict", {})
 ads_topics_df, rec_kws_df = build_ads_and_roi_tables(f_trends, f_queries, kp_lookup_dict, default_cpc_est, lead_conv_pct / 100.0, float(avg_deal_ltv))
 existing_content_df, truly_new_df = build_content_tables(f_trends)
+internal_links_df = build_internal_linking_plan(f_trends, clustered_df)
 
 # --- TOP KPI ROW ---
 k1, k2, k3, k4, k5 = st.columns(5)
 k1.metric("Surging Topics", len(f_trends))
-k2.metric("Weekly Impressions", f"{int(f_trends['impressions_7d'].sum()):,}")
-k3.metric("Avg Google Rank", f"#{f_trends['connext_org_pos'].mean():.1f}")
+k2.metric("Content Decay Alerts", len(f_decay), help="Topics where 7d impressions dropped >= 22% or Google rank slipped >= 2.5 spots.")
+k3.metric("Weekly Impressions", f"{int(f_trends['impressions_7d'].sum()):,}")
 k4.metric("Est. Missed Clicks/Mo", f"{f_trends['est_missed_clicks_30d'].sum():,.0f}")
 k5.metric("Lost Traffic Value/Mo", f"${ads_topics_df['Lost Traffic Value/Mo'].sum():,.0f}")
 
-# --- 6 CLEAN, SCANNABLE TABS ---
+# --- 6 CLEAN, SCANNABLE ENTERPRISE TABS ---
 t_over, t_pages, t_ads, t_content, t_comp, t_trends = st.tabs([
-    "1. Overview",
-    f"2. Pages & SEO ({len(f_pages)})",
-    f"3. Paid Ads & ROI ({len(rec_kws_df)})",
-    f"4. Content & FAQs ({len(truly_new_df)} New)",
+    "1. Executive Overview",
+    f"2. Pages, Decay & On-Page Audit ({len(f_decay)} Decay)",
+    f"3. Paid Ads, ROI & Negatives ({len(rec_kws_df)})",
+    f"4. Content, Linking & FAQs ({len(truly_new_df)} New)",
     "5. Competitor Blogs & Ads",
     "6. Trends, Bing & Research",
 ])
 
 # ==============================================================================
-# TAB 1: OVERVIEW
+# TAB 1: EXECUTIVE OVERVIEW + BRAND HEALTH + MULTI-SHEET EXCEL EXPORT
 # ==============================================================================
 with t_over:
-    horizon = st.radio("Time Horizon:", ["All Surging", "Today (3-Day Spike)", "This Week (7-Day)", "This Month (30-Day)"], horizontal=True)
+    top_bar1, top_bar2 = st.columns([2.5, 1])
+    with top_bar1:
+        horizon = st.radio("Time Horizon:", ["All Surging", "Today (3-Day Spike)", "This Week (7-Day)", "This Month (30-Day)"], horizontal=True)
+    with top_bar2:
+        exec_summary_df = pd.DataFrame([
+            {"Metric": "Report Date (UTC)", "Value": datetime.now(timezone.utc).strftime("%Y-%m-%d")},
+            {"Metric": "Surging B2B Topics", "Value": len(f_trends)},
+            {"Metric": "Content Decay Alerts", "Value": len(f_decay)},
+            {"Metric": "Weekly Surging Impressions", "Value": int(f_trends["impressions_7d"].sum())},
+            {"Metric": "Avg Google Rank", "Value": round(float(f_trends["connext_org_pos"].mean()), 1)},
+            {"Metric": "Est. Missed Clicks / Month", "Value": round(float(f_trends["est_missed_clicks_30d"].sum()), 0)},
+            {"Metric": "Lost Traffic Ad Value / Month ($)", "Value": round(float(ads_topics_df["Lost Traffic Value/Mo"].sum()), 0)},
+        ])
+        excel_bytes = build_enterprise_excel_bytes({
+            "Executive Summary": exec_summary_df,
+            "Surging Topics": f_trends[["topic", "sector", "funnel", "priority_score", "team_action", "impressions_7d", "impressions_30d", "google_rank_label", "est_missed_clicks_30d", "recommended_money_page"]],
+            "Content Decay Alerts": f_decay,
+            "Paid Ads & ROI": ads_topics_df,
+            "Suggested Keywords": rec_kws_df.head(500),
+            "Content Plan": existing_content_df,
+            "New Content Gaps": truly_new_df,
+            "Internal Linking": internal_links_df,
+        })
+        st.download_button(
+            "Download Full Executive Report (.xlsx)",
+            excel_bytes,
+            file_name=f"connext_enterprise_search_report_{datetime.now(timezone.utc).strftime('%Y%m%d')}.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            key="dl_exec_xlsx",
+        )
+
     vdf = f_trends.copy()
     g_col, g_lbl = "growth_pct_3d", "3d Surge"
     if "Today" in horizon:
@@ -1635,27 +1801,44 @@ with t_over:
             fig_t = px.bar(
                 vdf.head(10), x="impressions_7d", y="topic", orientation="h", color="team_action", text=g_col,
                 color_discrete_map={"Launch Paid Ads": CNXT_COLORS["sun"], "Update Existing Page": CNXT_COLORS["blue"], "Write New Page": CNXT_COLORS["twilight"], "Defend Top 3 Rank": CNXT_COLORS["teal"]},
-                custom_data=["google_rank_label", "est_missed_clicks_30d", "sector"],
+                custom_data=["google_rank_label", "est_missed_clicks_30d", "funnel"],
                 labels={"impressions_7d": "7-Day Impressions", "topic": "", "team_action": ""},
             )
-            fig_t.update_traces(texttemplate="+%{text}%", textposition="outside", hovertemplate="<b>%{y}</b><br>7d Impr: <b>%{x:,}</b><br>Rank: <b>%{customdata[0]}</b><br>Missed Clicks/Mo: <b>%{customdata[1]:,.0f}</b><extra></extra>")
-            fig_t.update_layout(height=370, margin=dict(l=5, r=45, t=10, b=40), yaxis=dict(autorange="reversed"), xaxis=dict(gridcolor=CNXT_COLORS["line"]), plot_bgcolor="#FFFFFF", paper_bgcolor="#FFFFFF", legend=dict(orientation="h", y=-0.2))
-            st.plotly_chart(fig_t, use_container_width=True)
+            fig_t.update_traces(texttemplate="+%{text}%", textposition="outside", hovertemplate="<b>%{y}</b><br>7d Impr: <b>%{x:,}</b><br>Rank: <b>%{customdata[0]}</b><br>Funnel: %{customdata[2]}<br>Missed Clicks/Mo: <b>%{customdata[1]:,.0f}</b><extra></extra>")
+            fig_t.update_layout(margin=dict(l=5, r=45, t=10, b=45), yaxis=dict(autorange="reversed"))
+            st.plotly_chart(style_plotly_light(fig_t, height=370, legend_bottom=True), use_container_width=True)
 
         with c2:
-            st.markdown("#### Impressions by Connext Vertical")
+            st.markdown("#### Impressions by Vertical & Funnel Mix")
             sec_df = vdf.groupby("sector", as_index=False).agg(topics=("topic", "count"), impr=("impressions_7d", "sum")).sort_values("impr", ascending=True)
             fig_s = px.bar(sec_df, x="impr", y="sector", orientation="h", text="topics", color_discrete_sequence=[CNXT_COLORS["twilight"]], labels={"impr": "7-Day Impressions", "sector": ""})
             fig_s.update_traces(texttemplate="%{text} topics", textposition="outside")
-            fig_s.update_layout(height=370, margin=dict(l=5, r=55, t=10, b=40), xaxis=dict(gridcolor=CNXT_COLORS["line"]), plot_bgcolor="#FFFFFF", paper_bgcolor="#FFFFFF")
-            st.plotly_chart(fig_s, use_container_width=True)
+            fig_s.update_layout(margin=dict(l=5, r=55, t=10, b=45))
+            st.plotly_chart(style_plotly_light(fig_s, height=370), use_container_width=True)
+
+        # Enterprise Brand vs Non-Brand Health + Funnel Breakdown
+        h_c1, h_c2 = st.columns([1.3, 1])
+        with h_c1:
+            st.markdown("#### Brand vs. Non-Brand Search Demand Health")
+            bnb = raw_df.groupby(["date", "is_branded"], as_index=False)["impressions"].sum()
+            bnb["Segment"] = np.where(bnb["is_branded"], "Branded (Connext Awareness)", "Non-Branded (B2B Acquisition)")
+            fig_bnb = px.area(bnb, x="date", y="impressions", color="Segment", color_discrete_map={"Non-Branded (B2B Acquisition)": CNXT_COLORS["blue"], "Branded (Connext Awareness)": CNXT_COLORS["sun"]}, labels={"date": "", "impressions": "Daily Impressions"})
+            fig_bnb.update_layout(margin=dict(l=10, r=10, t=10, b=40))
+            st.plotly_chart(style_plotly_light(fig_bnb, height=260, legend_bottom=True), use_container_width=True)
+
+        with h_c2:
+            st.markdown("#### Surging Topics by Buyer Funnel Stage")
+            f_agg = vdf.groupby("funnel", as_index=False).agg(topics=("topic", "count"), impr=("impressions_7d", "sum"))
+            fig_f = px.pie(f_agg, names="funnel", values="impr", hole=0.52, color="funnel", color_discrete_map={"BOFU — Ready to Buy": CNXT_COLORS["sun"], "MOFU — Evaluating": CNXT_COLORS["blue"], "TOFU — Research": CNXT_COLORS["teal"]})
+            fig_f.update_layout(margin=dict(l=10, r=10, t=10, b=35))
+            st.plotly_chart(style_plotly_light(fig_f, height=260, legend_bottom=True), use_container_width=True)
 
         st.markdown("#### Daily Search Trend Inspector")
         sel_t = st.selectbox("Select a topic to inspect its daily curve:", vdf["topic"].tolist(), key="sel_ov_topic")
         sr = vdf[vdf["topic"] == sel_t].iloc[0]
         st.markdown(
             f"""<div class="cnxt-callout">
-<strong>{sr['topic'].title()}</strong> ({sr['sector']}) — <strong>{sr['impressions_7d']:,}</strong> weekly impressions (<strong>+{sr[g_col]}%</strong> {g_lbl}) • Currently <strong>{sr['google_rank_label']}</strong> • Est. <strong>{sr['est_missed_clicks_30d']:,.0f} missed clicks/mo</strong> • Recommended Action: <strong>{sr['team_action']}</strong> → <code>{sr['recommended_money_page']}</code>
+<strong>{sr['topic'].title()}</strong> ({sr['sector']} • {sr['funnel']}) — Priority <strong>{sr['priority_score']}/100</strong> • <strong>{sr['impressions_7d']:,}</strong> weekly impressions (<strong>+{sr[g_col]}%</strong> {g_lbl}) • Currently <strong>{sr['google_rank_label']}</strong> • Est. <strong>{sr['est_missed_clicks_30d']:,.0f} missed clicks/mo</strong> • Next Step: <strong>{sr['team_action']}</strong> → <code>{sr['recommended_money_page']}</code>
 </div>""",
             unsafe_allow_html=True,
         )
@@ -1664,17 +1847,18 @@ with t_over:
         fig_l = go.Figure()
         fig_l.add_trace(go.Bar(x=ts["date"], y=ts["impressions"], name="Daily Impressions", marker_color="rgba(0,90,172,0.28)"))
         fig_l.add_trace(go.Scatter(x=ts["date"], y=ts["avg7"], mode="lines+markers", name="7-Day Trendline", line=dict(color=CNXT_COLORS["sun"], width=3), marker=dict(color=CNXT_COLORS["twilight"], size=6)))
-        fig_l.update_layout(height=270, margin=dict(l=10, r=10, t=10, b=35), plot_bgcolor="#FFFFFF", paper_bgcolor="#FFFFFF", yaxis=dict(title="Impressions", gridcolor=CNXT_COLORS["line"]), legend=dict(orientation="h", y=-0.22))
-        st.plotly_chart(fig_l, use_container_width=True)
+        fig_l.update_layout(margin=dict(l=10, r=10, t=10, b=40))
+        st.plotly_chart(style_plotly_light(fig_l, height=260, legend_bottom=True), use_container_width=True)
 
         st.markdown(f"#### All Surging Topics ({len(vdf)})")
-        ov_tbl = vdf[["topic", "sector", "team_action", "sparkline_7d", "impressions_7d", g_col, "google_rank_label", "est_missed_clicks_30d", "recommended_money_page"]].copy()
+        ov_tbl = vdf[["priority_score", "topic", "sector", "funnel", "team_action", "sparkline_7d", "impressions_7d", g_col, "google_rank_label", "est_missed_clicks_30d", "recommended_money_page"]].copy()
         ov_tbl["growth_lbl"] = ov_tbl[g_col].apply(lambda x: f"+{x}%" if x >= 0 else f"{x}%")
         st.dataframe(
-            ov_tbl[["topic", "sector", "team_action", "sparkline_7d", "impressions_7d", "growth_lbl", "google_rank_label", "est_missed_clicks_30d", "recommended_money_page"]],
+            ov_tbl[["priority_score", "topic", "sector", "funnel", "team_action", "sparkline_7d", "impressions_7d", "growth_lbl", "google_rank_label", "est_missed_clicks_30d", "recommended_money_page"]],
             use_container_width=True, hide_index=True, key="tbl_overview",
             column_config={
-                "topic": "Topic", "sector": "Vertical", "team_action": "Next Step",
+                "priority_score": st.column_config.ProgressColumn("Priority", min_value=0, max_value=100, format="%d"),
+                "topic": "Topic", "sector": "Vertical", "funnel": "Funnel", "team_action": "Next Step",
                 "sparkline_7d": st.column_config.LineChartColumn("7d Trend", width="small"),
                 "impressions_7d": st.column_config.NumberColumn("7d Impr."), "growth_lbl": g_lbl,
                 "google_rank_label": "Google Rank", "est_missed_clicks_30d": st.column_config.NumberColumn("Missed Clicks/Mo", format="%.0f"),
@@ -1683,22 +1867,31 @@ with t_over:
         )
 
         with st.expander("1-Click Teams Executive Summary (Copy & Paste)", expanded=False):
-            lines = [f"{i+1}. **{r['topic'].title()}** ({r['sector']}) — {r['impressions_7d']:,} weekly impr. (+{r[g_col]}%), Rank {r['google_rank_label']}, ~{r['est_missed_clicks_30d']:,.0f} missed clicks/mo → **{r['team_action']}**" for i, r in vdf.head(5).iterrows()]
-            st.code(f"Connext Search Trend Summary ({datetime.now(timezone.utc).strftime('%b %d, %Y')})\n" + "\n".join(lines), language="markdown")
+            lines = [f"{i+1}. **{r['topic'].title()}** ({r['sector']}, {r['funnel']}) — {r['impressions_7d']:,} weekly impr. (+{r[g_col]}%), Rank {r['google_rank_label']}, ~{r['est_missed_clicks_30d']:,.0f} missed clicks/mo → **{r['team_action']}**" for i, r in vdf.head(5).iterrows()]
+            decay_note = f"\n• Content Decay Alerts Requiring Refresh: **{len(f_decay)}** topics" if not f_decay.empty else ""
+            st.code(f"Connext Search Trend Summary ({datetime.now(timezone.utc).strftime('%b %d, %Y')}){decay_note}\n\n" + "\n".join(lines), language="markdown")
 
 # ==============================================================================
-# TAB 2: PAGES & SEO (CANNIBALIZATION + SITEMAP + QUERIES)
+# TAB 2: PAGES, CONTENT DECAY, CANNIBALIZATION & LIVE ON-PAGE AUDIT
 # ==============================================================================
 with t_pages:
-    st.markdown("#### Ranking Pages, Multi-URL Split Check & Search Queries")
-    st.markdown('<p class="cnxt-sec-sub">Inspect which Connext URLs currently rank, catch pages competing against each other, and view exact user searches.</p>', unsafe_allow_html=True)
+    st.markdown("#### Content Decay Alerts, Multi-URL Splits & Live On-Page SEO Grader")
+    st.markdown('<p class="cnxt-sec-sub">Catch slipping rankings early, resolve cannibalization, and audit any live connextglobal.com page on demand ($0).</p>', unsafe_allow_html=True)
+
+    # 1. Content Decay Early Warning
+    if not f_decay.empty:
+        st.markdown(f"##### Content Decay Early Warning ({len(f_decay)} Slipping Topics)")
+        st.dataframe(f_decay, use_container_width=True, hide_index=True, key="tbl_decay", column_config={"Affected Page": st.column_config.LinkColumn("Affected Page")})
+    else:
+        st.success("No major content decay alerts detected in this vertical over the last 7 days.")
 
     cann_df = f_trends[f_trends["is_cannibalized"]]
     if not cann_df.empty:
-        with st.expander(f"Cannibalization Check: {len(cann_df)} Topics Have 2+ Competing Connext URLs", expanded=False):
+        with st.expander(f"Cannibalization Check: {len(cann_df)} Surging Topics Have 2+ Competing Connext URLs", expanded=False):
             st.dataframe(cann_df[["topic", "sector", "ranking_pages_count", "google_rank_label", "impressions_7d", "primary_page", "closest_existing_url"]], use_container_width=True, hide_index=True, key="tbl_cann", column_config={"primary_page": st.column_config.LinkColumn("Top Ranking URL"), "closest_existing_url": st.column_config.LinkColumn("Main Sitemap URL")})
 
-    sel_c = st.selectbox("Choose a Topic to Inspect:", f_trends["topic"].tolist(), key="sel_pages_topic")
+    st.divider()
+    sel_c = st.selectbox("Inspect Ranking Pages, Exact Queries & Run Live On-Page Audit:", f_trends["topic"].tolist(), key="sel_pages_topic")
     tm = f_trends[f_trends["topic"] == sel_c].iloc[0]
 
     p1, p2 = st.columns([1.2, 1])
@@ -1717,6 +1910,21 @@ with t_pages:
                     seen.add(item["full_url"])
         st.dataframe(pd.DataFrame(recs), use_container_width=True, hide_index=True, key="tbl_sm_m", column_config={"URL": st.column_config.LinkColumn("Live Connext URL")})
 
+    # Live On-Page SEO & AI-Readiness Grader ($0 On-Demand)
+    st.markdown("**Live On-Page SEO & AI-Readiness Grader ($0 On-Demand)**")
+    audit_col1, audit_col2 = st.columns([2.2, 1])
+    audit_url = audit_col1.text_input("URL to Audit:", value=tm["primary_page"] or tm["recommended_money_page"], key="in_audit_url")
+    if audit_col2.button("Run Live On-Page Audit", type="primary", key="btn_run_audit"):
+        with st.spinner(f"Auditing {audit_url}..."):
+            st.session_state["onpage_audit_res"] = run_live_onpage_seo_audit(audit_url.strip(), tuple(tm["queries_list"][:3]))
+    if "onpage_audit_res" in st.session_state:
+        ares = st.session_state["onpage_audit_res"]
+        if "error" in ares:
+            st.warning(ares["error"])
+        else:
+            st.metric("On-Page SEO & AEO Score", f"{ares['score']} / 100")
+            st.dataframe(ares["checks"], use_container_width=True, hide_index=True, key="tbl_onpage_checks")
+
     st.markdown("**Exact Search Queries & AI Prompts (7+ Words)**")
     tqs = f_queries[f_queries["topic"] == sel_c].sort_values("imp_7d", ascending=False).copy()
     tqs["growth"] = tqs["query_growth_pct"].apply(lambda x: f"+{x}%" if x >= 0 else f"{x}%")
@@ -1724,20 +1932,20 @@ with t_pages:
     st.dataframe(tqs[["query", "is_ai_prompt", "imp_7d", "imp_30d", "growth", "rank", "top_page"]], use_container_width=True, hide_index=True, key="tbl_tqs", column_config={"is_ai_prompt": st.column_config.CheckboxColumn("AI Prompt"), "top_page": st.column_config.LinkColumn("Ranking URL")})
 
 # ==============================================================================
-# TAB 3: PAID ADS, EXPECTED TRAFFIC & KEYWORD PLANNER ($0 CSV SYNC)
+# TAB 3: PAID ADS, ROI, DAY-OF-WEEK SCHEDULER & LIVE NEGATIVE HARVESTER
 # ==============================================================================
 with t_ads:
-    st.markdown("#### Expected Traffic, Lost Opportunity Cost & Paid Ads Builder")
-    st.markdown('<p class="cnxt-sec-sub">Estimate missed monthly clicks below Top 3 and convert surging B2B queries into Google Ads campaigns—zero API credits required.</p>', unsafe_allow_html=True)
+    st.markdown("#### Expected Traffic, Lost Opportunity Cost & Paid Ads Toolkit")
+    st.markdown('<p class="cnxt-sec-sub">Quantify missed clicks below Top 3, optimize Google/Bing Ads day-of-week schedules, and harvest real B2B negative keywords from GSC.</p>', unsafe_allow_html=True)
 
-    with st.expander("Optional: Upload Free Google Keyword Planner CSV to Lock In Exact Monthly Volume & CPC Bids", expanded=False):
+    with st.expander("Optional: Upload Free Google Keyword Planner CSV to Lock In Exact Volume & CPC Bids", expanded=False):
         kp_up = st.file_uploader("Upload CSV/XLSX exported from Google Keyword Planner ('Get search volume and forecasts')", type=["csv", "xlsx", "xls"], key="inline_kp_upload")
         if kp_up:
             try:
                 parsed_kp = parse_keyword_planner_csv(kp_up)
                 st.session_state["kp_lookup_dict"] = parsed_kp
-                st.success(f"Synced {len(parsed_kp):,} Keyword Planner metrics! Tables below updated.")
-                ads_topics_df, rec_kws_df = build_ads_and_roi_tables(f_trends, f_queries, parsed_kp, default_cpc_est, lead_conv_pct / 100.0, float(avg_deal_ltv))
+                st.success(f"Synced {len(parsed_kp):,} Keyword Planner metrics! Recalculating ROI...")
+                st.rerun()
             except Exception as err:
                 st.error(str(err))
 
@@ -1757,6 +1965,30 @@ with t_ads:
         },
     )
 
+    # Enterprise Day-of-Week B2B Search Rhythm + Real Negative Keyword Harvester
+    st.divider()
+    ad_e1, ad_e2 = st.columns([1.2, 1])
+    with ad_e1:
+        st.markdown("#### Day-of-Week B2B Search Rhythm (Ad Scheduling Guide)")
+        dow_df = clustered_df.groupby("date", as_index=False)["impressions"].sum()
+        dow_df["Day"] = dow_df["date"].dt.day_name()
+        dow_order = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+        dow_agg = dow_df.groupby("Day", as_index=False)["impressions"].mean().round(0)
+        dow_agg["Day"] = pd.Categorical(dow_agg["Day"], categories=dow_order, ordered=True)
+        dow_agg = dow_agg.sort_values("Day")
+        fig_dow = px.bar(dow_agg, x="Day", y="impressions", text="impressions", color_discrete_sequence=[CNXT_COLORS["blue"]], labels={"impressions": "Avg Daily B2B Impr.", "Day": ""})
+        fig_dow.update_traces(texttemplate="%{text:,.0f}", textposition="outside")
+        fig_dow.update_layout(margin=dict(l=10, r=10, t=20, b=20))
+        st.plotly_chart(style_plotly_light(fig_dow, height=290), use_container_width=True)
+
+    with ad_e2:
+        st.markdown("#### Live Negative Keyword Harvester (Real GSC Waste)")
+        if not harvested_neg_df.empty:
+            st.caption("Actual job-seeker & non-B2B searches seen on connextglobal.com—block these in Google & Bing Ads.")
+            st.dataframe(harvested_neg_df.head(15), use_container_width=True, hide_index=True, key="tbl_neg_harv", height=245)
+        else:
+            st.info("No wasted non-B2B queries captured in this date range.")
+
     st.divider()
     st.markdown(f"#### Suggested Paid Keywords ({len(rec_kws_df)})")
     if not rec_kws_df.empty:
@@ -1770,7 +2002,7 @@ with t_ads:
         d1.download_button("Download Keywords & Opportunity CSV", scoped_kws.to_csv(index=False).encode("utf-8"), file_name="connext_paid_keywords.csv", mime="text/csv", key="dl_pk")
         d2.download_button("Export Clean List for Google Keyword Planner (.txt)", "\n".join(scoped_kws["Keyword"].head(500).tolist()).encode("utf-8"), file_name="keywords_for_keyword_planner.txt", mime="text/plain", key="dl_kp")
 
-        with st.expander("Ad Group Copy-Paste Builder (Exact, Phrase, Negatives & Headlines)", expanded=False):
+        with st.expander("Ad Group Copy-Paste Builder (Exact, Phrase, Real GSC Negatives & RSA Headlines)", expanded=False):
             sel_ad = st.selectbox("Pick Topic:", ads_topics_df["Topic"].tolist(), key="sel_ad_grp")
             ad_row = f_trends[f_trends["topic"] == sel_ad].iloc[0]
             kws = rec_kws_df[rec_kws_df["Topic"] == sel_ad]["Keyword"].tolist() or ad_row["queries_list"]
@@ -1780,8 +2012,12 @@ with t_ads:
             ce.code("\n".join(f"[{q}]" for q in kws), language="text")
             cp.markdown('**"Phrase Match"**')
             cp.code("\n".join(f'"{q}"' for q in kws), language="text")
-            cn.markdown("**B2B Negatives**")
-            cn.code("-jobs\n-careers\n-hiring\n-salary\n-internship\n-glassdoor\n-indeed\n-free\n-template", language="text")
+            cn.markdown("**B2B Negatives (Base + Real GSC Waste)**")
+            base_negs = ["-jobs", "-careers", "-hiring", "-salary", "-internship", "-glassdoor", "-indeed", "-free", "-template"]
+            if not harvested_neg_df.empty:
+                col0 = harvested_neg_df.columns[0]
+                base_negs.extend([f'"{q}"' for q in harvested_neg_df[col0].head(10).tolist()])
+            cn.code("\n".join(base_negs), language="text")
             hl, desc = build_rsa_assets(sel_ad)
             ch, cd = st.columns(2)
             ch.markdown("**Headlines (≤ 30 chars)**")
@@ -1792,7 +2028,7 @@ with t_ads:
                 cd.text(f"{d} ({len(d)}/90)")
 
 # ==============================================================================
-# TAB 4: CONTENT PLAN & FAQ SCHEMA
+# TAB 4: CONTENT PLAN, INTERNAL LINKING ARCHITECT & FAQ SCHEMA
 # ==============================================================================
 with t_content:
     st.markdown("#### 1. Update Existing Sitemap Pages (Prevent Duplicate Content)")
@@ -1801,22 +2037,33 @@ with t_content:
     st.download_button("Download Existing Page Updates CSV", existing_content_df.to_csv(index=False).encode("utf-8"), file_name="connext_content_updates.csv", mime="text/csv", key="dl_ex_c")
 
     st.divider()
-    st.markdown(f"#### 2. Truly New Content Ideas — Verified Not in Sitemap ({len(truly_new_df)})")
+    st.markdown(f"#### 2. Automated Internal Linking Architect ({len(internal_links_df)} High-Impact Links)")
+    st.markdown('<p class="cnxt-sec-sub">Add contextual links from these live high-authority blogs directly into Connext Service/Industry pages to lift Page-2 rankings into Top 3.</p>', unsafe_allow_html=True)
+    if internal_links_df.empty:
+        st.info("No internal link recommendations needed under current filters.")
+    else:
+        st.dataframe(
+            internal_links_df, use_container_width=True, hide_index=True, key="tbl_int_links",
+            column_config={"Source Blog / Guide (Add Link Here)": st.column_config.LinkColumn("Source Blog"), "Target Service / Industry Page": st.column_config.LinkColumn("Target Money Page")},
+        )
+        st.download_button("Download Internal Linking Plan CSV", internal_links_df.to_csv(index=False).encode("utf-8"), file_name="connext_internal_linking_plan.csv", mime="text/csv", key="dl_int_links")
+
+    st.divider()
+    st.markdown(f"#### 3. Truly New Content Ideas — Verified Not in Sitemap ({len(truly_new_df)})")
     if truly_new_df.empty:
         st.success("All currently surging topics already have a matching page in connextglobal.com/sitemap.xml!")
     else:
         st.dataframe(truly_new_df, use_container_width=True, hide_index=True, key="tbl_new_c", column_config={"Service Page to Link": st.column_config.LinkColumn("Service Page")})
-        st.download_button("Download New Content Gaps CSV", truly_new_df.to_csv(index=False).encode("utf-8"), file_name="connext_new_content_ideas.csv", mime="text/csv", key="dl_new_c")
 
     st.divider()
-    st.markdown("#### 3. Writer Brief & Webflow `FAQPage` JSON-LD Generator")
+    st.markdown("#### 4. Writer Brief & Webflow `FAQPage` JSON-LD Generator")
     sel_b = st.selectbox("Select Topic:", existing_content_df["Topic"].tolist(), key="sel_brief")
     br = f_trends[f_trends["topic"] == sel_b].iloc[0]
     lt_b = "\n".join(f"  - `{q}`" for q in (br["long_tail_list"] or br["queries_list"]))
     bc1, bc2 = st.columns([1.1, 1])
     with bc1:
         st.markdown(
-            f"""**Brief: {br['topic'].title()}** ({br['sector']})
+            f"""**Brief: {br['topic'].title()}** ({br['sector']} • {br['funnel']})
 - **Action:** {'Update `' + br['closest_existing_url'] + '`' if br['already_exists_in_sitemap'] else 'Create New Article (Not in Sitemap)'}
 - **Rank & Opportunity:** {br['google_rank_label']} • **{br['impressions_7d']:,}** 7d impr. • ~**{br['est_missed_clicks_30d']:,.0f}** missed clicks/mo
 - **Main Service Page to Link:** `{br['recommended_money_page']}`
@@ -1828,11 +2075,11 @@ with t_content:
         st.code(build_faq_jsonld(br["topic"], br["queries_list"]), language="html")
 
 # ==============================================================================
-# TAB 5: COMPETITOR NEW BLOGS (STRICTLY BLOGS + KEYWORDS) & FREE ADS LIBRARIES
+# TAB 5: ON-DEMAND COMPETITOR NEW BLOGS (+ KEYWORDS) & FREE ADS LIBRARIES
 # ==============================================================================
 with t_comp:
     st.markdown("#### Competitor New Blog Radar & Free US Ad Libraries (12 BPO Rivals)")
-    st.markdown('<p class="cnxt-sec-sub">100% Free — Zero SerpApi credits used. Tracks newly published competitor blog posts with auto-extracted target keywords plus direct US Ad Transparency links.</p>', unsafe_allow_html=True)
+    st.markdown('<p class="cnxt-sec-sub">Runs on demand (keeps dashboard login instant) with $0 paid APIs. Tracks strictly new competitor blogs + extracted target keywords.</p>', unsafe_allow_html=True)
 
     c_sub1, c_sub2 = st.tabs([
         "New Competitor Blogs & Main Keywords ($0)",
@@ -1840,28 +2087,32 @@ with t_comp:
     ])
 
     with c_sub1:
-        b_top1, b_top2 = st.columns([3, 1])
-        blog_days = b_top1.slider("Show Competitor Blogs Published / Updated Within (Days):", 14, 90, 45, key="sl_blog_days")
-        if b_top2.button("Refresh Blog Scan", key="btn_ref_blogs"):
+        b_top1, b_top2, b_top3 = st.columns([2.2, 1.1, 0.9])
+        blog_days = b_top1.slider("Competitor Blogs Published / Updated Within (Days):", 14, 90, 45, key="sl_blog_days")
+        if b_top2.button("Scan 12 Competitors' New Blogs Now", type="primary", key="btn_scan_blogs"):
+            with st.spinner("Scanning all 12 competitor sitemaps strictly for new blogs & extracting keywords (~15s)..."):
+                bdf, bnotes = scan_competitor_new_blogs_auto(lookback_days=blog_days)
+                if not bdf.empty:
+                    cov_l, cls_l = [], []
+                    for _, row in bdf.iterrows():
+                        chk = check_topic_against_sitemap(f"{row['Blog Headline']} {row['Main Target Keywords']}", "", live_set, live_df, live_vec, live_mat)
+                        cov_l.append("Connext Covers" if chk["already_exists_in_sitemap"] else "Content Gap")
+                        cls_l.append(chk["closest_existing_url"])
+                    bdf["Connext Status"] = cov_l
+                    bdf["Connext Closest Page"] = cls_l
+                st.session_state["comp_blogs_df"] = bdf
+                st.session_state["comp_blog_notes"] = bnotes
+        if b_top3.button("Clear Cache", key="btn_clr_blogs"):
             scan_competitor_new_blogs_auto.clear()
-            st.rerun()
+            st.session_state.pop("comp_blogs_df", None)
 
-        with st.spinner("Scanning all 12 competitors strictly for new blog articles & extracting main keywords..."):
-            comp_blogs_df, blog_notes = scan_competitor_new_blogs_auto(lookback_days=blog_days)
+        if "comp_blog_notes" in st.session_state:
+            st.caption("Blog feed status: " + " • ".join(st.session_state["comp_blog_notes"]))
 
-        st.caption("Blog feed status: " + " • ".join(blog_notes))
-
+        comp_blogs_df = st.session_state.get("comp_blogs_df", pd.DataFrame())
         if comp_blogs_df.empty:
-            st.info("No recently dated blog posts found across the 12 competitor sitemaps in this date window. Try widening the day slider above.")
+            st.info("Click **Scan 12 Competitors' New Blogs Now** above to pull strictly new editorial blog posts and their extracted target keywords (cached 24 hours).")
         else:
-            cov_list, closest_list = [], []
-            for _, row in comp_blogs_df.iterrows():
-                chk = check_topic_against_sitemap(f"{row['Blog Headline']} {row['Main Target Keywords']}", "", live_set, live_df, live_vec, live_mat)
-                cov_list.append("Connext Covers" if chk["already_exists_in_sitemap"] else "Content Gap")
-                closest_list.append(chk["closest_existing_url"])
-            comp_blogs_df["Connext Status"] = cov_list
-            comp_blogs_df["Connext Closest Page"] = closest_list
-
             bf1, bf2, bf3 = st.columns([1.2, 1.2, 1])
             b_comps = bf1.multiselect("Competitor:", sorted(comp_blogs_df["Competitor"].unique().tolist()), default=sorted(comp_blogs_df["Competitor"].unique().tolist()), key="ms_b_comp")
             b_verts = bf2.multiselect("Vertical:", sorted(comp_blogs_df["Vertical"].unique().tolist()), default=sorted(comp_blogs_df["Vertical"].unique().tolist()), key="ms_b_vert")
@@ -1874,9 +2125,9 @@ with t_comp:
                 bview = bview[bview["Connext Status"] == "Connext Covers"]
 
             bk1, bk2, bk3 = st.columns(3)
-            bk1.metric("New Competitor Blogs Found", len(bview))
+            bk1.metric("New Competitor Blogs", len(bview))
             bk2.metric("Topic Gaps Missing on Connext", int((bview["Connext Status"] == "Content Gap").sum()))
-            bk3.metric("Competitors Publishing Blogs", bview["Competitor"].nunique())
+            bk3.metric("Active Rivals Publishing", bview["Competitor"].nunique())
 
             st.dataframe(
                 bview[["Competitor", "Published", "Blog Headline", "Main Target Keywords", "Vertical", "Connext Status", "Connext Closest Page", "Blog URL"]],
@@ -1888,62 +2139,35 @@ with t_comp:
                     "Blog URL": st.column_config.LinkColumn("Read Competitor Blog"),
                 },
             )
-            st.download_button(
-                "Download Competitor New Blogs & Keywords CSV",
-                bview[["Competitor", "Published", "Blog Headline", "Main Target Keywords", "Vertical", "Connext Status", "Connext Closest Page", "Blog URL"]].to_csv(index=False).encode("utf-8"),
-                file_name="connext_competitor_new_blogs_keywords.csv",
-                mime="text/csv",
-                key="dl_comp_blogs",
-            )
+            st.download_button("Download Competitor New Blogs & Keywords CSV", bview[["Competitor", "Published", "Blog Headline", "Main Target Keywords", "Vertical", "Connext Status", "Connext Closest Page", "Blog URL"]].to_csv(index=False).encode("utf-8"), file_name="connext_competitor_new_blogs_keywords.csv", mime="text/csv", key="dl_comp_blogs")
 
     with c_sub2:
-        st.markdown(
-            """<div class="cnxt-callout">
-<strong>Free US Ad Transparency Lookup:</strong> Open any competitor's bare domain directly in <strong>Google Ads Transparency Center (US)</strong> to inspect active US Search/Display ads, or search them in <strong>Microsoft Ad Library</strong>. Zero SerpApi credits used.
-</div>""",
-            unsafe_allow_html=True,
-        )
+        st.markdown("""<div class="cnxt-callout"><strong>Free US Ad Transparency Lookup:</strong> Open any competitor's bare domain directly in <strong>Google Ads Transparency Center (US)</strong> or <strong>Microsoft Ad Library</strong>. Zero SerpApi credits used.</div>""", unsafe_allow_html=True)
         dir_df = pd.DataFrame([
-            {
-                "Competitor": cname,
-                "Domain": dom,
-                "Google Ads Transparency (US)": f"https://adstransparency.google.com/?region=US&domain={dom}",
-                "Microsoft Ad Library": "https://adlibrary.ads.microsoft.com/",
-            }
+            {"Competitor": cname, "Domain": dom, "Google Ads Transparency (US)": f"https://adstransparency.google.com/?region=US&domain={dom}", "Microsoft Ad Library": "https://adlibrary.ads.microsoft.com/"}
             for cname, dom, _ in COMPETITORS_REGISTRY
         ])
-        st.dataframe(
-            dir_df, use_container_width=True, hide_index=True, key="tbl_ad_dir",
-            column_config={
-                "Google Ads Transparency (US)": st.column_config.LinkColumn("Open Google Ads Transparency (US)"),
-                "Microsoft Ad Library": st.column_config.LinkColumn("Open Microsoft Ad Library"),
-            },
-        )
+        st.dataframe(dir_df, use_container_width=True, hide_index=True, key="tbl_ad_dir", column_config={"Google Ads Transparency (US)": st.column_config.LinkColumn("Open Google Ads Transparency (US)"), "Microsoft Ad Library": st.column_config.LinkColumn("Open Microsoft Ad Library")})
 
         st.divider()
-        st.markdown("**Optional: Official Free Microsoft Ad Library API Scan (EU/EEA Spillover Creatives)**")
-        if st.button("Scan 12 Competitors via Free Microsoft Ad Library API", key="btn_ms_api"):
+        if st.button("Scan 12 Competitors via Free Microsoft Ad Library API (EU/EEA Spillover)", key="btn_ms_api"):
             with st.spinner("Querying Microsoft Ad Library API..."):
                 st.session_state["ms_api_df"] = fetch_free_microsoft_ad_library_all()
         if "ms_api_df" in st.session_state:
             ms_df = st.session_state["ms_api_df"]
             if ms_df.empty:
-                st.info("No EU/EEA Microsoft Ads returned for these competitors (use the direct US Ad Library links above for US-only campaigns).")
+                st.info("No EU/EEA Microsoft Ads returned (use the direct US Ad Library links above for US-only campaigns).")
             else:
                 st.dataframe(ms_df, use_container_width=True, hide_index=True, key="tbl_ms_ads", column_config={"Ad Library Link": st.column_config.LinkColumn("Open Ad")})
 
 # ==============================================================================
-# TAB 6: INDUSTRY-FILTERED GOOGLE TRENDS, BING & FREE TOPIC RESEARCH
+# TAB 6: ON-DEMAND INDUSTRY-FILTERED TRENDS, BING & TOPIC RESEARCH ($0)
 # ==============================================================================
 with t_trends:
     st.markdown("#### Industry-Filtered Google Trends, Bing Search & Topic Research ($0)")
-    st.markdown('<p class="cnxt-sec-sub">100% scoped to B2B outsourcing, staffing, healthcare RCM, finance, and IT—zero unrelated macro news.</p>', unsafe_allow_html=True)
+    st.markdown('<p class="cnxt-sec-sub">100% scoped to B2B outsourcing, staffing, healthcare RCM, finance, and IT—runs on demand so the main dashboard stays fast.</p>', unsafe_allow_html=True)
 
-    r_sub1, r_sub2, r_sub3 = st.tabs([
-        "B2B Google Trends & Live Industry Radar",
-        "Bing Search Performance",
-        "Question & Reddit Pain-Point Finder",
-    ])
+    r_sub1, r_sub2, r_sub3 = st.tabs(["B2B Google Trends & Industry Feed", "Bing Search Performance", "Question & Reddit Pain-Point Finder"])
 
     with r_sub1:
         tc1, tc2, tc3 = st.columns([2.2, 0.9, 0.9])
@@ -1951,78 +2175,85 @@ with t_trends:
         gt_geo = tc2.selectbox("Region:", ["US", "CA", "AU", "GB"], index=0, key="gt_geo")
         gt_tf = tc3.selectbox("Window:", ["today 1-m", "today 3-m", "today 12-m"], index=0, key="gt_tf")
 
-        seed_tup = tuple(s.strip().lower() for s in gt_seeds.split(",") if s.strip())[:5]
-        iot_df, rising_df, gt_notes = fetch_free_google_trends_b2b(seed_tup, geo=gt_geo, timeframe=gt_tf)
-        if gt_notes:
-            st.caption(" • ".join(gt_notes))
+        news_vert = st.selectbox("B2B Industry News Feed (Last 14 Days):", list(INDUSTRY_NEWS_FEEDS.keys()), index=0, key="sel_news_vert")
+        if st.button("Load B2B Google Trends & Industry Headlines", type="primary", key="btn_load_gt"):
+            seed_tup = tuple(s.strip().lower() for s in gt_seeds.split(",") if s.strip())[:5]
+            with st.spinner("Fetching B2B Google Trends & industry headlines..."):
+                iot_d, ris_d, g_n = fetch_free_google_trends_b2b(seed_tup, geo=gt_geo, timeframe=gt_tf)
+                if not ris_d.empty:
+                    sm_s, sm_l = [], []
+                    for _, rr in ris_d.iterrows():
+                        chk = check_topic_against_sitemap(rr["Rising B2B Query"], "", live_set, live_df, live_vec, live_mat)
+                        sm_s.append("Already Covered" if chk["already_exists_in_sitemap"] else "New Topic Gap")
+                        sm_l.append(chk["best_money_url"] if chk["has_strong_money_match"] else chk["closest_existing_url"])
+                    ris_d["Connext Status"] = sm_s
+                    ris_d["Target Page"] = sm_l
+                st.session_state["gt_iot_df"] = iot_d
+                st.session_state["gt_ris_df"] = ris_d
+                st.session_state["gt_notes"] = g_n
+                st.session_state["b2b_news_df"] = fetch_b2b_industry_trending_feed(news_vert)
 
+        if "gt_notes" in st.session_state and st.session_state["gt_notes"]:
+            st.caption(" • ".join(st.session_state["gt_notes"]))
+        iot_df = st.session_state.get("gt_iot_df", pd.DataFrame())
         if not iot_df.empty:
             fig_gt = px.line(iot_df, x="date", y="interest_score", color="keyword", color_discrete_sequence=[CNXT_COLORS["blue"], CNXT_COLORS["sun"], CNXT_COLORS["teal"], CNXT_COLORS["twilight"], CNXT_COLORS["red"]], labels={"date": "", "interest_score": "Search Interest (0–100)", "keyword": ""})
-            fig_gt.update_layout(height=310, margin=dict(l=10, r=10, t=10, b=40), plot_bgcolor="#FFFFFF", paper_bgcolor="#FFFFFF", yaxis=dict(gridcolor=CNXT_COLORS["line"]), legend=dict(orientation="h", y=-0.22))
-            st.plotly_chart(fig_gt, use_container_width=True)
+            fig_gt.update_layout(margin=dict(l=10, r=10, t=10, b=40))
+            st.plotly_chart(style_plotly_light(fig_gt, height=310, legend_bottom=True), use_container_width=True)
 
-        if not rising_df.empty:
+        ris_df = st.session_state.get("gt_ris_df", pd.DataFrame())
+        if not ris_df.empty:
             st.markdown("**Rising B2B Queries (Google Trends)**")
-            sm_s, sm_l = [], []
-            for _, rr in rising_df.iterrows():
-                chk = check_topic_against_sitemap(rr["Rising B2B Query"], "", live_set, live_df, live_vec, live_mat)
-                sm_s.append("Already Covered" if chk["already_exists_in_sitemap"] else "New Topic Gap")
-                sm_l.append(chk["best_money_url"] if chk["has_strong_money_match"] else chk["closest_existing_url"])
-            rising_df["Connext Status"] = sm_s
-            rising_df["Target Connext Page"] = sm_l
-            st.dataframe(rising_df, use_container_width=True, hide_index=True, key="tbl_gt_r", column_config={"Target Connext Page": st.column_config.LinkColumn("Target Page")})
+            st.dataframe(ris_df, use_container_width=True, hide_index=True, key="tbl_gt_r", column_config={"Target Page": st.column_config.LinkColumn("Target Page")})
 
-        st.divider()
-        st.markdown("#### Live B2B Industry Trend Headlines (Last 14 Days — Strictly Industry-Filtered)")
-        news_vert = st.selectbox("Industry Feed:", list(INDUSTRY_NEWS_FEEDS.keys()), index=0, key="sel_news_vert")
-        news_df = fetch_b2b_industry_trending_feed(news_vert)
-        if news_df.empty:
-            st.info("No recent headlines returned right now.")
-        else:
-            st.dataframe(news_df, use_container_width=True, hide_index=True, key="tbl_b2b_news", column_config={"Article Link": st.column_config.LinkColumn("Read Article")})
+        b2b_news_df = st.session_state.get("b2b_news_df", pd.DataFrame())
+        if not b2b_news_df.empty:
+            st.markdown("**Live B2B Industry Trend Headlines (Strictly Industry-Filtered)**")
+            st.dataframe(b2b_news_df, use_container_width=True, hide_index=True, key="tbl_b2b_news", column_config={"Article Link": st.column_config.LinkColumn("Read Article")})
 
     with r_sub2:
         if has_bing_secret:
-            if st.button("Refresh Bing Webmaster Data", key="btn_ref_bing"):
-                fetch_free_bing_webmaster_queries.clear()
-                st.rerun()
-            bing_df, b_stat = fetch_free_bing_webmaster_queries(str(st.secrets["bing"]["api_key"]), st.secrets["bing"].get("site_url", "https://connextglobal.com/"), brand_regex, exclude_local_ph, custom_negatives)
-            if bing_df.empty:
-                st.warning(b_stat)
-            else:
-                st.success(b_stat)
+            if st.button("Load / Refresh Bing Webmaster Queries", type="primary", key="btn_ref_bing"):
+                with st.spinner("Syncing Bing Webmaster Tools..."):
+                    bdf, b_stat = fetch_free_bing_webmaster_queries(str(st.secrets["bing"]["api_key"]), st.secrets["bing"].get("site_url", "https://connextglobal.com/"), brand_regex, exclude_local_ph, custom_negatives)
+                    st.session_state["bing_wmt_df"] = bdf
+                    st.session_state["bing_wmt_stat"] = b_stat
+            if "bing_wmt_stat" in st.session_state:
+                st.caption(st.session_state["bing_wmt_stat"])
+            bing_df = st.session_state.get("bing_wmt_df", pd.DataFrame())
+            if not bing_df.empty:
                 bing_df["Growth"] = bing_df["growth_pct"].apply(lambda x: f"+{x}%" if x >= 0 else f"{x}%")
                 st.dataframe(bing_df[["query", "vertical", "bing_impr_recent", "bing_clicks", "Growth", "bing_rank_label"]], use_container_width=True, hide_index=True, key="tbl_bing", column_config={"query": "Bing Query", "vertical": "Vertical", "bing_impr_recent": "Recent Impr.", "bing_clicks": "Clicks", "bing_rank_label": "Bing Rank"})
         else:
-            st.markdown(
-                """<div class="cnxt-callout">
-<strong>Connect Free Bing Webmaster Tools ($0):</strong> Go to <strong>bing.com/webmasters → Settings → API Access → Generate API Key</strong>, then add <code>[bing]</code> with <code>api_key</code> and <code>site_url = "https://connextglobal.com/"</code> in Streamlit Secrets. This tracks your Bing, Microsoft Copilot, and ChatGPT Search query visibility.
-</div>""",
-                unsafe_allow_html=True,
-            )
+            st.markdown("""<div class="cnxt-callout"><strong>Connect Free Bing Webmaster Tools ($0):</strong> Go to <strong>bing.com/webmasters → Settings → API Access → Generate API Key</strong>, then add <code>[bing]</code> with <code>api_key</code> and <code>site_url = "https://connextglobal.com/"</code> in Streamlit Secrets.</div>""", unsafe_allow_html=True)
 
     with r_sub3:
-        rc1, rc2 = st.columns([1.2, 1.5])
-        picked_seed = rc1.selectbox("Pick from Surging GSC Topics:", f_trends["topic"].tolist(), key="sel_res_seed")
-        custom_seed = rc2.text_input("Or Type Any Custom B2B Topic:", placeholder="e.g., dental billing outsourcing", key="in_res_seed")
+        rc1, rc2, rc3 = st.columns([1.2, 1.4, 0.8])
+        picked_seed = rc1.selectbox("Pick Surging GSC Topic:", f_trends["topic"].tolist(), key="sel_res_seed")
+        custom_seed = rc2.text_input("Or Type Custom B2B Topic:", placeholder="e.g., dental billing outsourcing", key="in_res_seed")
         active_seed = custom_seed.strip() or picked_seed
+        if rc3.button("Mine Questions & Reddit", type="primary", key="btn_mine_res"):
+            with st.spinner(f"Mining Google/Bing Autocomplete & Reddit for '{active_seed}'..."):
+                s_df = fetch_free_google_and_bing_suggestions(active_seed)
+                if not s_df.empty:
+                    s_df["Connext Status"] = ["Already Covered" if check_topic_against_sitemap(q, "", live_set, live_df, live_vec, live_mat)["already_exists_in_sitemap"] else "New Gap" for q in s_df["Search Suggestion"]]
+                st.session_state["res_sugg_df"] = s_df
+                st.session_state["res_red_df"] = fetch_free_reddit_b2b_discussions(active_seed)
+                st.session_state["res_seed_lbl"] = active_seed
 
-        col_sugg, col_red = st.columns(2)
-        with col_sugg:
-            st.markdown(f"**Google & Bing Live Autocomplete for `{active_seed}`**")
-            sugg_df = fetch_free_google_and_bing_suggestions(active_seed)
-            if sugg_df.empty:
-                st.info("No autocomplete suggestions found.")
-            else:
-                sugg_df["Connext Status"] = [
-                    "Already Covered" if check_topic_against_sitemap(q, "", live_set, live_df, live_vec, live_mat)["already_exists_in_sitemap"] else "New Gap"
-                    for q in sugg_df["Search Suggestion"]
-                ]
-                st.dataframe(sugg_df, use_container_width=True, hide_index=True, key="tbl_sugg")
-        with col_red:
-            st.markdown(f"**Reddit B2B Buyer Discussions for `{active_seed}`**")
-            rd_df = fetch_free_reddit_b2b_discussions(active_seed)
-            if rd_df.empty:
-                st.info("No recent Reddit threads matched this exact phrase—try a shorter 2-word topic.")
-            else:
-                st.dataframe(rd_df, use_container_width=True, hide_index=True, key="tbl_reddit", column_config={"Thread": st.column_config.LinkColumn("Open Thread")})
+        if "res_seed_lbl" in st.session_state:
+            col_sugg, col_red = st.columns(2)
+            with col_sugg:
+                st.markdown(f"**Google & Bing Autocomplete for `{st.session_state['res_seed_lbl']}`**")
+                sdf = st.session_state.get("res_sugg_df", pd.DataFrame())
+                if sdf.empty:
+                    st.info("No autocomplete suggestions returned.")
+                else:
+                    st.dataframe(sdf, use_container_width=True, hide_index=True, key="tbl_sugg")
+            with col_red:
+                st.markdown(f"**Reddit B2B Buyer Discussions for `{st.session_state['res_seed_lbl']}`**")
+                rdf = st.session_state.get("res_red_df", pd.DataFrame())
+                if rdf.empty:
+                    st.info("No recent Reddit threads matched—try a shorter 2-word topic.")
+                else:
+                    st.dataframe(rdf, use_container_width=True, hide_index=True, key="tbl_reddit", column_config={"Thread": st.column_config.LinkColumn("Open Thread")})
