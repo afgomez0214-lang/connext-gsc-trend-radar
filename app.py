@@ -139,7 +139,7 @@ header[data-testid="stHeader"] { background-color: var(--cnxt-bg) !important; bo
 .block-container { padding-top: 1.5rem; padding-bottom: 2.5rem; max-width: 1440px; }
 h1, h2, h3, h4 { font-family: var(--font-display) !important; color: var(--cnxt-twilight) !important; letter-spacing: -0.015em; }
 
-/* Main Canvas Form & Input Contrast (Fixes Dark Mode Clashes on Login + Dashboard) */
+/* Main Canvas Form & Input Contrast */
 .stApp [data-testid="stForm"] {
     background-color: #FFFFFF !important; border: 1px solid var(--cnxt-line) !important;
     border-radius: 12px !important; padding: 22px 24px !important;
@@ -164,7 +164,7 @@ h1, h2, h3, h4 { font-family: var(--font-display) !important; color: var(--cnxt-
 .stApp .main [data-testid="stExpander"] summary p { color: var(--cnxt-twilight) !important; font-weight: 600 !important; }
 .stApp .main [data-testid="stCodeBlock"] pre { background-color: #0F172A !important; color: #F8FAFC !important; border-radius: 8px !important; }
 
-/* Primary & Form Submit Buttons (Login + Actions) */
+/* Primary & Form Submit Buttons */
 .stButton > button[kind="primary"],
 div[data-testid="stFormSubmitButton"] > button,
 .stDownloadButton > button {
@@ -202,7 +202,7 @@ section[data-testid="stSidebar"] .stButton > button[kind="primary"] { background
 /* Hero Banner */
 .cnxt-hero {
     background: linear-gradient(135deg, #071776 0%, #071739 100%);
-    color: #FFFFFF; padding: 22px 28px; border-radius: 12px; margin-bottom: 18px;
+    color: #FFFFFF; padding: 22px 28px; border-radius: 12px; margin-bottom: 16px;
     border: 1px solid rgba(144,203,219,0.2); box-shadow: 0 6px 20px rgba(7,23,57,0.08);
 }
 .cnxt-eyebrow { font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.16em; color: #F1C916; margin-bottom: 5px; font-weight: 600; }
@@ -220,15 +220,15 @@ div[data-testid="stMetric"] label { font-family: var(--font-mono) !important; fo
 div[data-testid="stMetric"] [data-testid="stMetricValue"] { font-family: var(--font-display) !important; color: var(--cnxt-twilight) !important; font-weight: 700 !important; font-size: 1.6rem !important; }
 
 /* Tabs */
-.stTabs [data-baseweb="tab-list"] { gap: 8px; border-bottom: 2px solid var(--cnxt-line); margin-bottom: 14px; flex-wrap: wrap; }
+.stTabs [data-baseweb="tab-list"] { gap: 6px; border-bottom: 2px solid var(--cnxt-line); margin-bottom: 14px; flex-wrap: wrap; }
 .stTabs [data-baseweb="tab"] {
-    font-family: var(--font-display); font-weight: 600; font-size: 0.91rem;
+    font-family: var(--font-display); font-weight: 600; font-size: 0.89rem;
     color: #334155 !important; background-color: #FFFFFF !important; border-radius: 8px 8px 0 0;
-    padding: 10px 16px; border: 1px solid var(--cnxt-line); border-bottom: none;
+    padding: 10px 14px; border: 1px solid var(--cnxt-line); border-bottom: none;
 }
 .stTabs [aria-selected="true"] { background-color: var(--cnxt-twilight) !important; color: #FFFFFF !important; border-color: var(--cnxt-twilight) !important; }
 
-/* Callout Card */
+/* Callout & Info Cards */
 .cnxt-callout {
     background-color: #FFFFFF; border: 1px solid var(--cnxt-line);
     border-left: 4px solid var(--cnxt-sun); border-radius: 8px;
@@ -236,6 +236,18 @@ div[data-testid="stMetric"] [data-testid="stMetricValue"] { font-family: var(--f
     box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
 }
 .cnxt-callout strong { color: var(--cnxt-twilight); }
+.cnxt-info-card {
+    background-color: #FFFFFF; border: 1px solid var(--cnxt-line); border-radius: 12px;
+    padding: 20px 22px; margin-bottom: 14px; color: #1E293B; font-size: 0.92rem; line-height: 1.6;
+    box-shadow: 0 2px 10px rgba(7, 23, 57, 0.04);
+}
+.cnxt-info-card h3 { margin-top: 0 !important; margin-bottom: 10px !important; font-size: 1.08rem !important; }
+.cnxt-info-card ul { margin: 6px 0 10px 18px; padding: 0; }
+.cnxt-info-card li { margin-bottom: 6px; }
+.cnxt-timing-box {
+    background-color: #FFFBEB; border: 1px solid #FDE68A; border-left: 4px solid #E58B25;
+    border-radius: 8px; padding: 12px 16px; margin: 12px 0; color: #78350F; font-size: 0.9rem; line-height: 1.5;
+}
 .cnxt-sec-sub { color: #64748B !important; font-size: 0.9rem; margin-top: -8px; margin-bottom: 12px; }
 span[data-baseweb="tag"] { background-color: var(--cnxt-twilight) !important; color: #FFFFFF !important; }
 </style>"""
@@ -246,7 +258,6 @@ inject_connext_brand_css()
 
 
 def style_plotly_light(fig: go.Figure, height: int = 360, legend_bottom: bool = False) -> go.Figure:
-    """Enforces crisp light-surface typography and axis readability in all browser modes."""
     layout_kwargs = dict(
         height=height,
         plot_bgcolor="#FFFFFF",
@@ -261,25 +272,38 @@ def style_plotly_light(fig: go.Figure, height: int = 360, legend_bottom: bool = 
     return fig
 
 
+def render_tab_guide(tab_name: str, what_you_see: str, what_to_expect: str, how_to_use: str):
+    """Renders a consistent, plain-English 3-column guide box inside every tab."""
+    with st.expander(f"How to Read & Use This Tab — {tab_name}", expanded=False):
+        gc1, gc2, gc3 = st.columns(3)
+        with gc1:
+            st.markdown(f"**What You Are Looking At**\n\n{what_you_see}")
+        with gc2:
+            st.markdown(f"**What Results to Expect**\n\n{what_to_expect}")
+        with gc3:
+            st.markdown(f"**How to Act on This Data**\n\n{how_to_use}")
+
+
 def require_connext_login():
-    """Clean, high-contrast team login screen with failed-attempt safeguard."""
+    """Beginner-friendly team login screen with complete onboarding guidelines and loading-time notice."""
     if st.session_state.get("cnxt_authenticated"):
         return
 
     st.markdown("<style>section[data-testid='stSidebar']{display:none !important;}</style>", unsafe_allow_html=True)
-    _, center_col, _ = st.columns([1, 1.25, 1])
-    with center_col:
-        st.markdown("<div style='height: 36px;'></div>", unsafe_allow_html=True)
-        st.image(CNXT_LOGO_COLOR, width=185)
-        st.markdown(
-            """<div class="cnxt-hero" style="margin-top: 14px; margin-bottom: 16px;">
-<div class="cnxt-eyebrow">INTERNAL CONNEXT TEAM ACCESS</div>
-<h1>Connext Search &amp; <span>Topic Radar</span></h1>
-<p>Sign in with your Connext team password to view live Google Search trends, content decay alerts, ROI opportunity forecasts, internal linking plans, and competitor blog intelligence.</p>
-</div>""",
-            unsafe_allow_html=True,
-        )
 
+    st.image(CNXT_LOGO_COLOR, width=190)
+    st.markdown(
+        """<div class="cnxt-hero" style="margin-top: 12px; margin-bottom: 20px;">
+<div class="cnxt-eyebrow">CONNEXT GLOBAL INTERNAL MARKETING &amp; GROWTH PLATFORM</div>
+<h1>Connext Search &amp; Topic <span>Trend Radar</span></h1>
+<p>A plain-English intelligence tool that turns live Google Search Console data into actionable priorities for Paid Ads, Content Creation, SEO updates, and Competitor Tracking—no SEO background required.</p>
+</div>""",
+        unsafe_allow_html=True,
+    )
+
+    col_login, col_guide = st.columns([1, 1.35], gap="large")
+
+    with col_login:
         if "app_password" not in st.secrets:
             st.error("`app_password` is not configured in Streamlit Secrets yet. Add it in App Settings → Secrets.")
             st.stop()
@@ -290,7 +314,9 @@ def require_connext_login():
             st.stop()
 
         with st.form("cnxt_login_form", clear_on_submit=False):
-            entered_pwd = st.text_input("Team Password", type="password", placeholder="Enter password and press Enter...")
+            st.markdown("### Team Sign-In")
+            st.caption("Enter the shared Connext marketing password provided in Microsoft Teams.")
+            entered_pwd = st.text_input("Team Password", type="password", placeholder="Enter team password...")
             submitted = st.form_submit_button("Unlock Enterprise Radar", type="primary", use_container_width=True)
             if submitted:
                 if hmac.compare_digest(entered_pwd.strip(), str(st.secrets["app_password"]).strip()):
@@ -301,7 +327,53 @@ def require_connext_login():
                     st.session_state["cnxt_login_attempts"] = attempts + 1
                     rem = max(0, 5 - (attempts + 1))
                     st.error(f"Incorrect password. ({rem} attempt{'s' if rem != 1 else ''} remaining)")
-        st.caption("For internal Connext Global use only • Read-only GSC connection")
+
+        st.markdown(
+            """<div class="cnxt-timing-box">
+<strong>Please Expect 30 to 60 Seconds to Load:</strong><br/>
+Right after you click <strong>Unlock Enterprise Radar</strong>, the app connects live to Google Search Console, filters out job-seeker noise, groups thousands of searches into B2B topics, and checks every topic against <code>connextglobal.com/sitemap.xml</code>. <strong>Please keep the tab open and do not refresh while it loads.</strong>
+</div>""",
+            unsafe_allow_html=True,
+        )
+
+        st.markdown(
+            """<div class="cnxt-info-card" style="padding: 14px 18px; font-size: 0.86rem;">
+<strong>Data Security &amp; Access Guidelines:</strong>
+<ul>
+<li><strong>Read-Only Connection:</strong> Nothing you click inside this dashboard can edit Google Search Console, Google Ads, or the live website.</li>
+<li><strong>Internal Use Only:</strong> Do not share the app link or password outside Connext Global. Click <em>Lock / Log Out</em> in the sidebar on shared screens.</li>
+</ul>
+</div>""",
+            unsafe_allow_html=True,
+        )
+
+    with col_guide:
+        st.markdown(
+            """<div class="cnxt-info-card">
+<h3>What This Tool Does (In Plain English)</h3>
+<ul>
+<li><strong>Finds Rising Buyer Demand:</strong> Spots B2B outsourcing topics growing right now on Google (3-day spikes, 7-day surges, and 30-day growth) across all Connext verticals.</li>
+<li><strong>Prevents Duplicate Content:</strong> Automatically cross-checks every idea against <code>connextglobal.com/sitemap.xml</code> so we update existing pages instead of creating duplicates.</li>
+<li><strong>Catches Slipping Pages Early:</strong> Flags <em>Content Decay</em> when a Connext topic loses search visibility or drops in Google rank.</li>
+<li><strong>Builds Paid Ads &amp; ROI Cases:</strong> Estimates missed monthly clicks and equivalent ad value, plus ready-to-paste keywords, negative keywords, and headlines.</li>
+<li><strong>Tracks 12 Competitors &amp; Market Trends ($0):</strong> Scans new competitor blog posts (extracting their main target keywords) and pulls B2B Google Trends, Bing, and Reddit pain points on demand.</li>
+</ul>
+<h3>How Each Team Uses This Data</h3>
+<ul>
+<li><strong>Content &amp; SEO Team:</strong> Use <em>Tab 2 (Decay &amp; On-Page Audit)</em> to rescue slipping pages, <em>Tab 4</em> for writer briefs, internal links, and FAQ schema, and <em>Tab 5</em> to see what competitors just published.</li>
+<li><strong>Paid Media (Google &amp; Bing Ads):</strong> Filter by <em>BOFU — Ready to Buy</em>, open <em>Tab 3</em> to grab high-intent keywords, copy real GSC negative keywords, and use the Day-of-Week chart for ad scheduling.</li>
+<li><strong>Leadership &amp; Strategy:</strong> Check <em>Tab 1 (Executive Overview)</em> for Brand vs. Non-Brand health, copy the <em>1-Click Teams Summary</em>, or download the <em>Full Excel Report (.xlsx)</em>.</li>
+</ul>
+<h3>What to Expect Once Inside</h3>
+<ul>
+<li><strong>Tabs 1–4</strong> load automatically after the initial 30–60s sync (cached for 1 hour so filtering is instant).</li>
+<li><strong>Tabs 5 &amp; 6</strong> (Competitor Blogs, Trends, Reddit) run <strong>only when you click their button</strong> (~10–20s) to keep the main dashboard fast.</li>
+<li>Open <strong>Tab 7 (User Guide &amp; Glossary)</strong> anytime for plain-English definitions of every metric and step-by-step workflows.</li>
+</ul>
+</div>""",
+            unsafe_allow_html=True,
+        )
+
     st.stop()
 
 
@@ -557,7 +629,6 @@ def classify_sector(text: str) -> str:
 
 
 def build_enterprise_excel_bytes(sheets_dict: dict[str, pd.DataFrame]) -> bytes:
-    """Exports a formatted multi-sheet Excel Executive Workbook using openpyxl ($0)."""
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine="openpyxl") as writer:
         for name, df in sheets_dict.items():
@@ -735,11 +806,10 @@ def build_faq_jsonld(topic: str, queries_list: list[str]) -> str:
 
 
 # ==============================================================================
-# ENTERPRISE FREE FUNCTION: LIVE ON-PAGE SEO & AI-READINESS GRADER ($0)
+# LIVE ON-PAGE SEO & AI-READINESS GRADER ($0)
 # ==============================================================================
 @st.cache_data(ttl=3600, show_spinner=False)
 def run_live_onpage_seo_audit(url: str, target_keywords: tuple[str, ...]) -> dict:
-    """Fetches a live connextglobal.com page and grades SEO & AI Overview readiness (0-100)."""
     headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
     try:
         with urllib.request.urlopen(urllib.request.Request(url, headers=headers), timeout=10) as resp:
@@ -778,14 +848,14 @@ def run_live_onpage_seo_audit(url: str, target_keywords: tuple[str, ...]) -> dic
         checks.append({"Check": "Meta Description", "Status": "Optimize", "Detail": f"{len(meta_desc)} chars (target 110–165)"})
 
     if len(h1s) == 1:
-        score += 14; checks.append({"Check": "H1 Structure", "Status": "Pass", "Detail": f"1 H1: {h1s[0][:75]}"})
+        score += 14; checks.append({"Check": "H1 Main Heading", "Status": "Pass", "Detail": f"1 H1: {h1s[0][:75]}"})
     else:
-        checks.append({"Check": "H1 Structure", "Status": "Fix", "Detail": f"Found {len(h1s)} H1 tags (use exactly 1)"})
+        checks.append({"Check": "H1 Main Heading", "Status": "Fix", "Detail": f"Found {len(h1s)} H1 tags (use exactly 1)"})
 
     if len(h2s) >= 3:
-        score += 14; checks.append({"Check": "H2 Scannability / AEO", "Status": "Pass", "Detail": f"{len(h2s)} H2 subheadings detected"})
+        score += 14; checks.append({"Check": "H2 Subheadings (Scannability)", "Status": "Pass", "Detail": f"{len(h2s)} H2 subheadings detected"})
     else:
-        checks.append({"Check": "H2 Scannability / AEO", "Status": "Optimize", "Detail": f"Only {len(h2s)} H2 tags (add 3+ question H2s)"})
+        checks.append({"Check": "H2 Subheadings (Scannability)", "Status": "Optimize", "Detail": f"Only {len(h2s)} H2 tags (add 3+ question H2s)"})
 
     if kw_in_title or kw_in_h1:
         score += 16; checks.append({"Check": "Target Keyword Match", "Status": "Pass", "Detail": f"'{primary_kw}' appears in Title/H1"})
@@ -798,15 +868,15 @@ def run_live_onpage_seo_audit(url: str, target_keywords: tuple[str, ...]) -> dic
         checks.append({"Check": "Content Depth", "Status": "Thin", "Detail": f"~{word_count:,} words (expand to 700+ words)"})
 
     if has_jsonld:
-        score += 12; checks.append({"Check": "JSON-LD / AI Schema", "Status": "Pass" if has_faq_schema else "Partial", "Detail": "FAQPage + JSON-LD active" if has_faq_schema else "JSON-LD found; add FAQPage from Tab 4"})
+        score += 12; checks.append({"Check": "Structured Data (AI Readiness)", "Status": "Pass" if has_faq_schema else "Partial", "Detail": "FAQPage + JSON-LD active" if has_faq_schema else "JSON-LD found; add FAQPage from Tab 4"})
     else:
-        checks.append({"Check": "JSON-LD / AI Schema", "Status": "Missing", "Detail": "Add FAQPage JSON-LD from Tab 4"})
+        checks.append({"Check": "Structured Data (AI Readiness)", "Status": "Missing", "Detail": "Add FAQPage JSON-LD from Tab 4"})
 
     return {"score": score, "checks": pd.DataFrame(checks)}
 
 
 # ==============================================================================
-# KEYWORD PLANNER ($0 CSV PARSER) & GSC LOADERS (WITH NEGATIVE HARVESTER)
+# KEYWORD PLANNER ($0 CSV PARSER) & GSC LOADERS
 # ==============================================================================
 def parse_keyword_planner_csv(uploaded_file) -> dict:
     fname = uploaded_file.name.lower()
@@ -880,6 +950,7 @@ def parse_gsc_web_upload(uploaded_file, brand_regex: str, custom_negatives: str,
         noise_mask = noise_mask | df["query"].str.contains(custom_negatives, regex=True, na=False)
 
     neg_df = df[noise_mask].groupby("query", as_index=False)["impressions"].sum().sort_values("impressions", ascending=False).head(100)
+    neg_df.columns = ["Wasted Non-B2B Query", "Wasted GSC Impr."]
     clean_df = df[~noise_mask].copy()
     clean_df["is_branded"] = clean_df["query"].str.contains(brand_regex, regex=True, na=False) if brand_regex else False
     return clean_df, neg_df
@@ -1320,7 +1391,6 @@ def cluster_queries(df: pd.DataFrame, distance_threshold: float) -> pd.DataFrame
 
 
 def analyze_trends_and_decay(non_brand_df: pd.DataFrame, live_set: set[str], live_df: pd.DataFrame, live_vec: TfidfVectorizer, live_mat, min_daily_imp: int, min_up_days: int, min_norm_slope: float, min_lift: float):
-    """Detects BOTH Surging Topics AND Decaying / Slipping Topics in one pass."""
     if non_brand_df.empty:
         return pd.DataFrame(), pd.DataFrame(), pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
     all_dates = sorted(non_brand_df["date"].unique())
@@ -1369,9 +1439,8 @@ def analyze_trends_and_decay(non_brand_df: pd.DataFrame, live_set: set[str], liv
         imp_30d = int(group[group["date"].isin(month_dates)]["impressions"].sum())
         avg_pos_now = float(rec_grp["weighted_pos"].sum() / max(imp_7d, 1)) if imp_7d > 0 else 0.0
         avg_pos_prior = float(pri_grp["weighted_pos"].sum() / max(int(pri_grp["impressions"].sum()), 1)) if not pri_grp.empty else avg_pos_now
-        rank_slip = round(avg_pos_now - avg_pos_prior, 1)  # positive = rank dropped worse
+        rank_slip = round(avg_pos_now - avg_pos_prior, 1)
 
-        # --- CONTENT DECAY DETECTOR ---
         drop_pct_7d = round(((m_week / m_prior) - 1.0) * 100, 1)
         if m_prior >= max(min_daily_imp, 15) and (drop_pct_7d <= -22.0 or (rank_slip >= 2.5 and avg_pos_prior <= 15.0)):
             gsc_url_d = top_page_map.get(topic, "")
@@ -1387,7 +1456,6 @@ def analyze_trends_and_decay(non_brand_df: pd.DataFrame, live_set: set[str], liv
                 "Rescue Action": "Refresh H1/H2s, update stats & add internal links immediately" if avg_pos_prior <= 10.0 else "Audit competing SERP pages & consolidate thin content",
             })
 
-        # --- SURGING TOPIC DETECTOR ---
         if max(m_today, m_week, m_mrec) < min_daily_imp:
             continue
         lift_today = m_today / m_prior
@@ -1434,7 +1502,6 @@ def analyze_trends_and_decay(non_brand_df: pd.DataFrame, live_set: set[str], liv
         top3_clicks = round(imp_30d * expected_ctr_by_rank(2.5), 1)
         missed_clicks = max(0.0, round(top3_clicks - cur_clicks, 1))
 
-        # Enterprise Priority Score (0-100)
         prio_score = min(100, int(
             (30 if funnel.startswith("BOFU") else (20 if funnel.startswith("MOFU") else 10))
             + min(30, int(np.log1p(imp_7d) * 4.5))
@@ -1488,7 +1555,6 @@ def analyze_trends_and_decay(non_brand_df: pd.DataFrame, live_set: set[str], liv
 
 
 def build_internal_linking_plan(trends_df: pd.DataFrame, all_pages_gsc_df: pd.DataFrame) -> pd.DataFrame:
-    """Enterprise $0 Internal Linking Architect: matches high-visibility live blog posts to target money pages."""
     page_imp_map = all_pages_gsc_df.groupby("norm_page")["impressions"].sum().to_dict() if not all_pages_gsc_df.empty else {}
     links = []
     for _, r in trends_df.iterrows():
@@ -1598,20 +1664,33 @@ if st.sidebar.button("Lock / Log Out"):
 st.sidebar.divider()
 
 has_secrets = "gcp_service_account" in st.secrets and "gsc_config" in st.secrets
-data_source = st.sidebar.radio("Search Console Source", ["Live GSC API", "Upload GSC CSV / ZIP"], index=0)
-exclude_local_ph = st.sidebar.checkbox("Filter Out Local PH / Student Noise", value=True)
-custom_negatives = st.sidebar.text_input("Extra Excluded Words", placeholder="intern|sample|pdf")
+data_source = st.sidebar.radio(
+    "Search Console Source",
+    ["Live GSC API", "Upload GSC CSV / ZIP"],
+    index=0,
+    help="Keep 'Live GSC API' selected for automatic live data. Initial sync takes 30–60 seconds.",
+)
+exclude_local_ph = st.sidebar.checkbox(
+    "Filter Out Local PH / Student Noise",
+    value=True,
+    help="Removes local PH city directory and student/university searches so only B2B buyer demand appears.",
+)
+custom_negatives = st.sidebar.text_input(
+    "Extra Excluded Words",
+    placeholder="intern|sample|pdf",
+    help="Optional: separate extra words to hide using a vertical pipe | (job-seeker words are already removed automatically).",
+)
 
 raw_df, harvested_neg_df = pd.DataFrame(), pd.DataFrame()
 if data_source == "Live GSC API":
     if has_secrets:
         site_url = st.secrets["gsc_config"].get("site_url", DEFAULT_SITE_URL)
         brand_regex = st.secrets["gsc_config"].get("brand_regex", DEFAULT_BRAND_REGEX)
-        lookback = st.sidebar.slider("GSC History Window (Days)", 28, 90, 45)
+        lookback = st.sidebar.slider("GSC History Window (Days)", 28, 90, 45, help="45 days is the fastest balance between short-term spikes and monthly trends.")
         if st.sidebar.button("Refresh Live GSC Data", type="primary"):
             fetch_gsc_api_data.clear()
             fetch_live_sitemap_paths.clear()
-        with st.spinner("Syncing Google Search Console..."):
+        with st.spinner("Loading live Google Search Console data & checking connextglobal.com/sitemap.xml... This normally takes 30 to 60 seconds. Please keep this tab open."):
             try:
                 raw_df, harvested_neg_df = fetch_gsc_api_data(dict(st.secrets["gcp_service_account"]), site_url, lookback, brand_regex, custom_negatives, exclude_local_ph)
             except Exception as err:
@@ -1623,7 +1702,8 @@ if data_source == "Live GSC API":
         brand_regex = DEFAULT_BRAND_REGEX
         lookback = st.sidebar.slider("GSC History Window (Days)", 28, 90, 45)
         if uploaded_json:
-            raw_df, harvested_neg_df = fetch_gsc_api_data(json.load(uploaded_json), site_url, lookback, brand_regex, custom_negatives, exclude_local_ph)
+            with st.spinner("Loading live Google Search Console data (30–60 seconds)..."):
+                raw_df, harvested_neg_df = fetch_gsc_api_data(json.load(uploaded_json), site_url, lookback, brand_regex, custom_negatives, exclude_local_ph)
 else:
     uploaded_csv = st.sidebar.file_uploader("Upload GSC Web CSV / ZIP", type=["csv", "zip"])
     brand_regex = DEFAULT_BRAND_REGEX
@@ -1634,13 +1714,18 @@ else:
             st.sidebar.error(str(err))
 
 st.sidebar.divider()
-preset_mode = st.sidebar.selectbox("Trend Sensitivity", ["Broad (All Verticals)", "Balanced", "Strict Breakouts"], index=0)
+preset_mode = st.sidebar.selectbox(
+    "Trend Sensitivity",
+    ["Broad (All Verticals)", "Balanced", "Strict Breakouts"],
+    index=0,
+    help="'Broad' shows rising demand across all Connext verticals. 'Strict Breakouts' shows only major volume spikes.",
+)
 def_imp, def_up, def_lift, def_slope = (50, 4, 1.40, 10) if preset_mode.startswith("Strict") else ((30, 4, 1.30, 8) if preset_mode.startswith("Balanced") else (15, 3, 1.18, 4))
 
 with st.sidebar.expander("ROI & Threshold Settings", expanded=False):
-    default_cpc_est = st.number_input("Fallback B2B CPC ($)", 1.0, 100.0, 7.50, 0.50)
-    lead_conv_pct = st.slider("Lead Conv. Rate (%)", 1.0, 15.0, 4.0, 0.5)
-    avg_deal_ltv = st.number_input("Avg Client Value ($)", 1000, 250000, 18000, 1000)
+    default_cpc_est = st.number_input("Fallback B2B CPC ($)", 1.0, 100.0, 7.50, 0.50, help="Used to estimate Lost Traffic Value when a Keyword Planner CSV is not uploaded.")
+    lead_conv_pct = st.slider("Lead Conv. Rate (%)", 1.0, 15.0, 4.0, 0.5, help="Estimated % of website visitors who submit a B2B lead form.")
+    avg_deal_ltv = st.number_input("Avg Client Value ($)", 1000, 250000, 18000, 1000, help="Estimated B2B pipeline value per closed client.")
     min_daily_imp = st.number_input("Min Avg Daily Impr.", 5, 5000, def_imp, 5)
     min_up_days = st.slider("Weekly Upward Days", 2, 6, def_up)
     min_lift = st.slider("Min Growth Multiplier", 1.05, 3.0, def_lift, 0.05)
@@ -1650,14 +1735,14 @@ with st.sidebar.expander("ROI & Threshold Settings", expanded=False):
 has_bing_secret = "bing" in st.secrets and "api_key" in st.secrets["bing"] and bool(str(st.secrets["bing"]["api_key"]).strip())
 
 # ==============================================================================
-# HEADER & HERO BANNER
+# HEADER, HERO BANNER & TOP QUICK-START GUIDE
 # ==============================================================================
 h_col1, h_col2 = st.columns([1.1, 4])
 with h_col1:
     st.image(CNXT_LOGO_COLOR, width=180)
 with h_col2:
     if not raw_df.empty:
-        st.caption(f"Live GSC Window: **{raw_df['date'].min().strftime('%b %d')} – {raw_df['date'].max().strftime('%b %d, %Y')}** ({raw_df['date'].nunique()} days)  •  {sitemap_source_label}  •  100% Free Enterprise Mode")
+        st.caption(f"Live GSC Window: **{raw_df['date'].min().strftime('%b %d')} – {raw_df['date'].max().strftime('%b %d, %Y')}** ({raw_df['date'].nunique()} complete days)  •  {sitemap_source_label}  •  100% Free Mode")
 
 st.markdown(
     """<div class="cnxt-hero">
@@ -1668,11 +1753,35 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+with st.expander("New here? 1-Minute Quick Start (How to Use This Tool & What to Expect)", expanded=False):
+    qs1, qs2, qs3 = st.columns(3)
+    with qs1:
+        st.markdown(
+            """**1. Start With the Filter Bar Below**
+- Pick a **Business Vertical** (e.g., *Healthcare & RCM*, *Finance & Accounting*) or leave on **All Verticals**.
+- Pick a **Recommended Next Step** (*Launch Paid Ads*, *Update Existing Page*, or *Striking Distance Quick Wins #4–#15*).
+- Every chart and table across Tabs 1–4 updates instantly."""
+        )
+    with qs2:
+        st.markdown(
+            """**2. Pick the Tab for Your Role**
+- **Leadership / Managers:** *Tab 1 (Executive Overview)* → copy the Teams Summary or download the Excel report.
+- **Content / SEO Team:** *Tab 2 (Decay & On-Page Audit)* + *Tab 4 (Content, Linking & FAQs)* + *Tab 5 (Competitor Blogs)*.
+- **Paid Ads Team:** *Tab 3 (Paid Ads, ROI & Negatives)* + *Tab 5 (US Ad Libraries)*."""
+        )
+    with qs3:
+        st.markdown(
+            """**3. What to Expect (Speed & Data)**
+- Initial load takes **30–60 seconds** (live Google Search Console sync, cached for 1 hour).
+- **Tabs 5 & 6** run **on-demand when you click their button** (~10–20s) so the dashboard stays fast.
+- Need definitions? Open **Tab 7 (User Guide & Glossary)** for plain-English explanations of every metric."""
+        )
+
 if raw_df.empty:
     st.info("Connect your Google Search Console API or upload a GSC CSV in the sidebar to begin.")
     st.stop()
 
-with st.spinner("Computing live trends, content decay alerts & internal linking graph..."):
+with st.spinner("Grouping queries into topics, checking sitemap coverage & calculating ROI opportunity..."):
     clustered_df = cluster_queries(raw_df, cluster_dist)
     trends_df, decay_df, daily_topic_df, all_queries_df, pages_df = analyze_trends_and_decay(
         clustered_df, live_set, live_df, live_vec, live_mat,
@@ -1716,7 +1825,7 @@ if search_box.strip():
 f_trends = f_trends.reset_index(drop=True)
 
 if f_trends.empty:
-    st.info("No topics match those filters. Reset **Business Vertical**, **Next Step**, or **Funnel Stage** above.")
+    st.info("No topics match those exact filters right now. Reset **Business Vertical**, **Recommended Next Step**, or **Funnel Stage** above to see all active trends.")
     st.stop()
 
 f_queries = all_queries_df[all_queries_df["topic"].isin(f_trends["topic"])].copy()
@@ -1730,26 +1839,34 @@ internal_links_df = build_internal_linking_plan(f_trends, clustered_df)
 
 # --- TOP KPI ROW ---
 k1, k2, k3, k4, k5 = st.columns(5)
-k1.metric("Surging Topics", len(f_trends))
-k2.metric("Content Decay Alerts", len(f_decay), help="Topics where 7d impressions dropped >= 22% or Google rank slipped >= 2.5 spots.")
-k3.metric("Weekly Impressions", f"{int(f_trends['impressions_7d'].sum()):,}")
-k4.metric("Est. Missed Clicks/Mo", f"{f_trends['est_missed_clicks_30d'].sum():,.0f}")
-k5.metric("Lost Traffic Value/Mo", f"${ads_topics_df['Lost Traffic Value/Mo'].sum():,.0f}")
+k1.metric("Surging Topics", len(f_trends), help="Number of B2B topic groups gaining search visibility on Google right now.")
+k2.metric("Content Decay Alerts", len(f_decay), help="Topics where 7-day impressions dropped >= 22% or Google rank slipped >= 2.5 spots.")
+k3.metric("Weekly Impressions", f"{int(f_trends['impressions_7d'].sum()):,}", help="Total times connextglobal.com appeared on Google for these surging topics in the last 7 days.")
+k4.metric("Est. Missed Clicks/Mo", f"{f_trends['est_missed_clicks_30d'].sum():,.0f}", help="Extra monthly clicks Connext could win by ranking in Google's Top 3 for these topics.")
+k5.metric("Lost Traffic Value/Mo", f"${ads_topics_df['Lost Traffic Value/Mo'].sum():,.0f}", help="Estimated Google Ads spend required to buy those missed organic clicks.")
 
-# --- 6 CLEAN, SCANNABLE ENTERPRISE TABS ---
-t_over, t_pages, t_ads, t_content, t_comp, t_trends = st.tabs([
+# --- 7 ENTERPRISE TABS (INCLUDING COMPLETE USER GUIDE & GLOSSARY) ---
+t_over, t_pages, t_ads, t_content, t_comp, t_trends, t_guide = st.tabs([
     "1. Executive Overview",
-    f"2. Pages, Decay & On-Page Audit ({len(f_decay)} Decay)",
-    f"3. Paid Ads, ROI & Negatives ({len(rec_kws_df)})",
-    f"4. Content, Linking & FAQs ({len(truly_new_df)} New)",
+    f"2. Pages, Decay & Audit ({len(f_decay)} Decay)",
+    f"3. Paid Ads & ROI ({len(rec_kws_df)})",
+    f"4. Content & Linking ({len(truly_new_df)} New)",
     "5. Competitor Blogs & Ads",
     "6. Trends, Bing & Research",
+    "7. User Guide & Glossary",
 ])
 
 # ==============================================================================
-# TAB 1: EXECUTIVE OVERVIEW + BRAND HEALTH + MULTI-SHEET EXCEL EXPORT
+# TAB 1: EXECUTIVE OVERVIEW
 # ==============================================================================
 with t_over:
+    render_tab_guide(
+        "Executive Overview",
+        "A high-level radar of which B2B topics are growing fastest on Google, how demand splits across Connext verticals, and whether growth is coming from Brand awareness or Non-Brand acquisition.",
+        "Ranked bar charts, a 0–100 Priority Score per topic, daily trend curves, and a ready-to-download multi-sheet Excel report (.xlsx).",
+        "Start weekly team meetings here: review the top 5 orange/blue bars, copy the 1-Click Teams Executive Summary at the bottom, or export the Excel workbook to share with stakeholders.",
+    )
+
     top_bar1, top_bar2 = st.columns([2.5, 1])
     with top_bar1:
         horizon = st.radio("Time Horizon:", ["All Surging", "Today (3-Day Spike)", "This Week (7-Day)", "This Month (30-Day)"], horizontal=True)
@@ -1809,14 +1926,13 @@ with t_over:
             st.plotly_chart(style_plotly_light(fig_t, height=370, legend_bottom=True), use_container_width=True)
 
         with c2:
-            st.markdown("#### Impressions by Vertical & Funnel Mix")
+            st.markdown("#### Impressions by Vertical")
             sec_df = vdf.groupby("sector", as_index=False).agg(topics=("topic", "count"), impr=("impressions_7d", "sum")).sort_values("impr", ascending=True)
             fig_s = px.bar(sec_df, x="impr", y="sector", orientation="h", text="topics", color_discrete_sequence=[CNXT_COLORS["twilight"]], labels={"impr": "7-Day Impressions", "sector": ""})
             fig_s.update_traces(texttemplate="%{text} topics", textposition="outside")
             fig_s.update_layout(margin=dict(l=5, r=55, t=10, b=45))
             st.plotly_chart(style_plotly_light(fig_s, height=370), use_container_width=True)
 
-        # Enterprise Brand vs Non-Brand Health + Funnel Breakdown
         h_c1, h_c2 = st.columns([1.3, 1])
         with h_c1:
             st.markdown("#### Brand vs. Non-Brand Search Demand Health")
@@ -1875,10 +1991,13 @@ with t_over:
 # TAB 2: PAGES, CONTENT DECAY, CANNIBALIZATION & LIVE ON-PAGE AUDIT
 # ==============================================================================
 with t_pages:
-    st.markdown("#### Content Decay Alerts, Multi-URL Splits & Live On-Page SEO Grader")
-    st.markdown('<p class="cnxt-sec-sub">Catch slipping rankings early, resolve cannibalization, and audit any live connextglobal.com page on demand ($0).</p>', unsafe_allow_html=True)
+    render_tab_guide(
+        "Pages, Decay & Live On-Page Audit",
+        "Shows (1) topics losing visibility/rank (Content Decay), (2) topics where 2+ Connext pages compete against each other (Cannibalization), (3) exact user searches, and (4) a live On-Page SEO Grader.",
+        "Actionable decay alerts, exact URLs ranking on Google, and a 0–100 SEO/AI-readiness checklist when you click 'Run Live On-Page Audit'.",
+        "Fix Decay pages on Page 1 first to protect current leads. Then select any topic, run the Live On-Page Audit on its URL, and send any 'Fix/Missing' items (Title, H1, FAQ schema) to Content or Webflow dev.",
+    )
 
-    # 1. Content Decay Early Warning
     if not f_decay.empty:
         st.markdown(f"##### Content Decay Early Warning ({len(f_decay)} Slipping Topics)")
         st.dataframe(f_decay, use_container_width=True, hide_index=True, key="tbl_decay", column_config={"Affected Page": st.column_config.LinkColumn("Affected Page")})
@@ -1910,19 +2029,18 @@ with t_pages:
                     seen.add(item["full_url"])
         st.dataframe(pd.DataFrame(recs), use_container_width=True, hide_index=True, key="tbl_sm_m", column_config={"URL": st.column_config.LinkColumn("Live Connext URL")})
 
-    # Live On-Page SEO & AI-Readiness Grader ($0 On-Demand)
     st.markdown("**Live On-Page SEO & AI-Readiness Grader ($0 On-Demand)**")
     audit_col1, audit_col2 = st.columns([2.2, 1])
     audit_url = audit_col1.text_input("URL to Audit:", value=tm["primary_page"] or tm["recommended_money_page"], key="in_audit_url")
     if audit_col2.button("Run Live On-Page Audit", type="primary", key="btn_run_audit"):
-        with st.spinner(f"Auditing {audit_url}..."):
+        with st.spinner(f"Auditing {audit_url} (~5 seconds)..."):
             st.session_state["onpage_audit_res"] = run_live_onpage_seo_audit(audit_url.strip(), tuple(tm["queries_list"][:3]))
     if "onpage_audit_res" in st.session_state:
         ares = st.session_state["onpage_audit_res"]
         if "error" in ares:
             st.warning(ares["error"])
         else:
-            st.metric("On-Page SEO & AEO Score", f"{ares['score']} / 100")
+            st.metric("On-Page SEO & AI-Readiness Score", f"{ares['score']} / 100")
             st.dataframe(ares["checks"], use_container_width=True, hide_index=True, key="tbl_onpage_checks")
 
     st.markdown("**Exact Search Queries & AI Prompts (7+ Words)**")
@@ -1935,8 +2053,12 @@ with t_pages:
 # TAB 3: PAID ADS, ROI, DAY-OF-WEEK SCHEDULER & LIVE NEGATIVE HARVESTER
 # ==============================================================================
 with t_ads:
-    st.markdown("#### Expected Traffic, Lost Opportunity Cost & Paid Ads Toolkit")
-    st.markdown('<p class="cnxt-sec-sub">Quantify missed clicks below Top 3, optimize Google/Bing Ads day-of-week schedules, and harvest real B2B negative keywords from GSC.</p>', unsafe_allow_html=True)
+    render_tab_guide(
+        "Paid Ads, ROI & Negative Keywords",
+        "Shows which rising topics make the best Google & Bing Ads campaigns, how much traffic/pipeline value we miss below Top 3, peak B2B search days, and real wasted non-B2B searches.",
+        "Every suggested keyword comes with real 7-day & 30-day organic impressions, estimated CPC/Lost Value, Exact/Phrase lists, Negative Keywords, and 30/90-char RSA ad copy.",
+        "1) Focus on 'P0' and 'BOFU' topics where Connext ranks below #5. 2) Export the .txt list into Google Keyword Planner if you want exact Google CPC bids and upload the CSV back here. 3) Copy Exact/Phrase keywords + Real GSC Negatives straight into Google/Bing Ads.",
+    )
 
     with st.expander("Optional: Upload Free Google Keyword Planner CSV to Lock In Exact Volume & CPC Bids", expanded=False):
         kp_up = st.file_uploader("Upload CSV/XLSX exported from Google Keyword Planner ('Get search volume and forecasts')", type=["csv", "xlsx", "xls"], key="inline_kp_upload")
@@ -1965,7 +2087,6 @@ with t_ads:
         },
     )
 
-    # Enterprise Day-of-Week B2B Search Rhythm + Real Negative Keyword Harvester
     st.divider()
     ad_e1, ad_e2 = st.columns([1.2, 1])
     with ad_e1:
@@ -2031,14 +2152,19 @@ with t_ads:
 # TAB 4: CONTENT PLAN, INTERNAL LINKING ARCHITECT & FAQ SCHEMA
 # ==============================================================================
 with t_content:
+    render_tab_guide(
+        "Content Plan, Internal Linking & FAQ Schema",
+        "Separates surging topics into (1) existing pages to update, (2) internal links to add from high-traffic blogs to Service Pages, (3) genuinely new content gaps, and (4) Writer Briefs + Webflow FAQ Schema.",
+        "Zero duplicate content suggestions—every topic is verified against connextglobal.com/sitemap.xml before recommending a new article.",
+        "Assign Section 1 updates to writers first (fastest ROI), add the Section 2 internal links in Webflow to boost Page-2 Service Pages, and copy-paste the Section 4 FAQ JSON-LD into Webflow Page Settings → Custom Code.",
+    )
+
     st.markdown("#### 1. Update Existing Sitemap Pages (Prevent Duplicate Content)")
-    st.markdown('<p class="cnxt-sec-sub">Cross-checked against live connextglobal.com/sitemap.xml so writers refresh existing pages instead of duplicating URLs.</p>', unsafe_allow_html=True)
     st.dataframe(existing_content_df, use_container_width=True, hide_index=True, key="tbl_ex_c", column_config={"Existing Page": st.column_config.LinkColumn("Existing Sitemap Page")})
     st.download_button("Download Existing Page Updates CSV", existing_content_df.to_csv(index=False).encode("utf-8"), file_name="connext_content_updates.csv", mime="text/csv", key="dl_ex_c")
 
     st.divider()
     st.markdown(f"#### 2. Automated Internal Linking Architect ({len(internal_links_df)} High-Impact Links)")
-    st.markdown('<p class="cnxt-sec-sub">Add contextual links from these live high-authority blogs directly into Connext Service/Industry pages to lift Page-2 rankings into Top 3.</p>', unsafe_allow_html=True)
     if internal_links_df.empty:
         st.info("No internal link recommendations needed under current filters.")
     else:
@@ -2078,8 +2204,12 @@ with t_content:
 # TAB 5: ON-DEMAND COMPETITOR NEW BLOGS (+ KEYWORDS) & FREE ADS LIBRARIES
 # ==============================================================================
 with t_comp:
-    st.markdown("#### Competitor New Blog Radar & Free US Ad Libraries (12 BPO Rivals)")
-    st.markdown('<p class="cnxt-sec-sub">Runs on demand (keeps dashboard login instant) with $0 paid APIs. Tracks strictly new competitor blogs + extracted target keywords.</p>', unsafe_allow_html=True)
+    render_tab_guide(
+        "Competitor New Blogs & US Ad Libraries",
+        "Monitors our 12 direct BPO competitors (Solvo, Genius, Microsourcing, Emapta, Outsourced, OP360, Lean Solutions, TaskUs, TOA Global, Cloudstaff, Near, BairesDev) strictly for newly published blog articles and provides 1-click links to their live US Google & Microsoft ads.",
+        "Clicking 'Scan 12 Competitors' takes ~15–20 seconds and returns each rival's newest blog headline, auto-extracted Main Target Keywords, and whether Connext already covers that topic. Note: a few sites block automated bots ('blocked')—this is normal.",
+        "Filter to 'Content Gaps Only' to spot topics rivals are aggressively writing about that Connext doesn't cover yet. Use Sub-Tab 2 to inspect competitor US ad headlines and offers before launching campaigns.",
+    )
 
     c_sub1, c_sub2 = st.tabs([
         "New Competitor Blogs & Main Keywords ($0)",
@@ -2090,7 +2220,7 @@ with t_comp:
         b_top1, b_top2, b_top3 = st.columns([2.2, 1.1, 0.9])
         blog_days = b_top1.slider("Competitor Blogs Published / Updated Within (Days):", 14, 90, 45, key="sl_blog_days")
         if b_top2.button("Scan 12 Competitors' New Blogs Now", type="primary", key="btn_scan_blogs"):
-            with st.spinner("Scanning all 12 competitor sitemaps strictly for new blogs & extracting keywords (~15s)..."):
+            with st.spinner("Scanning all 12 competitor sitemaps strictly for new blogs & extracting main keywords (~15–20s)..."):
                 bdf, bnotes = scan_competitor_new_blogs_auto(lookback_days=blog_days)
                 if not bdf.empty:
                     cov_l, cls_l = [], []
@@ -2142,7 +2272,7 @@ with t_comp:
             st.download_button("Download Competitor New Blogs & Keywords CSV", bview[["Competitor", "Published", "Blog Headline", "Main Target Keywords", "Vertical", "Connext Status", "Connext Closest Page", "Blog URL"]].to_csv(index=False).encode("utf-8"), file_name="connext_competitor_new_blogs_keywords.csv", mime="text/csv", key="dl_comp_blogs")
 
     with c_sub2:
-        st.markdown("""<div class="cnxt-callout"><strong>Free US Ad Transparency Lookup:</strong> Open any competitor's bare domain directly in <strong>Google Ads Transparency Center (US)</strong> or <strong>Microsoft Ad Library</strong>. Zero SerpApi credits used.</div>""", unsafe_allow_html=True)
+        st.markdown("""<div class="cnxt-callout"><strong>Free US Ad Transparency Lookup:</strong> Click any competitor's bare-domain link below to see their active US Google Search/Display ads, or open Microsoft Ad Library and search their brand name. Zero API credits used.</div>""", unsafe_allow_html=True)
         dir_df = pd.DataFrame([
             {"Competitor": cname, "Domain": dom, "Google Ads Transparency (US)": f"https://adstransparency.google.com/?region=US&domain={dom}", "Microsoft Ad Library": "https://adlibrary.ads.microsoft.com/"}
             for cname, dom, _ in COMPETITORS_REGISTRY
@@ -2151,7 +2281,7 @@ with t_comp:
 
         st.divider()
         if st.button("Scan 12 Competitors via Free Microsoft Ad Library API (EU/EEA Spillover)", key="btn_ms_api"):
-            with st.spinner("Querying Microsoft Ad Library API..."):
+            with st.spinner("Querying Microsoft Ad Library API (~10s)..."):
                 st.session_state["ms_api_df"] = fetch_free_microsoft_ad_library_all()
         if "ms_api_df" in st.session_state:
             ms_df = st.session_state["ms_api_df"]
@@ -2164,8 +2294,12 @@ with t_comp:
 # TAB 6: ON-DEMAND INDUSTRY-FILTERED TRENDS, BING & TOPIC RESEARCH ($0)
 # ==============================================================================
 with t_trends:
-    st.markdown("#### Industry-Filtered Google Trends, Bing Search & Topic Research ($0)")
-    st.markdown('<p class="cnxt-sec-sub">100% scoped to B2B outsourcing, staffing, healthcare RCM, finance, and IT—runs on demand so the main dashboard stays fast.</p>', unsafe_allow_html=True)
+    render_tab_guide(
+        "Industry Trends, Bing & Buyer Research",
+        "External $0 research feeds strictly scoped to Connext's B2B industry: Google Trends curves + B2B industry news headlines, Bing Webmaster performance (also powers Copilot/ChatGPT Search), and Google/Bing Autocomplete + Reddit buyer questions.",
+        "Runs on demand (~10 seconds per click). Google Trends may occasionally show a brief cloud rate-limit notice, while the B2B Industry Feed, Autocomplete, and Reddit remain available.",
+        "Use Sub-Tab 1 to spot emerging industry shifts before they hit Search Console. Use Sub-Tab 3 to pull real customer questions and objections from Google, Bing, and Reddit for blog H2s and ad hooks.",
+    )
 
     r_sub1, r_sub2, r_sub3 = st.tabs(["B2B Google Trends & Industry Feed", "Bing Search Performance", "Question & Reddit Pain-Point Finder"])
 
@@ -2178,7 +2312,7 @@ with t_trends:
         news_vert = st.selectbox("B2B Industry News Feed (Last 14 Days):", list(INDUSTRY_NEWS_FEEDS.keys()), index=0, key="sel_news_vert")
         if st.button("Load B2B Google Trends & Industry Headlines", type="primary", key="btn_load_gt"):
             seed_tup = tuple(s.strip().lower() for s in gt_seeds.split(",") if s.strip())[:5]
-            with st.spinner("Fetching B2B Google Trends & industry headlines..."):
+            with st.spinner("Fetching B2B Google Trends & industry headlines (~10s)..."):
                 iot_d, ris_d, g_n = fetch_free_google_trends_b2b(seed_tup, geo=gt_geo, timeframe=gt_tf)
                 if not ris_d.empty:
                     sm_s, sm_l = [], []
@@ -2214,7 +2348,7 @@ with t_trends:
     with r_sub2:
         if has_bing_secret:
             if st.button("Load / Refresh Bing Webmaster Queries", type="primary", key="btn_ref_bing"):
-                with st.spinner("Syncing Bing Webmaster Tools..."):
+                with st.spinner("Syncing Bing Webmaster Tools (~8s)..."):
                     bdf, b_stat = fetch_free_bing_webmaster_queries(str(st.secrets["bing"]["api_key"]), st.secrets["bing"].get("site_url", "https://connextglobal.com/"), brand_regex, exclude_local_ph, custom_negatives)
                     st.session_state["bing_wmt_df"] = bdf
                     st.session_state["bing_wmt_stat"] = b_stat
@@ -2233,7 +2367,7 @@ with t_trends:
         custom_seed = rc2.text_input("Or Type Custom B2B Topic:", placeholder="e.g., dental billing outsourcing", key="in_res_seed")
         active_seed = custom_seed.strip() or picked_seed
         if rc3.button("Mine Questions & Reddit", type="primary", key="btn_mine_res"):
-            with st.spinner(f"Mining Google/Bing Autocomplete & Reddit for '{active_seed}'..."):
+            with st.spinner(f"Mining Google/Bing Autocomplete & Reddit for '{active_seed}' (~10s)..."):
                 s_df = fetch_free_google_and_bing_suggestions(active_seed)
                 if not s_df.empty:
                     s_df["Connext Status"] = ["Already Covered" if check_topic_against_sitemap(q, "", live_set, live_df, live_vec, live_mat)["already_exists_in_sitemap"] else "New Gap" for q in s_df["Search Suggestion"]]
@@ -2257,3 +2391,105 @@ with t_trends:
                     st.info("No recent Reddit threads matched—try a shorter 2-word topic.")
                 else:
                     st.dataframe(rdf, use_container_width=True, hide_index=True, key="tbl_reddit", column_config={"Thread": st.column_config.LinkColumn("Open Thread")})
+
+# ==============================================================================
+# TAB 7: COMPLETE USER GUIDE, PLAIN-ENGLISH GLOSSARY & TEAM PLAYBOOKS
+# ==============================================================================
+with t_guide:
+    st.markdown("### Complete User Guide for Non-SEO Reviewers")
+    st.markdown('<p class="cnxt-sec-sub">Everything you need to know about how this radar works, what each number means, and how to turn insights into leads and traffic.</p>', unsafe_allow_html=True)
+
+    g_row1_c1, g_row1_c2 = st.columns(2)
+    with g_row1_c1:
+        st.markdown(
+            """<div class="cnxt-info-card">
+<h3>1. What to Expect (Speed, Data &amp; Freshness)</h3>
+<ul>
+<li><strong>Initial Login Load (30–60 seconds):</strong> After unlocking, the app pulls up to 45–90 days of live Google Search Console rows, filters out job-seeker/applicant searches, groups queries into topics, and indexes <code>connextglobal.com/sitemap.xml</code>.</li>
+<li><strong>Instant Filtering After Load:</strong> Once loaded, data is cached for 1 hour so switching verticals, funnel stages, or tabs happens instantly.</li>
+<li><strong>On-Demand Tabs (Tabs 5 &amp; 6):</strong> Competitor Blog Scans, On-Page Audits, Google Trends, Bing, and Reddit run only when you click their button (typically 10–20 seconds) so the main dashboard stays fast.</li>
+<li><strong>2-Day Google Reporting Lag:</strong> Google Search Console data normally finalizes 48 hours behind today. This tool automatically trims partial/incomplete days so charts never show fake sudden drops.</li>
+<li><strong>100% Free &amp; Read-Only:</strong> Nothing in this tool spends paid API credits or modifies Connext's live website, Google Ads, or Search Console settings.</li>
+</ul>
+</div>""",
+            unsafe_allow_html=True,
+        )
+    with g_row1_c2:
+        st.markdown(
+            """<div class="cnxt-info-card">
+<h3>2. Step-by-Step: How to Use the Tool in 5 Minutes</h3>
+<ul>
+<li><strong>Step 1 — Narrow Your Focus:</strong> Use the top filter bar to pick a <strong>Business Vertical</strong> (e.g., <em>Healthcare &amp; RCM</em>) or a <strong>Funnel Stage</strong> (e.g., <em>BOFU — Ready to Buy</em>).</li>
+<li><strong>Step 2 — Spot Priorities (Tab 1):</strong> Sort by <strong>Priority (0–100)</strong> or <strong>Missed Clicks/Mo</strong>. Click any topic in the Trend Inspector to verify whether demand is steadily growing or a one-day spike.</li>
+<li><strong>Step 3 — Protect Existing Rankings (Tab 2):</strong> Review <strong>Content Decay Alerts</strong> and run the <strong>Live On-Page Audit</strong> on slipping Page-1 URLs.</li>
+<li><strong>Step 4 — Take Action (Tabs 3 &amp; 4):</strong> Export ready-to-bid keywords &amp; negative keywords for Paid Ads, or grab Writer Briefs, Internal Links, and FAQ Schema for Content.</li>
+<li><strong>Step 5 — Check Competitors &amp; Market (Tabs 5 &amp; 6):</strong> Scan our 12 rivals' newest blogs for missing topics and check live US Ads Transparency links.</li>
+</ul>
+</div>""",
+            unsafe_allow_html=True,
+        )
+
+    st.markdown("### 3. Plain-English Metrics Glossary (No SEO Jargon)")
+    glossary_df = pd.DataFrame([
+        {"Metric / Term": "Impressions (7d / 30d)", "Plain-English Meaning": "How many times a connextglobal.com page appeared on someone's Google screen. Rising impressions = growing buyer demand, even before they click."},
+        {"Metric / Term": "Google Rank (Top 3 / Page 1 / Page 2)", "Plain-English Meaning": "Where Connext appears organically (unpaid). Top 3 (#1–3) gets the most clicks; #4–#15 ('Striking Distance') are quick wins; Page 2+ (#11+) rarely gets organic clicks without Ads or a page update."},
+        {"Metric / Term": "3d / 7d / 30d Growth (%)", "Plain-English Meaning": "How much faster daily impressions grew compared to the prior 2-week baseline. Example: +100% means daily visibility doubled."},
+        {"Metric / Term": "Priority Score (0–100)", "Plain-English Meaning": "Combines buyer intent (BOFU/MOFU/TOFU), search volume, surge speed, and rank gap into a single score so you know what matters most first."},
+        {"Metric / Term": "Funnel Stage (BOFU / MOFU / TOFU)", "Plain-English Meaning": "BOFU = Ready to buy ('pricing', 'hire', 'outsourcing company'); MOFU = Comparing options ('best', 'vs', 'dedicated team'); TOFU = Early research ('how to', 'what is')."},
+        {"Metric / Term": "Content Decay Alert", "Plain-English Meaning": "Early warning for topics where Connext lost >=22% of impressions or slipped >=2.5 rank spots. Refreshing these pages protects existing organic leads."},
+        {"Metric / Term": "Missed Clicks/Mo & Lost Traffic Value ($)", "Plain-English Meaning": "Estimated extra monthly clicks we would win by moving a topic into Google's Top 3, multiplied by CPC to show what those clicks would cost in Google Ads."},
+        {"Metric / Term": "Sitemap Check (Already in Sitemap vs. New Gap)", "Plain-English Meaning": "Checks connextglobal.com/sitemap.xml automatically. If 'Already in Sitemap', update that existing URL instead of writing a duplicate blog post."},
+        {"Metric / Term": "Cannibalization (2+ URLs)", "Plain-English Meaning": "When two or more Connext pages try to rank for the same topic and split Google's authority. Consolidate links into one main page."},
+        {"Metric / Term": "AI Prompts (7+ Words)", "Plain-English Meaning": "Long, question-style searches (e.g., 'how much does offshore medical billing cost in the philippines') that frequently trigger Google AI Overviews & AI Mode."},
+    ])
+    st.dataframe(glossary_df, use_container_width=True, hide_index=True, key="tbl_glossary")
+
+    st.markdown("### 4. Role-Based Weekly Playbooks (How to Use the Results)")
+    pb1, pb2, pb3 = st.columns(3)
+    with pb1:
+        st.markdown(
+            """<div class="cnxt-info-card">
+<h3>Content &amp; SEO Team</h3>
+<ul>
+<li><strong>Monday (10 min):</strong> Open <strong>Tab 2</strong> → check <em>Content Decay Alerts</em> and run the <em>Live On-Page Audit</em> on any slipping Page-1 URL.</li>
+<li><strong>Tuesday (15 min):</strong> Open <strong>Tab 4</strong> → pick 2–3 high-priority topics, copy the <em>Writer Brief</em>, add the suggested <em>Internal Links</em> in Webflow, and paste the <em>FAQPage JSON-LD</em> schema.</li>
+<li><strong>Thursday (10 min):</strong> Open <strong>Tab 5</strong> → scan our 12 competitors' new blogs, filter to <em>Content Gaps Only</em>, and add the best topics to the editorial calendar.</li>
+</ul>
+</div>""",
+            unsafe_allow_html=True,
+        )
+    with pb2:
+        st.markdown(
+            """<div class="cnxt-info-card">
+<h3>Paid Media (Google &amp; Bing Ads)</h3>
+<ul>
+<li><strong>Find High-ROI Campaigns:</strong> Set <em>Funnel Stage</em> to <strong>BOFU — Ready to Buy</strong> and open <strong>Tab 3</strong>. Focus on <em>P0 / P1</em> topics where Connext ranks below #5 organically.</li>
+<li><strong>Verify Exact CPC Bids ($0):</strong> Click <em>Export Clean List for Google Keyword Planner (.txt)</em>, paste into Google Keyword Planner, download the forecast CSV, and upload it back into Tab 3.</li>
+<li><strong>Cut Wasted Spend:</strong> Copy the <em>Real GSC Negative Keywords</em> and check the <em>Day-of-Week Chart</em> to weight ad budgets toward peak Mon–Fri B2B search days.</li>
+<li><strong>Spy on Rival Ads:</strong> Open <strong>Tab 5 → Sub-Tab 2</strong> for direct US Google Ads Transparency links.</li>
+</ul>
+</div>""",
+            unsafe_allow_html=True,
+        )
+    with pb3:
+        st.markdown(
+            """<div class="cnxt-info-card">
+<h3>Leadership &amp; Marketing Managers</h3>
+<ul>
+<li><strong>Weekly Pulse Check:</strong> Open <strong>Tab 1 (Executive Overview)</strong> to see total surging topics, Content Decay count, and monthly missed traffic value.</li>
+<li><strong>Brand vs. Acquisition Health:</strong> Check the <em>Brand vs. Non-Brand</em> area chart to verify new-buyer search demand is growing alongside brand awareness.</li>
+<li><strong>Share in 10 Seconds:</strong> Expand <em>1-Click Teams Executive Summary</em> to copy a clean bulleted update into Microsoft Teams, or click <em>Download Full Executive Report (.xlsx)</em> for leadership decks.</li>
+</ul>
+</div>""",
+            unsafe_allow_html=True,
+        )
+
+    with st.expander("5. Quick Troubleshooting & FAQ", expanded=False):
+        st.markdown(
+            """
+- **"Why did the app say 'No topics match those filters'?"** — You likely combined a narrow vertical with a narrow action or funnel stage. Reset **Business Vertical**, **Recommended Next Step**, and **Funnel Stage** back to *All*, or switch **Trend Sensitivity** in the sidebar to **Broad (All Verticals)**.
+- **"Why do some competitors show `blocked` in Tab 5?"** — A few competitor websites use Cloudflare/bot protection on their `sitemap.xml`. The remaining competitors still scan cleanly, and you can still check any blocked rival's US ads via the direct Ads Transparency links.
+- **"Why did Google Trends say 'rate-limited'?"** — Free Google Trends occasionally throttles shared cloud servers. Wait a few minutes and try again, or use the **Live B2B Industry News Feed** and **Google/Bing Autocomplete** in Tab 6, which do not rate-limit.
+- **"How do I get fresh data?"** — Click **Refresh Live GSC Data** in the left sidebar (takes 30–60 seconds).
+            """
+        )
