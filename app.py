@@ -180,7 +180,7 @@ def inject_connext_brand_css():
         st.html(css_block)
     else:
         st.markdown(css_block, unsafe_allow_html=True)
-   
+
 
 inject_connext_brand_css()
 
@@ -372,8 +372,61 @@ LOCAL_PH_AND_STUDENT_REGEX = re.compile(
     re.I,
 )
 
-BOFU_REGEX = re.compile(r"\b(cost|pricing|rates|quote|hire|agency|company|companies|provider|partner|firm|services|outsourcing|outsource|staffing)\b", re.I)
-MOFU_REGEX = re.compile(r"\b(best|top|vs|versus|compare|comparison|solutions|dedicated|offshore|nearshore|remote team|bpo)\b", re.I)
+# --- UPGRADED B2B CONVERSION FUNNEL CLASSIFIER (TOFU / MOFU / BOFU) ---
+TOFU_DEF_RE = re.compile(
+    r"\b(meaning|mean|means|definition|define|stands for|acronym|glossary|"
+    r"what is|what are|what does|what do|explain|explained|overview|basics|"
+    r"examples? of|history of|types of|introduction to)\b",
+    re.I,
+)
+TOFU_EDU_RE = re.compile(
+    r"\b(why is|why do|benefits of|advantages of|disadvantages of|challenges of|"
+    r"trends|statistics|stats|role of|responsibilities|duties|skills needed|"
+    r"importance of|how does .* work|guide to|what happens)\b",
+    re.I,
+)
+BOFU_PRICE_RE = re.compile(
+    r"\b(cost|costs|pricing|price|prices|rates?|fee|fees|quote|quotes|calculator|how much|roi)\b",
+    re.I,
+)
+BOFU_BUY_RE = re.compile(
+    r"\b(hire|hiring|agency|agencies|company|companies|firm|firms|provider|providers|"
+    r"partner|partners|vendor|vendors|services?|consultants?|"
+    r"dedicated team|staff augmentation|for hire|get started|book a|request a)\b",
+    re.I,
+)
+BOFU_ACTION_VERB_RE = re.compile(
+    r"\boutsource\s+(my|your|our|a)?\s*(medical|dental|accounting|bookkeeping|payroll|it|software|"
+    r"customer|claims|billing|coding|prior|credentialing|back office|finance|hr|marketing|legal|"
+    r"mortgage|title|insurance|engineering|data|support|operations|call center|rcm|tax|cpa|controller|rebadging)\b",
+    re.I,
+)
+BUYER_DELIVERY_RE = re.compile(r"\b(outsourcing|outsource|staffing|bpo)\b", re.I)
+HOW_TO_EVAL_RE = re.compile(
+    r"\b(how to hire|how to outsource|how to build|how to transition|how to choose|how to find|how to set up|how to manage|steps to outsource|checklist)\b",
+    re.I,
+)
+GEO_RE = re.compile(r"\b(philippines|colombia|mexico|india|latam|latin america|offshore|nearshore)\b", re.I)
+CONNEXT_SPECIFIC_FUNCTION_RE = re.compile(
+    r"\b(rebadging|contractor transitions?|employer of record|eor|co-?management|"
+    r"medical billing|medical coding|revenue cycle|rcm|prior authorization|prior auth|"
+    r"credentialing|claims management|dental billing|remote patient monitoring|virtual nursing|"
+    r"virtual medical assistants?|bookkeeping|bookkeepers?|accounting|accountants?|cpas?|controllers?|"
+    r"payroll|debt collection|accounts payable|accounts receivable|"
+    r"software developers?|developers?|engineers?|python|servicenow|ai staffing|"
+    r"machine learning|virtual assistants?|call centers?|technical support|customer support|"
+    r"customer service|customer success|zendesk|back office|data entry|mortgage|title escrow|"
+    r"insurance underwriting|paralegals?|digital marketing|e-?commerce)\b",
+    re.I,
+)
+MOFU_EVAL_RE = re.compile(
+    r"\b(best|top|vs|versus|compare|comparison|alternatives?|review|reviews|"
+    r"framework|strategy|models?|in-?house vs|onshore vs|offshore vs|nearshore vs|"
+    r"pros and cons|benefits of outsourcing|why outsource|co-?management|managed services|"
+    r"rebadging|contractor transitions?|employer of record|eor|staffing model|dedicated|process|workflow)\b",
+    re.I,
+)
+
 COMMERCIAL_MODIFIERS = re.compile(r"\b(outsourcing|outsource|staffing|offshore|nearshore|dedicated|bpo|agency|company|firm|services|solutions|cost|pricing|rates|quote|remote team|vs|versus|best|top|partner|provider|hire)\b", re.I)
 AI_PROMPT_REGEX = re.compile(r"^(how|what|why|when|where|which|can|does|is|are|should|compare|difference between|pros and cons|steps to|best way to)\b", re.I)
 
@@ -465,7 +518,7 @@ GENERIC_BRAND_STOPWORDS = {
 
 
 # ==============================================================================
-# UTILITY HELPERS
+# UTILITY & FUNNEL CLASSIFICATION HELPERS
 # ==============================================================================
 def normalize_url(url: str) -> str:
     u = str(url).strip().lower()
@@ -511,12 +564,68 @@ def classify_page_role(path: str, live_paths_set: set[str]) -> str:
     return "Core Brand Page"
 
 
-def classify_funnel_stage(text: str) -> str:
-    if BOFU_REGEX.search(text):
-        return "BOFU — Ready to Buy"
-    if MOFU_REGEX.search(text):
-        return "MOFU — Evaluating"
-    return "TOFU — Research"
+def classify_single_query_funnel(query: str) -> tuple[str, str]:
+    """Classifies one B2B query into TOFU / MOFU / BOFU with a plain-English reason."""
+    q = str(query).lower().strip()
+    has_price = bool(BOFU_PRICE_RE.search(q))
+    has_buy = bool(BOFU_BUY_RE.search(q))
+    has_action = bool(BOFU_ACTION_VERB_RE.search(q))
+    has_delivery = bool(BUYER_DELIVERY_RE.search(q))
+    has_how_eval = bool(HOW_TO_EVAL_RE.search(q))
+    has_def = bool(TOFU_DEF_RE.search(q))
+    has_edu = bool(TOFU_EDU_RE.search(q))
+    has_mofu = bool(MOFU_EVAL_RE.search(q))
+    has_geo = bool(GEO_RE.search(q))
+    has_func = bool(CONNEXT_SPECIFIC_FUNCTION_RE.search(q))
+    has_service = has_func or has_delivery
+
+    if has_price and (has_service or has_geo or has_buy):
+        return "BOFU — Ready to Buy", "Pricing / Cost Intent"
+    if has_def and not (has_buy or has_action):
+        return "TOFU — Awareness", "Definition / Meaning Lookup"
+    if has_how_eval or re.search(r"\b(vs|versus|compare|comparison|pros and cons)\b", q):
+        return "MOFU — Evaluating", "Evaluating Execution / Comparison"
+    if has_edu and not (has_buy or has_action or has_price):
+        return "TOFU — Awareness", "Educational / Trends"
+    if has_action or (has_buy and (has_service or has_geo)):
+        return "BOFU — Ready to Buy", "Vendor / Hiring Intent"
+    if (has_func and has_delivery) or (has_geo and has_service):
+        return "BOFU — Ready to Buy", "Commercial Service Intent"
+    if has_mofu:
+        return "MOFU — Evaluating", "Evaluating B2B Model"
+    if has_func or has_delivery:
+        return "MOFU — Evaluating", "Core B2B Service Research"
+    return "TOFU — Awareness", "General Research"
+
+
+def classify_cluster_funnel(topic: str, query_imp_pairs: list[tuple[str, int]], top_page_role: str = "") -> tuple[str, str]:
+    """Impression-weighted funnel classification across all queries in a topic cluster."""
+    scores = {"TOFU — Awareness": 0.0, "MOFU — Evaluating": 0.0, "BOFU — Ready to Buy": 0.0}
+    reason_weights = {}
+
+    t_stage, t_reason = classify_single_query_funnel(topic)
+    total_imp = sum(imp for _, imp in query_imp_pairs) or 1
+    scores[t_stage] += total_imp * 0.45
+    reason_weights[(t_stage, t_reason)] = reason_weights.get((t_stage, t_reason), 0.0) + total_imp * 0.45
+
+    for q, imp in query_imp_pairs:
+        st_lbl, rsn = classify_single_query_funnel(q)
+        w = max(float(imp), 1.0)
+        scores[st_lbl] += w
+        reason_weights[(st_lbl, rsn)] = reason_weights.get((st_lbl, rsn), 0.0) + w
+
+    if top_page_role in ("Industry Page", "Team Solution Page", "Service Model Page"):
+        scores["BOFU — Ready to Buy"] += total_imp * 0.08
+    elif top_page_role == "Blog / Guide":
+        scores["TOFU — Awareness"] += total_imp * 0.05
+
+    winning_stage = max(scores.items(), key=lambda x: x[1])[0]
+    best_reason = max(
+        ((rsn, w) for (stg, rsn), w in reason_weights.items() if stg == winning_stage),
+        key=lambda x: x[1],
+        default=(t_reason, 1.0),
+    )[0]
+    return winning_stage, best_reason
 
 
 def human_rank_label(pos: float) -> str:
@@ -1340,6 +1449,10 @@ def analyze_trends_and_decay(non_brand_df: pd.DataFrame, live_set: set[str], liv
     top_q_map = recent_df.groupby(["topic", "query"], as_index=False)["impressions"].sum().sort_values("impressions", ascending=False).groupby("topic")["query"].apply(list).to_dict()
     lt_q_map = recent_df[recent_df["is_long_tail"]].groupby(["topic", "query"], as_index=False)["impressions"].sum().sort_values("impressions", ascending=False).groupby("topic")["query"].apply(list).to_dict()
 
+    topic_q_imp_map = {}
+    for t_name, grp in recent_df.groupby(["topic", "query"], as_index=False)["impressions"].sum().sort_values("impressions", ascending=False).groupby("topic"):
+        topic_q_imp_map[t_name] = list(zip(grp["query"].tolist(), grp["impressions"].tolist()))
+
     pages_agg = recent_df.groupby(["topic", "norm_page", "path"], as_index=False).agg(page_imp_7d=("impressions", "sum"), page_weighted_pos=("weighted_pos", "sum"), queries_on_page=("query", "nunique")).sort_values(["topic", "page_imp_7d"], ascending=[True, False])
     pages_agg["page_org_pos"] = (pages_agg["page_weighted_pos"] / np.maximum(pages_agg["page_imp_7d"], 1)).round(1)
     pages_agg["page_role"] = pages_agg["path"].apply(lambda p: classify_page_role(p, live_set))
@@ -1347,6 +1460,7 @@ def analyze_trends_and_decay(non_brand_df: pd.DataFrame, live_set: set[str], liv
     pages_agg["is_money_url"] = pages_agg["page_role"].isin(["Industry Page", "Team Solution Page", "Service Model Page", "Location Hub", "Interactive Tool"])
 
     top_page_map = pages_agg.groupby("topic")["norm_page"].first().to_dict()
+    top_page_role_map = pages_agg.groupby("topic")["page_role"].first().to_dict()
     has_money_map = pages_agg.groupby("topic")["is_money_url"].any().to_dict()
     has_legacy_map = (~pages_agg["is_live_url"]).groupby(pages_agg["topic"]).any().to_dict()
     page_cnt_map = pages_agg.groupby("topic")["norm_page"].nunique().to_dict()
@@ -1400,8 +1514,10 @@ def analyze_trends_and_decay(non_brand_df: pd.DataFrame, live_set: set[str], liv
         q_list = top_q_map.get(topic, [topic])
         lt_list = lt_q_map.get(topic, [])
         joined_q = ", ".join(q_list[:6])
-        has_comm = bool(COMMERCIAL_MODIFIERS.search(joined_q))
-        funnel = classify_funnel_stage(joined_q)
+        q_imp_pairs = topic_q_imp_map.get(topic, [(topic, imp_7d)])
+        funnel, funnel_reason = classify_cluster_funnel(topic, q_imp_pairs, top_page_role_map.get(topic, ""))
+        has_comm = bool(funnel == "BOFU — Ready to Buy")
+
         u_pages = int(page_cnt_map.get(topic, 1))
         gsc_url = top_page_map.get(topic, "")
         sector = classify_sector(f"{joined_q} {gsc_url}")
@@ -1438,7 +1554,8 @@ def analyze_trends_and_decay(non_brand_df: pd.DataFrame, live_set: set[str], liv
         ))
 
         surge_results.append({
-            "topic": topic, "sector": sector, "funnel": funnel, "priority_score": prio_score,
+            "topic": topic, "sector": sector, "funnel": funnel, "funnel_reason": funnel_reason,
+            "priority_score": prio_score,
             "is_today": is_today, "is_week": is_week, "is_month": is_month,
             "is_striking_distance": bool(4.0 <= avg_pos_now <= 15.0), "is_cannibalized": bool(u_pages >= 2),
             "team_action": action,
@@ -1473,7 +1590,7 @@ def analyze_trends_and_decay(non_brand_df: pd.DataFrame, live_set: set[str], liv
     q_merged["query_growth_pct"] = (((q_merged["daily_7d"] / np.maximum(q_merged["imp_base14"] / max(len(prior_14_dates), 1), 0.5)) - 1.0) * 100).round(0).astype(int)
     q_merged["connext_org_pos"] = (q_merged["weighted_pos"] / np.maximum(q_merged["imp_7d"], 1)).round(1)
     q_merged["sector"] = q_merged.apply(lambda r: classify_sector(f"{r['query']} {r['top_page']}"), axis=1)
-    q_merged["is_commercial"] = q_merged["query"].str.contains(COMMERCIAL_MODIFIERS, na=False)
+    q_merged["is_commercial"] = q_merged["query"].apply(lambda q: classify_single_query_funnel(q)[0] == "BOFU — Ready to Buy")
     q_merged = q_merged.sort_values(["imp_7d", "imp_30d"], ascending=False)
 
     pages_merged = pages_agg[pages_agg["topic"].isin(trends_df["topic"])].copy()
@@ -1603,6 +1720,11 @@ exclude_local_ph = st.sidebar.checkbox(
     value=True,
     help="Removes local PH city directory and student/university searches so only B2B buyer demand appears.",
 )
+exclude_glossary = st.sidebar.checkbox(
+    "Hide Glossary / 'Meaning' Queries",
+    value=False,
+    help="Turn on to hide definition/meaning lookups (like 'rebadging meaning') and focus strictly on MOFU/BOFU buyer topics.",
+)
 custom_negatives = st.sidebar.text_input(
     "Extra Excluded Words",
     placeholder="intern|sample|pdf",
@@ -1640,6 +1762,9 @@ else:
             raw_df, harvested_neg_df = parse_gsc_web_upload(uploaded_csv, brand_regex, custom_negatives, exclude_local_ph)
         except Exception as err:
             st.sidebar.error(str(err))
+
+if exclude_glossary and not raw_df.empty:
+    raw_df = raw_df[~raw_df["query"].str.contains(TOFU_DEF_RE, regex=True, na=False)].copy()
 
 st.sidebar.divider()
 preset_mode = st.sidebar.selectbox(
@@ -1687,7 +1812,7 @@ with st.expander("New here? 1-Minute Quick Start (How to Use This Tool & What to
         st.markdown(
             """**1. Start With the Filter Bar Below**
 - Pick a **Business Vertical** (e.g., *Healthcare & RCM*, *Finance & Accounting*) or leave on **All Verticals**.
-- Pick a **Recommended Next Step** (*Launch Paid Ads*, *Update Existing Page*, or *Striking Distance Quick Wins #4–#15*).
+- Pick a **Funnel Stage** (*BOFU — Ready to Buy*, *MOFU — Evaluating*, or *TOFU — Awareness*).
 - Every chart and table across Tabs 1–4 updates instantly."""
         )
     with qs2:
@@ -1709,7 +1834,7 @@ if raw_df.empty:
     st.info("Connect your Google Search Console API or upload a GSC CSV in the sidebar to begin.")
     st.stop()
 
-with st.spinner("Grouping queries into topics, checking sitemap coverage & calculating ROI opportunity..."):
+with st.spinner("Grouping queries into topics, classifying buyer funnel stages & checking sitemap coverage..."):
     clustered_df = cluster_queries(raw_df, cluster_dist)
     trends_df, decay_df, daily_topic_df, all_queries_df, pages_df = analyze_trends_and_decay(
         clustered_df, live_set, live_df, live_vec, live_mat,
@@ -1737,7 +1862,7 @@ a_opts = [
 fc1, fc2, fc3, fc4 = st.columns([1.4, 1.4, 1.0, 1.2])
 sel_vert = fc1.selectbox("Business Vertical", v_opts, index=0)
 sel_act = fc2.selectbox("Recommended Next Step", a_opts, index=0)
-sel_funnel = fc3.selectbox("Funnel Stage", ["All Funnel Stages", "BOFU — Ready to Buy", "MOFU — Evaluating", "TOFU — Research"])
+sel_funnel = fc3.selectbox("Funnel Stage", ["All Funnel Stages", "BOFU — Ready to Buy", "MOFU — Evaluating", "TOFU — Awareness"])
 search_box = fc4.text_input("Filter by Keyword or URL", placeholder="e.g., medical billing, cpa...")
 
 f_trends = trends_df.copy()
@@ -1773,7 +1898,7 @@ k3.metric("Weekly Impressions", f"{int(f_trends['impressions_7d'].sum()):,}", he
 k4.metric("Est. Missed Clicks/Mo", f"{f_trends['est_missed_clicks_30d'].sum():,.0f}", help="Extra monthly clicks Connext could win by ranking in Google's Top 3 for these topics.")
 k5.metric("Lost Traffic Value/Mo", f"${ads_topics_df['Lost Traffic Value/Mo'].sum():,.0f}", help="Estimated Google Ads spend required to buy those missed organic clicks.")
 
-# --- 7 ENTERPRISE TABS (INCLUDING COMPLETE USER GUIDE & GLOSSARY) ---
+# --- 7 ENTERPRISE TABS ---
 t_over, t_pages, t_ads, t_content, t_comp, t_trends, t_guide = st.tabs([
     "1. Executive Overview",
     f"2. Pages, Decay & Audit ({len(f_decay)} Decay)",
@@ -1790,7 +1915,7 @@ t_over, t_pages, t_ads, t_content, t_comp, t_trends, t_guide = st.tabs([
 with t_over:
     render_tab_guide(
         "Executive Overview",
-        "A high-level radar of which B2B topics are growing fastest on Google, how demand splits across Connext verticals, and whether growth is coming from Brand awareness or Non-Brand acquisition.",
+        "A high-level radar of which B2B topics are growing fastest on Google, the exact keywords inside each cluster, their TOFU/MOFU/BOFU funnel stage, and Brand vs. Non-Brand health.",
         "Ranked bar charts, a 0–100 Priority Score per topic, daily trend curves, and a ready-to-download multi-sheet Excel report (.xlsx).",
         "Start weekly team meetings here: review the top 5 orange/blue bars, copy the 1-Click Teams Executive Summary at the bottom, or export the Excel workbook to share with stakeholders.",
     )
@@ -1810,7 +1935,7 @@ with t_over:
         ])
         excel_bytes = build_enterprise_excel_bytes({
             "Executive Summary": exec_summary_df,
-            "Surging Topics": f_trends[["topic", "sector", "funnel", "priority_score", "team_action", "impressions_7d", "impressions_30d", "google_rank_label", "est_missed_clicks_30d", "recommended_money_page"]],
+            "Surging Topics": f_trends[["topic", "top_rising_queries", "sector", "funnel", "funnel_reason", "priority_score", "team_action", "impressions_7d", "impressions_30d", "google_rank_label", "est_missed_clicks_30d", "recommended_money_page"]],
             "Content Decay Alerts": f_decay,
             "Paid Ads & ROI": ads_topics_df,
             "Suggested Keywords": rec_kws_df.head(500),
@@ -1873,7 +1998,7 @@ with t_over:
         with h_c2:
             st.markdown("#### Surging Topics by Buyer Funnel Stage")
             f_agg = vdf.groupby("funnel", as_index=False).agg(topics=("topic", "count"), impr=("impressions_7d", "sum"))
-            fig_f = px.pie(f_agg, names="funnel", values="impr", hole=0.52, color="funnel", color_discrete_map={"BOFU — Ready to Buy": CNXT_COLORS["sun"], "MOFU — Evaluating": CNXT_COLORS["blue"], "TOFU — Research": CNXT_COLORS["teal"]})
+            fig_f = px.pie(f_agg, names="funnel", values="impr", hole=0.52, color="funnel", color_discrete_map={"BOFU — Ready to Buy": CNXT_COLORS["sun"], "MOFU — Evaluating": CNXT_COLORS["blue"], "TOFU — Awareness": CNXT_COLORS["teal"]})
             fig_f.update_layout(margin=dict(l=10, r=10, t=10, b=35))
             st.plotly_chart(style_plotly_light(fig_f, height=260, legend_bottom=True), use_container_width=True)
 
@@ -1882,7 +2007,7 @@ with t_over:
         sr = vdf[vdf["topic"] == sel_t].iloc[0]
         st.markdown(
             f"""<div class="cnxt-callout">
-<strong>{sr['topic'].title()}</strong> ({sr['sector']} • {sr['funnel']}) — Priority <strong>{sr['priority_score']}/100</strong> • <strong>{sr['impressions_7d']:,}</strong> weekly impressions (<strong>+{sr[g_col]}%</strong> {g_lbl}) • Currently <strong>{sr['google_rank_label']}</strong> • Est. <strong>{sr['est_missed_clicks_30d']:,.0f} missed clicks/mo</strong> • Next Step: <strong>{sr['team_action']}</strong> → <code>{sr['recommended_money_page']}</code>
+<strong>{sr['topic'].title()}</strong> ({sr['sector']} • {sr['funnel']} — <em>{sr['funnel_reason']}</em>) — Priority <strong>{sr['priority_score']}/100</strong> • <strong>{sr['impressions_7d']:,}</strong> weekly impressions (<strong>+{sr[g_col]}%</strong> {g_lbl}) • Currently <strong>{sr['google_rank_label']}</strong> • Est. <strong>{sr['est_missed_clicks_30d']:,.0f} missed clicks/mo</strong> • Next Step: <strong>{sr['team_action']}</strong> → <code>{sr['recommended_money_page']}</code>
 </div>""",
             unsafe_allow_html=True,
         )
@@ -1895,17 +2020,24 @@ with t_over:
         st.plotly_chart(style_plotly_light(fig_l, height=260, legend_bottom=True), use_container_width=True)
 
         st.markdown(f"#### All Surging Topics ({len(vdf)})")
-        ov_tbl = vdf[["priority_score", "topic", "sector", "funnel", "team_action", "sparkline_7d", "impressions_7d", g_col, "google_rank_label", "est_missed_clicks_30d", "recommended_money_page"]].copy()
+        ov_tbl = vdf[["priority_score", "topic", "top_rising_queries", "sector", "funnel", "funnel_reason", "team_action", "sparkline_7d", "impressions_7d", g_col, "google_rank_label", "est_missed_clicks_30d", "recommended_money_page"]].copy()
         ov_tbl["growth_lbl"] = ov_tbl[g_col].apply(lambda x: f"+{x}%" if x >= 0 else f"{x}%")
         st.dataframe(
-            ov_tbl[["priority_score", "topic", "sector", "funnel", "team_action", "sparkline_7d", "impressions_7d", "growth_lbl", "google_rank_label", "est_missed_clicks_30d", "recommended_money_page"]],
+            ov_tbl[["priority_score", "topic", "top_rising_queries", "sector", "funnel", "funnel_reason", "team_action", "sparkline_7d", "impressions_7d", "growth_lbl", "google_rank_label", "est_missed_clicks_30d", "recommended_money_page"]],
             use_container_width=True, hide_index=True, key="tbl_overview",
             column_config={
                 "priority_score": st.column_config.ProgressColumn("Priority", min_value=0, max_value=100, format="%d"),
-                "topic": "Topic", "sector": "Vertical", "funnel": "Funnel", "team_action": "Next Step",
+                "topic": "Topic",
+                "top_rising_queries": st.column_config.TextColumn("Top Keywords in Cluster", width="medium"),
+                "sector": "Vertical",
+                "funnel": "Funnel Stage",
+                "funnel_reason": "Why This Funnel",
+                "team_action": "Next Step",
                 "sparkline_7d": st.column_config.LineChartColumn("7d Trend", width="small"),
-                "impressions_7d": st.column_config.NumberColumn("7d Impr."), "growth_lbl": g_lbl,
-                "google_rank_label": "Google Rank", "est_missed_clicks_30d": st.column_config.NumberColumn("Missed Clicks/Mo", format="%.0f"),
+                "impressions_7d": st.column_config.NumberColumn("7d Impr."),
+                "growth_lbl": g_lbl,
+                "google_rank_label": "Google Rank",
+                "est_missed_clicks_30d": st.column_config.NumberColumn("Missed Clicks/Mo", format="%.0f"),
                 "recommended_money_page": st.column_config.LinkColumn("Target Service Page"),
             },
         )
@@ -2363,7 +2495,7 @@ with t_guide:
         {"Metric / Term": "Google Rank (Top 3 / Page 1 / Page 2)", "Plain-English Meaning": "Where Connext appears organically (unpaid). Top 3 (#1–3) gets the most clicks; #4–#15 ('Striking Distance') are quick wins; Page 2+ (#11+) rarely gets organic clicks without Ads or a page update."},
         {"Metric / Term": "3d / 7d / 30d Growth (%)", "Plain-English Meaning": "How much faster daily impressions grew compared to the prior 2-week baseline. Example: +100% means daily visibility doubled."},
         {"Metric / Term": "Priority Score (0–100)", "Plain-English Meaning": "Combines buyer intent (BOFU/MOFU/TOFU), search volume, surge speed, and rank gap into a single score so you know what matters most first."},
-        {"Metric / Term": "Funnel Stage (BOFU / MOFU / TOFU)", "Plain-English Meaning": "BOFU = Ready to buy ('pricing', 'hire', 'outsourcing company'); MOFU = Comparing options ('best', 'vs', 'dedicated team'); TOFU = Early research ('how to', 'what is')."},
+        {"Metric / Term": "Funnel Stage (BOFU / MOFU / TOFU)", "Plain-English Meaning": "BOFU = Ready to buy ('pricing', 'hire', 'outsourcing company'); MOFU = Comparing options ('best', 'vs', 'dedicated team', 'employee rebadging'); TOFU = Early awareness/definitions ('what is', 'meaning', 'trends')."},
         {"Metric / Term": "Content Decay Alert", "Plain-English Meaning": "Early warning for topics where Connext lost >=22% of impressions or slipped >=2.5 rank spots. Refreshing these pages protects existing organic leads."},
         {"Metric / Term": "Missed Clicks/Mo & Lost Traffic Value ($)", "Plain-English Meaning": "Estimated extra monthly clicks we would win by moving a topic into Google's Top 3, multiplied by CPC to show what those clicks would cost in Google Ads."},
         {"Metric / Term": "Sitemap Check (Already in Sitemap vs. New Gap)", "Plain-English Meaning": "Checks connextglobal.com/sitemap.xml automatically. If 'Already in Sitemap', update that existing URL instead of writing a duplicate blog post."},
